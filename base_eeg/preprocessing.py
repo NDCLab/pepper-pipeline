@@ -7,14 +7,12 @@ from mne_bids import write_raw_bids
     BrainVision and EGI. 
 """
 
-
 def read_raw(fname: str) -> mne.io.Raw:
     _, ext = os.path.splitext(fname)
     if(ext == ".mff"):
         return mne.io.read_raw_egi(fname)
     else:
-        return
-
+        pass 
 
 
 def write_bids(raw, bids_path):

@@ -1,7 +1,6 @@
 import preprocessing
 import mne
 from mne_bids import BIDSPath, write_raw_bids
-from matplotlib import pyplot as plt 
 import argparse, sys, os 
 
 # from mne.datasets import sample
