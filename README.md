@@ -13,8 +13,11 @@ Example file to use for development is located here: https://drive.google.com/fi
 Folder/branch organization should follow this convention:
 
 main
+
 ->dev
+
 -->dev-feature-[featureName]
+
 --->dev-feature-[featureName]-[yourName]
 
 Reminders:
