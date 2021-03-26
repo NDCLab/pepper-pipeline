@@ -1,17 +1,26 @@
-import preprocessing
-import mne
-from mne_bids import BIDSPath, write_raw_bids
-import argparse, sys, os 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+@author = "Jonhas Colina and Dan Roberts"
+@license = "LGPL"
+Main scripting file for the preprocessing system
+"""
 
-# from mne.datasets import sample
-# from mne_bids import BIDSPath
+import preprocessing
+from mne_bids import BIDSPath
+import argparse
+import sys
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Preprocessing Script for EEG Data")
+    # Argument parser object to allow passing of command line args
+    parser = argparse.ArgumentParser(
+        description="Preprocessing Script for EEG Data"
+    )
+
     parser.add_argument(
-        '--fname', 
+        '--fname',
         help="Path to raw EGI file",
-        type=str, 
+        type=str,
     )
 
     args = parser.parse_args()
@@ -20,13 +29,17 @@ if __name__ == "__main__":
         sys.exit(1)
 
     raw = preprocessing.read_raw(args.fname)
-    
+
+    # Building the BidsPath which allows dynamic updating of entities in place
     bids_path = BIDSPath(
         subject="01",
         session="01",
         task="testing",
-        run="01", 
-        root="/data/BIDS"
+        run="01",
+        root="~/"
     )
-    
+
+    # PowerLineFrequency parameter is required in the sidecar files.
+    raw.info['line_freq'] = 60
+
     bids = preprocessing.write_bids(raw, bids_path)

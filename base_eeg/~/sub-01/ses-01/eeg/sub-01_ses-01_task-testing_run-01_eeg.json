@@ -1,0 +1,18 @@
+{
+    "TaskName": "testing",
+    "Manufacturer": "Elekta",
+    "PowerLineFrequency": 60,
+    "SamplingFrequency": 500.0,
+    "SoftwareFilters": "n/a",
+    "RecordingDuration": 5783.168,
+    "RecordingType": "continuous",
+    "EEGReference": "n/a",
+    "EEGGround": "n/a",
+    "EEGPlacementScheme": "n/a",
+    "EEGChannelCount": 129,
+    "EOGChannelCount": 0,
+    "ECGChannelCount": 0,
+    "EMGChannelCount": 0,
+    "MiscChannelCount": 0,
+    "TriggerChannelCount": 46
+}
