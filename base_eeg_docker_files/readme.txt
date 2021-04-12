@@ -8,11 +8,9 @@ After the docker image is built, the image can be run and developed on interacti
 docker run -it imageName:version bash
 
 
-As for using a local directory with docker the following command works: docker run --rm -it -v $(PWD):/projects -w /projects dockerImage:Version bash
+ As for using a local directory with docker the following command works: docker run --rm -it -v $(PWD):/projects -w /projects dockerImage:Version bash
 
-Note on how to use jupyter in browser mode: to enable in browser jupyter you have to give port access with -p so run this: docker run --rm -it -v $(PWD):/projects -w /projects -p 5000:8888 dockerImage:version bash
-
+ Note on how to use jupyter in browser mode: to enable in browser jupyter you have to give port access with -p so run this: docker run --rm -it -v $(PWD):/projects -w /projects -p 8888:8888 dockerImage:version bash
 then you need to link ports by inputing the following while in the ubuntu docker
 jupyter notebook --ip 0.0.0.0 --no-browser --allow-root
-
-finally you can use the browser jupyter by typing the url: localhost:5000/tree on your local browser
+finally you can use the browser jupyter by typing the url: localhost:8888/tree on your local browser
