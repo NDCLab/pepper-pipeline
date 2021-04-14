@@ -26,6 +26,8 @@ RUN locale-gen en_US.UTF-8
 
 COPY requirements.txt /tmp
 WORKDIR /tmp
+RUN pip3 install matplotlib 
+RUN pip3 install mne-bids
 RUN pip3 install -r requirements.txt
 
 # Disable password and not ask for finger info
