@@ -43,6 +43,26 @@ Folder/branch organization should follow this convention:
 ## Roadmap
 - See issues for latest roadmap
 
+Folder/branch organization should follow this convention:
+
+main
+
+->dev
+
+-->dev-feature-[featureName]
+
+--->dev-feature-[featureName]-[yourName]
+
+Reminders:
+
+1. only push directly (without code review) to dev-feature-[featureName]=[yourName]
+2. Must initiate pull request (and assign at least one person) for any higher-level branch
+3. Mandatory code review by one person for all pull requests 
+4. main should be 100% stable and deployable/usable by any lab member (i.e. must also have full documentation and no "test features")
+5. dev is the must up-to-date, complete version of the code, including all tested features, though dev is considered alpha/beta
+6. dev-feature-[featureName] reflects a branch devoted to development/testing of a particular feature. Likely not stable, but at least has been reviewed by a second author
+
+
 
 ## Example Files for Development
 - Two example files are currently being used for development:
