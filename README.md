@@ -4,7 +4,6 @@ Lab-wide EEG scripts
 If working on development for this project, please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/readme.txt`. 
 
 
-
 ## Issues
 
 See issues for current/future work. 
@@ -12,7 +11,6 @@ See issues for current/future work.
 Always assign yourself to an issue before beginning work on it!
 
 If someone is already assigned to an issue, but you want to help, post a comment to ask if you can help before assigning yourself. If no response within 24 hours, then you are free to start work on the issue, but post another comment first to let them know what you will be doing.
-
 
 
 ## Git Workflow 
@@ -39,29 +37,14 @@ Folder/branch organization should follow this convention:
 - Merged into `-->dev-feature-[featureName]` after pull-request (code review)
 
 
-
-## Roadmap
-- See issues for latest roadmap
-
-Folder/branch organization should follow this convention:
-
-main
-
-->dev
-
--->dev-feature-[featureName]
-
---->dev-feature-[featureName]-[yourName]
-
-Reminders:
-
+## Reminders
 1. only push directly (without code review) to dev-feature-[featureName]=[yourName]
 2. Must initiate pull request (and assign at least one person) for any higher-level branch
 3. Mandatory code review by one person for all pull requests 
-4. main should be 100% stable and deployable/usable by any lab member (i.e. must also have full documentation and no "test features")
-5. dev is the must up-to-date, complete version of the code, including all tested features, though dev is considered alpha/beta
-6. dev-feature-[featureName] reflects a branch devoted to development/testing of a particular feature. Likely not stable, but at least has been reviewed by a second author
 
+
+## Roadmap
+- See issues for latest roadmap
 
 
 ## Example Files for Development
