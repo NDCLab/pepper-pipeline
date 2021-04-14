@@ -1,7 +1,7 @@
 # baseEEG
 Lab-wide EEG scripts
 
-If working on development for this project, please use the docker image located at `base_eeg_docker_file/`. Directions on installation and usage located in `base_eeg_docker_files/readme.txt`. 
+If working on development for this project, please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/readme.txt`. 
 
 
 
@@ -11,7 +11,8 @@ See issues for current/future work.
 
 Always assign yourself to an issue before beginning work on it!
 
-Example file to use for development is located here: https://drive.google.com/file/d/1-e0-AryZRDmgzXyJtm27vWFq48FY_lUj/view?usp=sharing. Must request access to the folder first; requires appropriate onboarding to guaruntee ethicical use of data.
+If someone is already assigned to an issue, but you want to help, post a comment to ask if you can help before assigning yourself. If no response within 24 hours, then you are free to start work on the issue, but post another comment first to let them know what you will be doing.
+
 
 
 ## Git Workflow 
@@ -31,6 +32,7 @@ Folder/branch organization should follow this convention:
 
 `-->dev-feature-[featureName]`
 - Ongoing development and testing of feature to be pull requested into `dev` 
+- *no direct commits*
 
 `--->dev-feature-[featureName]-[yourName]`
 - *only* branch available for personal development, must be branched off of `-->dev-feature-[featureName]` branch
@@ -39,9 +41,11 @@ Folder/branch organization should follow this convention:
 
 
 ## Roadmap
+- See issues for latest roadmap
 
-1. Solve the issue of jupyter notebooks and github. implement solution and communicate to group
-2. Push initial jupyter notebook. all set up to sync to this repo and work off this same notebook
-3. code for first step of pipeline: import example mff data and then write as bids data. WHoever, does this first, everyone else follow the file path naming conventions
-4. proceed through each step of the mne python tutorial, with each step viewed as an additional "feature" and an issue created for it.
-5. ... 
+
+## Example Files for Development
+- Two example files are currently being used for development:
+- For feature-io, we are using this file here: https://drive.google.com/file/d/1-e0-AryZRDmgzXyJtm27vWFq48FY_lUj/view?usp=sharing.
+- For all preprocessing features, we are using this file here: https://osf.io/cj2dr/ (use data located in: eeg_matchingpennies->sub-05->eeg
+
