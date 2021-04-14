@@ -27,11 +27,11 @@ How to enable in-browser jupyter with port access:
     1) Run docker: 
         a) If using Linux/MacOS: 
 
-            docker run --rm -it -v $(PWD):/projects -w /projects -p 8888:8888 dockerImage:version bash 
+            docker run --rm -it -v $(PWD):/projects -w /projects -p 5000:8888 dockerImage:version bash 
 
         b) If using Windows: 
 
-            docker run --rm -it -v %cd%:/projects -w /projects -p 8888:8888 dockerImage:version bash 
+            docker run --rm -it -v %cd%:/projects -w /projects -p 5000:8888 dockerImage:version bash 
 
     2) While in virtual machine, run the following to link ports: 
 
