@@ -7,7 +7,8 @@ import pandas as pd
 
 bids_root = pathlib.Path.cwd() / 'BIDS'
 
-meta_data = pd.read_csv(pathlib.Path.cwd() / 'HBN_R1_1_Pheno.csv')
+# TODO: load and merge phenotype metadata files from all batches of data
+meta_data = pd.read_csv(pathlib.Path.cwd() / 'HBN_R2_1_Pheno.csv')
 
 # mapping of event codes to block starts
 block_mapping = {90: 'RestingState',
@@ -23,9 +24,22 @@ block_mapping = {90: 'RestingState',
                 83: 'Video3',
                 84: 'Video4'}
 
+# TODO: double check that the sex mapping is correct
+sex_mapping = {0: 'F',
+               1: 'M'}
+
 input_path = 'NDARAB793GL3.mff'
 
 participant_code = pathlib.Path(input_path).stem
+meta_data_rows = (meta_data['EID'] == participant_code).sum()
+# fetch metadata
+if meta_data_rows < 1:
+    raise Exception('Participant not in metadata')
+elif meta_data_rows > 1:
+    raise Exception('Participant in metadata more than once')
+else:
+    participant_age = float(meta_data.loc[meta_data['EID'] == participant_code, 'Age'])
+    participant_sex = sex_mapping[int(meta_data.loc[meta_data['EID'] == participant_code, 'Sex'])]
 
 # here, MNE was deciding to exclude channel 90 if not set to explicitly not exclude any channels
 raw = mne.io.read_raw_egi(input_path, preload=True, verbose=True, exclude=[])
@@ -79,7 +93,7 @@ block_df['run'] = block_df.groupby('event').cumcount()+1
 for b in block_df.index:
 
     task_name = block_mapping[block_df.loc[b, 'event']]
-    run_number = str(block_df.loc[b, 'run'])
+    run_number = str(block_df.loc[b, 'run']).zfill(2)
 
     # crop & convert sample point into seconds & save as .fif
     raw_cropped = raw.copy().crop(tmin=block_df.loc[b, 'start_time'], tmax=block_df.loc[b, 'end_time'], include_tmax=False)
@@ -98,5 +112,17 @@ for b in block_df.index:
 
     mne_bids.write_raw_bids(raw_temp, bids_path, format='BrainVision', overwrite=True)
 
+    # update sidecar values
+    bids_path.update(suffix='eeg', extension='.json')
+    eeg_sidecar_values = {'EEGReference': 'Cz'}
+    mne_bids.update_sidecar_json(bids_path, eeg_sidecar_values)
+
     # remove the temporary FIF
     os.remove(temp_path)
+
+# update participants.tsv
+participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t')
+participant_data.loc[participant_data['participant_id'] == 'sub-' + participant_code, 'age'] = participant_age
+participant_data.loc[participant_data['participant_id'] == 'sub-' + participant_code, 'sex'] = participant_sex
+participant_data.to_csv(bids_root / 'participants.tsv',  sep='\t')
+
