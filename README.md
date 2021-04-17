@@ -76,15 +76,15 @@ Format of "annotations_preproc.json" (please add additional fields as necessary;
 
 Steps/features of the pipline:
 
-Feature-filter
+- Feature-filter
 -High pass filter the data using mne function
 -Read in the the "highPass" "lowpass" fields from the "user_params.json" file to define filter parameters
 
-Feature-badchans
+- Feature-badchans
 -auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
 -write to annotations file to indicate which channels were detected as bad (write to field "globalBad_chans")
 
-Feature-ica
+- Feature-ica
 This feature includes three main (and sequential) steps: 1. Prepica; 2. Ica; 3. Rejica
 Overview: ICA requires a decent amount of stationarity in the data. This is often violated by raw EEG. One way around this is to first make a copy of the eeg data. For the copy, use automated methods to detect noisy portions of data and remove these sections of data. Run ICA on the copied data after cleaning. Finally, take the ICA weights produced by the copied dataset and copy them back to the recording prior to making a copy (and prior to removing sections of noisy data). In this way, we do not have to “throw out” sections of noisy data, while at the same time, we are able to derive an improved ICA decomposition.
 Prepica
@@ -101,20 +101,20 @@ Rejica
 -Remove the data corresponding to the ica-identified-artifacts
 -Write to the annotations file which ica components were identified as artifacts in the "icArtifacts" field
 
-Feature-segment
+- Feature-segment
 -segment/epoch (cut) the continuous data into epochs of data, such that the zero point for each epoch is a given marker of interest
 -write to annotations file which markers were used for epoching purposes, how many of each epoch were created, and how many ms appear before/after the markers of interest
 
-Feature-finalrej
+- Feature-finalrej
 -loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
 -write to the annotations file which channel/epoch intersections were rejected
 
-Feature-interp
+- Feature-interp
 -interpolate missing channels, at the channel/epoch level using a spherical spline interpolation, as implemented in mne
 -interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in mne
 -write to annotations file which channels were interpolated and using what method
 
-Feature-reref
+- Feature-reref
 -re-reference the data to the average of all electrodes (“average reference”) using the mne function
 -write to annotations file that data were re-referenced to average
 
