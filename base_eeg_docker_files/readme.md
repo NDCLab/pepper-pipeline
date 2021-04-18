@@ -1,43 +1,55 @@
-The image built using the dockerfile has all the base functionality required for analysis (python, mne, nipype, tensor flow, pandas etc.) you just need to set your own local directories yourself at this time in order to save work between sessions.
+## Docker Instructions
 
-How to use docker: 
-    1) Download and install Docker on your local PC (https://docs.docker.com/get-docker/). 
-    2) Pull the latest Dockerfile & requirements.txt from the Github repo
-    3) While in the directory of the Dockerfile type the following in terminal to build the image:
-
-        docker build -t imageName:version . 
-
-    (imageName is how you will call the image in the future)
-
-    4) After the docker image is built, it can be run by typing:
-
-        docker run -it imageName:version bash
+The image built using the dockerfile has all the base functionality required for analysis (python, mne, nipype, tensorflow, pandas etc.) you just need to set your own local directories yourself at this time in order to save work between sessions.
 
 
-How to use a local directory with docker after building: 
-    1a) If using Linux/MacOS: 
+### How to use docker: 
+1. Download and install Docker on your local PC: [https://docs.docker.com/get-docker/]()
 
-        docker run --rm -it -v $(PWD):/projects -w /projects dockerImage:Version bash 
+2. Pull the latest Dockerfile & requirements.txt from the Github repo
+ 
+3. While in the directory of the Dockerfile type the following in terminal to build the image, where imageName is the tag of the image to use in the future. The final command is the path at which the dockerfile is located, so if in location of the docker file, specify `.` (the current directory)
+	
+	`docker build -t imageName:version .
+	`
 
-    1b) If using Windows: 
+4. After the docker image is built, it can be run by typing:
 
-        docker run --rm -it -v %cd%:/projects -w /projects dockerImage:Version bash 
+	`docker run -it imageName:version bash
+	`
+	
+	See additional commands below to run Docker with a mapped directory and / or Jupyter enabled
 
-How to enable in-browser jupyter with port access: 
-    1) Run docker: 
-        a) If using Linux/MacOS: 
 
-            docker run --rm -it -v $(PWD):/projects -w /projects -p 5000:8888 dockerImage:version bash 
+### How to use a local directory with docker after building (*without* Jupyter / JupyterLab): 
 
-        b) If using Windows: 
+##### If using Linux/MacOS: 
 
-            docker run --rm -it -v %cd%:/projects -w /projects -p 5000:8888 dockerImage:version bash 
+`docker run --rm -it -v $(PWD):/projects -w /projects dockerImage:Version bash 
+`
+##### If using Windows: 
 
-    2) While in virtual machine, run the following to link ports: 
+`docker run --rm -it -v %cd%:/projects -w /projects dockerImage:Version bash 
+`
+### How to use a local directory with docker after building (*with* Jupyter / JupyterLab): 
 
-        jupyter notebook --ip 0.0.0.0 --no-browser --allow-root
+#### Run docker: 
 
-    3) Access jupyter notebooks by 
-        a) Following link listed in terminal 
+##### If using Linux/MacOS: 
 
-        3) Copying and pasting localhost:5000/tree in browser  
+`docker run --rm -it -v $(PWD):/projects -w /projects -p 5000:8888 dockerImage:version bash 
+`
+##### If using Windows: 
+
+`docker run --rm -it -v %cd%:/projects -w /projects -p 5000:8888 dockerImage:version bash 
+`
+#### While in virtual machine, run the following to link ports: 
+
+`jupyter lab --ip 0.0.0.0 --no-browser --allow-root
+`
+
+Access Jupyter notebooks by either
+ 
+* Following link listed in terminal 
+
+* Copying and pasting localhost:5000/lab in browser  
