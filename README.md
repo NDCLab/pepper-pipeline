@@ -59,22 +59,50 @@ The Preprocessing pipeline assumes that data is already in BIDS format. Thus, an
 
 Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline.
 
-Format of "user_params.json" (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a parameter that users might want to control, just add another field to the "user_params.json" file. There is no issue with having lots of fields with default values.)
+### user_params.json
 
+This input file will define a set of function parameter constants. The user may define these paremeters within the JSON file to infuence filtering and channel rejection. 
+
+(please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a parameter that users might want to control, just add another field to the "user_params.json" file. There is no issue with having lots of fields with default values.)
+
+Format:
+```javascript
 {
-"highPass": [.3],
-"lowpass": [50],
-]
+    "highPass": [.3],
+    "lowpass": [50]
 }
+```
 
-Format of "annotations_preproc.json" (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a value that is computed that might be of use to users, please add it to the "annotations_preproc.json" file.)
+### annotations_preproc.json
 
+This output file will define which EEG data-set attributes were removed or transformed through the pipeline. This file will be built iteratively as the pipeline progresses. 
+
+(please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a value that is computed that might be of use to users, please add it to the "annotations_preproc.json" file.)
+
+Format:
+```javascript
 {
-"globalBad_Chans": [1, 23, 119],
-"icArtifacts": [1, 3, 9],,
+    "globalBad_Chans": [1, 23, 119],
+    "icArtifacts": [1, 3, 9]
 }
+```
 
-Steps/features of the pipline:
+### output.log
+
+This output file will define the verbose outputs of mne functions including warnings and errors. Format will vary based on pipeline output.
+
+To record function output to log-file, insert the following:
+```python 
+# initialize log-file
+logging.basicConfig(filename='output.log', filemode='a', encoding='utf-8', level=logging.NOTSET)
+
+# ... pipeline steps execute ...
+
+logging.info("describe output of pipeline")
+# record pipeline output
+logging.info(mne.post.info)
+```
+### Steps/features of the pipline:
 
 - Feature-filter
 -High pass filter the data using mne function
