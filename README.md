@@ -50,6 +50,7 @@ Folder/branch organization should follow this convention:
 
 
 ## Roadmap
+
 All features (pipeline steps) can and should be worked on independently and in parallel. Any steps for which implementation relied on a prior step first being completed have been merged into one single feature (e.g., feature-ica contains three steps that must be implemented sequentially). Please self-assign to any feature, read the relevant documentation, reach out with questions, and begin implementation. There is no correct order to implement any of these steps.
 
 For now, when working to implement a given step, please use this (BIDS-formatted) test file: https://osf.io/cj2dr/
@@ -57,7 +58,13 @@ For now, when working to implement a given step, please use this (BIDS-formatted
 
 The Preprocessing pipeline assumes that data is already in BIDS format. Thus, any scripts (e.g. feature-filter-io) to convert data to BIDS format are NOT part of the preprocessing pipeline. Thus, all steps of the preprocessing pipeline should be written in such a way as to assume a BIDS folder structure file already exists and that standard BIDS metadata files exist (which can be read in to govern preprocessing). Moreover, all outputs of the preprocessing stream should either be in line with existing BIDS standards or if they relate to a feature that there is not yet a BIDS standard for, the developer should set things up in a way that is in line with general BIDS principles.
 
-Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline.
+
+### Input/Output .json and .log files
+
+Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline. In addition to the "annotations_preproc.json" output file, all features should all provide more verbose writing of outputs to an output.log file.
+
+The "user_params.json" should control all research-relevant features of the pipeline (e.g. filter cutoffs, segmentation lengths, etc.). The "annotations_preproc.json" output file should contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). Together, the contents of "user_params.json" "annotations_preproc.json" should define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were. In fact, the long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "annotations_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc. 
+
 
 ### user_params.json
 
