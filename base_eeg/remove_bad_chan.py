@@ -4,7 +4,6 @@ import mne
 import mne_bids
 import autoreject as ar 
 import logging
-import os 
 
 def main(): 
     # import raw data 
