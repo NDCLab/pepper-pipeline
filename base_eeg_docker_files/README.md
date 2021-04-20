@@ -1,10 +1,10 @@
 # Containerization 
-Containerization is an alternative or companion to virtualization. It involves encapsulating or packaging up software and all its dependencies so that it can run uniformly and consistently on any infrastructure. This allows for developers to create and deploy applications faster and more securely. The image built using the dockerfile has all the base functionality required for analysis, such as Python, MNE, Nipype, TensorFlow, Pandas, and more.  
+Containerization is an alternative or companion to virtualization. It involves encapsulating or packaging up software and all its dependencies so that it can run uniformly and consistently on any infrastructure. This allows for developers to create and deploy applications faster and more securely. Moreover, this allows researchers to replicate each others analyses deterministically (computational replicability). The image built using the dockerfile has all the base functionality required for analysis, such as Python, MNE, Nipype, TensorFlow, Pandas, and more.  
 
 
 ## What is Docker?
 
-Docker is a set of platform as a service product that uses OS-level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries, and configuration files. 
+Docker is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries, and configuration files. 
 
 ## What is a Docker Volume? 
 Docker volumes are the preferred mechanism for persisting data generated 
@@ -16,6 +16,8 @@ managed by Docker. Volumes have several advantages over bind mounts:
 * Volumes can be more safely shared among multiple containers.
 
 Volumes are often a better choice than persisting data in a container’s writable layer, because a volume does not increase the size of the containers using it, and the volume’s contents exist outside the lifecycle of a given container. 
+
+As a default, you should use volume mounts instead of bind mounts.
 
 
 ## How to Use Docker? 
@@ -35,7 +37,7 @@ With a Dockerfile, we can construct a docker container with a volume attached to
     DRIVER    VOLUME NAME
     local     data
    ```
-   which lists all of the volumes known to docker. If we want to see detailed information on the docker containerr, we can use the inspect command. That is, `docker inspect data` which will produce the following output: 
+   which lists all of the volumes known to docker. If we want to see detailed information on the docker container, we can use the inspect command. That is, `docker inspect data` which will produce the following output: 
    ```json 
     [
         {
