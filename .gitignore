@@ -136,3 +136,6 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# ide specific files
+.vscode 
