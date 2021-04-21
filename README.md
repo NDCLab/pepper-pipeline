@@ -124,6 +124,7 @@ This feature includes three main (and sequential) steps: 1. Prepica; 2. Ica; 3. 
 Overview: ICA requires a decent amount of stationarity in the data. This is often violated by raw EEG. One way around this is to first make a copy of the eeg data. For the copy, use automated methods to detect noisy portions of data and remove these sections of data. Run ICA on the copied data after cleaning. Finally, take the ICA weights produced by the copied dataset and copy them back to the recording prior to making a copy (and prior to removing sections of noisy data). In this way, we do not have to “throw out” sections of noisy data, while at the same time, we are able to derive an improved ICA decomposition.
 Prepica
 -Make a copy of the eeg recording
+-For the copied data: high-pass filter at 1 hz
 -For the copied data: segment/epoch (“cut”) the continuous EEG recording into arbitrary 1-second epochs
 -For the copied data: Use automated methods (voltage outlier detection and spectral outlier detection) to detect epochs -that are excessively “noisy” for any channel
 -For the copied data: reject (remove) the noisy periods of data
