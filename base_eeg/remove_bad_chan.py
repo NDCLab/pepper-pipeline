@@ -19,7 +19,6 @@ def main():
     with open("raw_data/task-matchingpennies_eeg.json", encoding="utf8") as file:
         cap_json = json.load(file)
     montage = get_montage(cap_json) 
-    print(montage.)
     # raw.set_montage(montage)
 
     # Mark and list bad channels 
