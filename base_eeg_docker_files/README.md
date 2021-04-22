@@ -87,7 +87,8 @@ With a Dockerfile, we can construct a docker container with a volume attached to
    
 7. Once a docker containerized enviroment is running, link ports by entering
 
-   ```jupyter lab --ip 0.0.0.0 --no-browser --allow-root
+   ```bash 
+   jupyter lab --ip 0.0.0.0 --no-browser --allow-root
    ```
 
 The jupyter notebook then can be accessed through: 
