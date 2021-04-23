@@ -38,7 +38,20 @@ def get_montage(cap_json):
             break 
     return mne.channels.make_standard_montage(handle) 
 
-with open("task-matchingpennies_eeg.json", encoding="utf8") as file:
+matchpennies_montage = "standard_1020"
+with open("base_eeg/task-matchingpennies_eeg.json", encoding="utf8") as file:
+        cap_json = json.load(file)
+montage = get_montage(cap_json) 
+print(montage)
+
+matchpennies_montage = "easycapM1"
+with open("base_eeg/task-facerecognition_eeg.json", encoding="utf8") as file:
+        cap_json = json.load(file)
+montage = get_montage(cap_json) 
+print(montage)
+
+matchpennies_montage = "easycapM1"
+with open("base_eeg/task-facerecognition_eeg.json", encoding="utf8") as file:
         cap_json = json.load(file)
 montage = get_montage(cap_json) 
 print(montage)
