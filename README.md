@@ -50,6 +50,7 @@ Folder/branch organization should follow this convention:
 
 
 ## Roadmap
+
 All features (pipeline steps) can and should be worked on independently and in parallel. Any steps for which implementation relied on a prior step first being completed have been merged into one single feature (e.g., feature-ica contains three steps that must be implemented sequentially). Please self-assign to any feature, read the relevant documentation, reach out with questions, and begin implementation. There is no correct order to implement any of these steps.
 
 For now, when working to implement a given step, please use this (BIDS-formatted) test file: https://osf.io/cj2dr/
@@ -57,24 +58,58 @@ For now, when working to implement a given step, please use this (BIDS-formatted
 
 The Preprocessing pipeline assumes that data is already in BIDS format. Thus, any scripts (e.g. feature-filter-io) to convert data to BIDS format are NOT part of the preprocessing pipeline. Thus, all steps of the preprocessing pipeline should be written in such a way as to assume a BIDS folder structure file already exists and that standard BIDS metadata files exist (which can be read in to govern preprocessing). Moreover, all outputs of the preprocessing stream should either be in line with existing BIDS standards or if they relate to a feature that there is not yet a BIDS standard for, the developer should set things up in a way that is in line with general BIDS principles.
 
-Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline.
 
-Format of "user_params.json" (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a parameter that users might want to control, just add another field to the "user_params.json" file. There is no issue with having lots of fields with default values.)
+### Input/Output .json and .log files
 
+Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline. In addition to the "annotations_preproc.json" output file, all features should all provide more verbose writing of outputs to an output.log file.
+
+The "user_params.json" should control all research-relevant features of the pipeline (e.g. filter cutoffs, segmentation lengths, etc.). The "annotations_preproc.json" output file should contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). Together, the contents of "user_params.json" "annotations_preproc.json" should define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were. In fact, the long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "annotations_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc. 
+
+
+### user_params.json
+
+This input file will define a set of function parameter constants. The user may define these paremeters within the JSON file to infuence filtering and channel rejection. 
+
+(please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a parameter that users might want to control, just add another field to the "user_params.json" file. There is no issue with having lots of fields with default values.)
+
+Format:
+```javascript
 {
-"highPass": [.3],
-"lowpass": [50],
-]
+    "highPass": [.3],
+    "lowpass": [50]
 }
+```
 
-Format of "annotations_preproc.json" (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a value that is computed that might be of use to users, please add it to the "annotations_preproc.json" file.)
+### annotations_preproc.json
 
+This output file will define which EEG data-set attributes were removed or transformed through the pipeline. This file will be built iteratively as the pipeline progresses. 
+
+(please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a value that is computed that might be of use to users, please add it to the "annotations_preproc.json" file.)
+
+Format:
+```javascript
 {
-"globalBad_Chans": [1, 23, 119],
-"icArtifacts": [1, 3, 9],,
+    "globalBad_Chans": [1, 23, 119],
+    "icArtifacts": [1, 3, 9]
 }
+```
 
-Steps/features of the pipline:
+### output.log
+
+This output file will define the verbose outputs of mne functions including warnings and errors. Format will vary based on pipeline output.
+
+To record function output to log-file, insert the following:
+```python 
+# initialize log-file
+logging.basicConfig(filename='output.log', filemode='a', encoding='utf-8', level=logging.NOTSET)
+
+# ... pipeline steps execute ...
+
+logging.info("describe output of pipeline")
+# record pipeline output
+logging.info(mne.post.info)
+```
+### Steps/features of the pipline:
 
 - Feature-filter
 -High pass filter the data using mne function
@@ -89,6 +124,7 @@ This feature includes three main (and sequential) steps: 1. Prepica; 2. Ica; 3. 
 Overview: ICA requires a decent amount of stationarity in the data. This is often violated by raw EEG. One way around this is to first make a copy of the eeg data. For the copy, use automated methods to detect noisy portions of data and remove these sections of data. Run ICA on the copied data after cleaning. Finally, take the ICA weights produced by the copied dataset and copy them back to the recording prior to making a copy (and prior to removing sections of noisy data). In this way, we do not have to “throw out” sections of noisy data, while at the same time, we are able to derive an improved ICA decomposition.
 Prepica
 -Make a copy of the eeg recording
+-For the copied data: high-pass filter at 1 hz
 -For the copied data: segment/epoch (“cut”) the continuous EEG recording into arbitrary 1-second epochs
 -For the copied data: Use automated methods (voltage outlier detection and spectral outlier detection) to detect epochs -that are excessively “noisy” for any channel
 -For the copied data: reject (remove) the noisy periods of data
