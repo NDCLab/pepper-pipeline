@@ -43,10 +43,8 @@ Folder/branch organization should follow this convention:
 3. Mandatory code review by one person for all pull requests 
 
 
-## Example Files for Development
-- Two example files are currently being used for development:
-- For feature-io, we are using this file here: https://drive.google.com/file/d/1-e0-AryZRDmgzXyJtm27vWFq48FY_lUj/view?usp=sharing.
-- For all preprocessing features, we are using this file here: https://osf.io/cj2dr/ (use data located in: eeg_matchingpennies->sub-05->eeg
+## Example File for Development
+- [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used for all pipeline features.
 
 
 ## Roadmap
