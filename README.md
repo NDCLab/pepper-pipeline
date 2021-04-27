@@ -43,6 +43,10 @@ Folder/branch organization should follow this convention:
 3. Mandatory code review by one person for all pull requests 
 
 
+## CI test
+NDCLab CI test documentation: https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit
+
+
 ## Example Files for Development
 - Two example files are currently being used for development:
 - For feature-io, we are using this file here: https://drive.google.com/file/d/1-e0-AryZRDmgzXyJtm27vWFq48FY_lUj/view?usp=sharing.
