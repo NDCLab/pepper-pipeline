@@ -1,7 +1,7 @@
 # baseEEG
 Lab-wide EEG scripts
 
-If working on development for this project, please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/readme.txt`. 
+If working on development for this project, please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/README.md`. 
 
 
 ## Issues
@@ -15,7 +15,8 @@ If someone is already assigned to an issue, but you want to help, post a comment
 
 ## Git Workflow 
 
-![ndcworkflow](https://user-images.githubusercontent.com/26397102/114767588-6e076680-9d2d-11eb-87a7-0f1a48d9984f.png)
+![ndcworkflow](https://user-images.githubusercontent.com/26397102/116148813-00512800-a6a7-11eb-9624-cd81f11d3ada.png)
+
 
 Folder/branch organization should follow this convention:
 
@@ -47,18 +48,13 @@ Folder/branch organization should follow this convention:
 NDCLab CI test documentation: https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit
 
 
-## Example Files for Development
-- Two example files are currently being used for development:
-- For feature-io, we are using this file here: https://drive.google.com/file/d/1-e0-AryZRDmgzXyJtm27vWFq48FY_lUj/view?usp=sharing.
-- For all preprocessing features, we are using this file here: https://osf.io/cj2dr/ (use data located in: eeg_matchingpennies->sub-05->eeg
+## Example File for Development
+- [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as input file for all pipeline features.
 
 
 ## Roadmap
 
 All features (pipeline steps) can and should be worked on independently and in parallel. Any steps for which implementation relied on a prior step first being completed have been merged into one single feature (e.g., feature-ica contains three steps that must be implemented sequentially). Please self-assign to any feature, read the relevant documentation, reach out with questions, and begin implementation. There is no correct order to implement any of these steps.
-
-For now, when working to implement a given step, please use this (BIDS-formatted) test file: https://osf.io/cj2dr/
-(use data located in: eeg_matchingpennies->sub-05->eeg. Once feature-io is complete, everyone should switch to using a new test file created using feature-io.
 
 The Preprocessing pipeline assumes that data is already in BIDS format. Thus, any scripts (e.g. feature-filter-io) to convert data to BIDS format are NOT part of the preprocessing pipeline. Thus, all steps of the preprocessing pipeline should be written in such a way as to assume a BIDS folder structure file already exists and that standard BIDS metadata files exist (which can be read in to govern preprocessing). Moreover, all outputs of the preprocessing stream should either be in line with existing BIDS standards or if they relate to a feature that there is not yet a BIDS standard for, the developer should set things up in a way that is in line with general BIDS principles.
 
