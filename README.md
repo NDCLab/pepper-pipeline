@@ -44,6 +44,10 @@ Folder/branch organization should follow this convention:
 3. Mandatory code review by one person for all pull requests 
 
 
+## CI test
+NDCLab CI test documentation: https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit
+
+
 ## Example File for Development
 - [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as input file for all pipeline features.
 
