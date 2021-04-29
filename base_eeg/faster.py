@@ -78,9 +78,11 @@ def faster_bad_channels(epochs, picks=None, thres=3, use_metrics=None):
     metrics = {
         'variance': lambda x: np.var(x, axis=1),
         'correlation': lambda x: np.nanmean(
-                           np.ma.masked_array(np.corrcoef(x),
-                                              np.identity(len(x), dtype=bool)),
-                           axis=0),
+                                            np.ma.masked_array(
+                                                np.corrcoef(x),
+                                                np.identity(len(x), dtype=bool)
+                                            ),
+                                            axis=0),
         'hurst': lambda x: hurst(x),
         'kurtosis': lambda x: kurtosis(x, axis=1),
         'line_noise': lambda x: _freqs_power(x, epochs.info['sfreq'],
@@ -226,9 +228,11 @@ def faster_bad_components(ica, epochs, thres=3, use_metrics=None):
     metrics = {
         'eog_correlation': lambda x: x.find_bads_eog(epochs)[1],
         'kurtosis': lambda x: kurtosis(
-                               np.dot(x.mixing_matrix_.T,
-                                      x.pca_components_[:x.n_components_]),
-                               axis=1),
+                                        np.dot(
+                                            x.mixing_matrix_.T,
+                                            x.pca_components_[:x.n_components_]
+                                        ),
+                                        axis=1),
         'power_gradient': lambda x: _power_gradient(x, source_data),
         'hurst': lambda x: hurst(source_data),
         'median_gradient': lambda x: np.median(np.abs(np.diff(source_data)),
