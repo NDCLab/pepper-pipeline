@@ -1,10 +1,30 @@
-import unittest
+from pathlib import Path
+
+from mne_bids import BIDSPath
 from bids_validator import BIDSValidator
+
+import unittest
 
 
 class BidsTest(unittest.TestCase):
+    def setUp(self):
+        # init validator
+        self.validator = BIDSValidator()
+
+        # get all available BIDS files
+        bids_root = Path('BIDS')
+        bids_path = BIDSPath(
+            datatype='eeg',
+            root=bids_root
+        )
+        # init list of BIDS files
+        self.files = map(str, bids_path.match())
+
     def test_if_valid(self):
-        self.assertTrue(BIDSValidator.is_bids("BIDS"))
+        for file in self.files:
+            print(file)
+            self.assertTrue(self.validator.is_bids(file[4:]),
+                            msg="BIDS validate failed on file" + str(file[4:]))
 
 
 if __name__ == '__main__':
