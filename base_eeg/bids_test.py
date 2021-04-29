@@ -7,6 +7,22 @@ import unittest
 
 
 class BidsTest(unittest.TestCase):
+    """Testing module that validates BIDS format and files
+
+    Instance Variables
+    ----------
+    self.validator: BIDSValidator()
+        BIDSValidator object
+
+    self.files: list
+        list that contains all data files from BIDS directory
+
+    Public Methods
+    ----------
+    test_if_valid()
+        verbose method that checks if each BIDS file is in proper format
+
+    """
     def setUp(self):
         # init validator
         self.validator = BIDSValidator()
@@ -22,7 +38,7 @@ class BidsTest(unittest.TestCase):
 
     def test_if_valid(self):
         for file in self.files:
-            print(file)
+            print("checking", file)
             self.assertTrue(self.validator.is_bids(file[4:]),
                             msg="BIDS validate failed on file" + str(file[4:]))
 
