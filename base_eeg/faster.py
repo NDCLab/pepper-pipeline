@@ -81,7 +81,7 @@ def faster_bad_channels(epochs, picks=None, thres=3, use_metrics=None):
                                             np.ma.masked_array(
                                                 np.corrcoef(x), 
                                                 np.identity(len(x), dtype=bool)
-                                                ),
+                                            ),
                                             axis=0),
         'hurst': lambda x: hurst(x),
         'kurtosis': lambda x: kurtosis(x, axis=1),
@@ -231,7 +231,7 @@ def faster_bad_components(ica, epochs, thres=3, use_metrics=None):
                                         np.dot(
                                             x.mixing_matrix_.T,
                                             x.pca_components_[:x.n_components_]
-                                            ),
+                                        ),
                                         axis=1),
         'power_gradient': lambda x: _power_gradient(x, source_data),
         'hurst': lambda x: hurst(source_data),
