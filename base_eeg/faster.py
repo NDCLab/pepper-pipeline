@@ -4,7 +4,7 @@ import mne
 from scipy.stats import kurtosis
 from mne.preprocessing.bads import _find_outliers
 from mne.utils import logger
-#from mne.preprocessing.eog import _get_eog_channel_index
+# from mne.preprocessing.eog import _get_eog_channel_index
 
 
 def hurst(x):
@@ -40,6 +40,7 @@ def hurst(x):
 
     return 0.5 * np.log2(s2 / s1)
 
+
 def _freqs_power(data, sfreq, freqs):
     fs, ps = scipy.signal.welch(data, sfreq,
                                 nperseg=2 ** int(np.log2(10 * sfreq) + 1),
@@ -47,9 +48,10 @@ def _freqs_power(data, sfreq, freqs):
                                 axis=-1)
     return np.sum([ps[..., np.searchsorted(fs, f)] for f in freqs], axis=0)
 
+
 def faster_bad_channels(epochs, picks=None, thres=3, use_metrics=None):
     """Implements the first step of the FASTER algorithm.
-    
+
     This function attempts to automatically mark bad EEG channels by performing
     outlier detection. It operated on epoched data, to make sure only relevant
     data is analyzed.
@@ -74,17 +76,17 @@ def faster_bad_channels(epochs, picks=None, thres=3, use_metrics=None):
         The names of the bad EEG channels.
     """
     metrics = {
-        'variance':    lambda x: np.var(x, axis=1),
+        'variance': lambda x: np.var(x, axis=1),
         'correlation': lambda x: np.nanmean(
                            np.ma.masked_array(
                                np.corrcoef(x),
                                np.identity(len(x), dtype=bool)
                            ),
                            axis=0),
-        'hurst':       lambda x: hurst(x),
-        'kurtosis':    lambda x: kurtosis(x, axis=1),
-        'line_noise':  lambda x: _freqs_power(x, epochs.info['sfreq'],
-                                              [50, 60]),
+        'hurst': lambda x: hurst(x),
+        'kurtosis': lambda x: kurtosis(x, axis=1),
+        'line_noise': lambda x: _freqs_power(x, epochs.info['sfreq'],
+                                             [50, 60]),
     }
 
     if picks is None:
@@ -107,12 +109,13 @@ def faster_bad_channels(epochs, picks=None, thres=3, use_metrics=None):
 
     return np.unique(np.concatenate(bads)).tolist()
 
+
 def _deviation(data):
     """Computes the deviation from mean for each channel in a set of epochs.
 
     This is not implemented as a lambda function, because the channel means
     should be cached during the computation.
-    
+
     Parameters
     ----------
     data : 3D numpy array
@@ -126,9 +129,10 @@ def _deviation(data):
     ch_mean = np.mean(data, axis=2)
     return ch_mean - np.mean(ch_mean, axis=0)
 
+
 def faster_bad_epochs(epochs, picks=None, thres=3, use_metrics=None):
     """Implements the second step of the FASTER algorithm.
-    
+
     This function attempts to automatically mark bad epochs by performing
     outlier detection.
 
@@ -155,7 +159,7 @@ def faster_bad_epochs(epochs, picks=None, thres=3, use_metrics=None):
     metrics = {
         'amplitude': lambda x: np.mean(np.ptp(x, axis=2), axis=1),
         'deviation': lambda x: np.mean(_deviation(x), axis=1),
-        'variance':  lambda x: np.mean(np.var(x, axis=2), axis=1),
+        'variance': lambda x: np.mean(np.var(x, axis=2), axis=1),
     }
 
     if picks is None:
@@ -175,6 +179,7 @@ def faster_bad_epochs(epochs, picks=None, thres=3, use_metrics=None):
 
     return np.unique(np.concatenate(bads)).tolist()
 
+
 def _power_gradient(ica, source_data):
     # Compute power spectrum
     f, Ps = scipy.signal.welch(source_data, ica.info['sfreq'])
@@ -188,7 +193,7 @@ def _power_gradient(ica, source_data):
 
 def faster_bad_components(ica, epochs, thres=3, use_metrics=None):
     """Implements the third step of the FASTER algorithm.
-    
+
     This function attempts to automatically mark bad ICA components by
     performing outlier detection.
 
@@ -217,22 +222,22 @@ def faster_bad_components(ica, epochs, thres=3, use_metrics=None):
     ICA.find_bads_ecg
     ICA.find_bads_eog
     """
-    source_data = ica.get_sources(epochs).get_data().transpose(1,0,2)
+    source_data = ica.get_sources(epochs).get_data().transpose(1, 0, 2)
     source_data = source_data.reshape(source_data.shape[0], -1)
 
     metrics = {
         'eog_correlation': lambda x: x.find_bads_eog(epochs)[1],
-        'kurtosis':        lambda x: kurtosis(
+        'kurtosis': lambda x: kurtosis(
                                np.dot(
                                    x.mixing_matrix_.T,
                                    x.pca_components_[:x.n_components_]),
                                axis=1),
-        'power_gradient':  lambda x: _power_gradient(x, source_data),
-        'hurst':           lambda x: hurst(source_data),
+        'power_gradient': lambda x: _power_gradient(x, source_data),
+        'hurst': lambda x: hurst(source_data),
         'median_gradient': lambda x: np.median(np.abs(np.diff(source_data)),
                                                axis=1),
-        'line_noise':  lambda x: _freqs_power(source_data,
-                                              epochs.info['sfreq'], [50, 60]),
+        'line_noise': lambda x: _freqs_power(source_data,
+                                             epochs.info['sfreq'], [50, 60]),
     }
 
     if use_metrics is None:
@@ -248,9 +253,11 @@ def faster_bad_components(ica, epochs, thres=3, use_metrics=None):
 
     return np.unique(np.concatenate(bads)).tolist()
 
-def faster_bad_channels_in_epochs(epochs, picks=None, thres=3, use_metrics=None):
+
+def faster_bad_channels_in_epochs(epochs, picks=None, thres=3,
+                                  use_metrics=None):
     """Implements the fourth step of the FASTER algorithm.
-    
+
     This function attempts to automatically mark bad channels in each epochs by
     performing outlier detection.
 
@@ -275,12 +282,12 @@ def faster_bad_channels_in_epochs(epochs, picks=None, thres=3, use_metrics=None)
     """
 
     metrics = {
-        'amplitude':       lambda x: np.ptp(x, axis=2),
-        'deviation':       lambda x: _deviation(x),
-        'variance':        lambda x: np.var(x, axis=2),
+        'amplitude': lambda x: np.ptp(x, axis=2),
+        'deviation': lambda x: _deviation(x),
+        'variance': lambda x: np.var(x, axis=2),
         'median_gradient': lambda x: np.median(np.abs(np.diff(x)), axis=2),
-        'line_noise':      lambda x: _freqs_power(x, epochs.info['sfreq'],
-                                                  [50, 60]),
+        'line_noise': lambda x: _freqs_power(x, epochs.info['sfreq'],
+                                             [50, 60]),
     }
 
     if picks is None:
@@ -289,7 +296,6 @@ def faster_bad_channels_in_epochs(epochs, picks=None, thres=3, use_metrics=None)
     if use_metrics is None:
         use_metrics = metrics.keys()
 
-    
     data = epochs.get_data()[:, picks, :]
 
     bads = [[] for i in range(len(epochs))]
@@ -305,6 +311,7 @@ def faster_bad_channels_in_epochs(epochs, picks=None, thres=3, use_metrics=None)
             bads[i] = np.unique(np.concatenate(b)).tolist()
 
     return bads
+
 
 def run_faster(epochs, thres=3, copy=True):
     """Run the entire FASTER pipeline on the data.
@@ -324,8 +331,10 @@ def run_faster(epochs, thres=3, copy=True):
 
     # Step three (using the build-in MNE functionality for this)
     logger.info('Step 3: mark bad ICA components')
-    picks = mne.pick_types(epochs.info, meg=False, eeg=True, eog=True, exclude='bads')
-    ica = mne.preprocessing.run_ica(epochs, len(picks), picks=picks, eog_ch=['vEOG', 'hEOG'])
+    picks = mne.pick_types(epochs.info, meg=False, eeg=True, eog=True, 
+                           exclude='bads')
+    ica = mne.preprocessing.run_ica(epochs, len(picks), picks=picks,
+                                    eog_ch=['vEOG', 'hEOG'])
     print(ica.exclude)
     ica.apply(epochs)
 
