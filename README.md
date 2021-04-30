@@ -61,14 +61,14 @@ The Preprocessing pipeline assumes that data is already in BIDS format. Thus, an
 
 ### Input/Output .json and .log files
 
-Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json", all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline. In addition to the "annotations_preproc.json" output file, all features should all provide more verbose writing of outputs to an output.log file.
+Given that the final pipeline will read from a user-supplied json file called "user_params.json" and write to an annotations file called "annotations_preproc.json" for each subject, all independent feature development should refer to a common standard format for these two files to allow for easier integration of features for the final pipeline. In addition to the "annotations_preproc.json" output file, all features should all provide more verbose writing of outputs to an output.log file.
 
-The "user_params.json" should control all research-relevant features of the pipeline (e.g. filter cutoffs, segmentation lengths, etc.). The "annotations_preproc.json" output file should contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). Together, the contents of "user_params.json" "annotations_preproc.json" should define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were. In fact, the long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "annotations_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc. 
+The "user_params.json" should control all research-relevant features of the pipeline (e.g. filter cutoffs, segmentation lengths, etc.). The "annotations_preproc.json" output files should contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). Together, the contents of "user_params.json" "annotations_preproc.json" should define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were. In fact, the long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "annotations_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc. 
 
 
 ### user_params.json
 
-This input file will define a set of function parameter constants. The user may define these paremeters within the JSON file to infuence filtering and channel rejection. 
+This singular input file will define a set of function parameter constants. The user may define these paremeters within the JSON file to infuence filtering and channel rejection. 
 
 (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a parameter that users might want to control, just add another field to the "user_params.json" file. There is no issue with having lots of fields with default values.)
 
@@ -80,9 +80,9 @@ Format:
 }
 ```
 
-### annotations_preproc.json
+### annotations_preproc_sub_XXX_task_YYY_run_ZZZ.json
 
-This output file will define which EEG data-set attributes were removed or transformed through the pipeline. This file will be built iteratively as the pipeline progresses. 
+These output annotation files will define which EEG data-set attributes were removed or transformed through the pipeline for each subject. This file will be built iteratively as the pipeline progresses. 
 
 (please add additional fields as necessary; do not hesitate to add fields. Basically, when working on a feature, if you think there is a value that is computed that might be of use to users, please add it to the "annotations_preproc.json" file.)
 
@@ -94,9 +94,9 @@ Format:
 }
 ```
 
-### output.log
+### output_sub_XXX_task_YYY_run_ZZZ.log
 
-This output file will define the verbose outputs of mne functions including warnings and errors. Format will vary based on pipeline output.
+These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output.
 
 To record function output to log-file, insert the following:
 ```python 
