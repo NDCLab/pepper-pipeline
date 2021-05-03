@@ -80,7 +80,7 @@ Format:
 }
 ```
 
-### annotations_preproc.json
+### outputs_preproc.json
 
 This output file will define which EEG data-set attributes were removed or transformed through the pipeline. This file will be built iteratively as the pipeline progresses. 
 
