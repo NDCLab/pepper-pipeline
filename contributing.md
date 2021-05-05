@@ -58,10 +58,23 @@ Subsequently, branches follow this convention:
 [NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
 
 ## Input-Data
-- For development, [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline features.
-- 
+- [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development. 
+- [user_params.json](README.md)
 
 ## Output-Data
+- [output_preproc_sub_XXX_task_YYY_run_ZZZ.json](README.md)
+- [output_sub_XXX_task_YYY_run_ZZZ.log](README.md)
+    To record function output to log-file, insert the following:
+    ```python 
+    # initialize log-file
+    logging.basicConfig(filename=subject_file_name, filemode='a', encoding='utf-8', level=logging.NOTSET)
+
+    # ... pipeline steps execute ...
+
+    logging.info("describe output of pipeline")
+    # record pipeline output
+    logging.info(mne.post.info)
+    ```
 
 ## Reminders
 1. only push directly (without code review) to dev-feature-[featureName]-[yourName]
