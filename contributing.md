@@ -62,8 +62,8 @@ Subsequently, branches follow this convention:
 - [user_params.json](README.md)
 
 ## Output-Data
-- [output_preproc_sub_XXX_task_YYY_run_ZZZ.json](README.md)
-- [output_sub_XXX_task_YYY_run_ZZZ.log](README.md)
+- [output_preproc.json](README.md)
+- [output.log](README.md)
     To record function output to log-file, insert the following:
     ```python 
     # initialize log-file
