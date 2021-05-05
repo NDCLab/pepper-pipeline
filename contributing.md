@@ -1,7 +1,6 @@
 # baseEEG contributing docs & standards
 Welcome to baseEEG! The guidelines for development are as follows: 
 
-#### Table of Contents
 * [Roadmap](#Roadmap)  
 * [Containers](#Containers)
 * [Issues](#Issues)  

@@ -3,7 +3,7 @@ Lab-wide EEG scripts
 
 Development guidelines and details are listed in [contributing.md](contributing.md)
 
-## Pipeline Steps:
+## Pipeline Steps
 
 ### 1) Feature-filter
 
