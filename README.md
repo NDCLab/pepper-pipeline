@@ -1,6 +1,8 @@
 # baseEEG
 Lab-wide EEG scripts
 
+![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
+
 Development guidelines and details are listed in [contributing.md](contributing.md)
 
 ## Pipeline Steps
