@@ -1,34 +1,55 @@
-#!/usr/bin/python3
+import sys
 
-import matplotlib
-from pathlib import Path
-import mne
-import mne_bids
-import PyQt5
 
-# Read BIDS Data
-bids_root = Path('eeg_matchingpennies')
-bids_path = mne_bids.BIDSPath(subject='05',
-                              task='matchingpennies',
-                              datatype='eeg',
-                              root=bids_root)
-raw = mne_bids.read_raw_bids(bids_path)
+def interpolate_data(orig_raw, reset_bads=False):
+    """Used to return a Raw object that has been interpolated. 
+    
+    Parameters:
+    ----------:
+    orig_raw:   Raw
+                Raw data in FIF format. Before interpolation. 
+    reset_bads: bool
+                If true, removes the bads from info. 
+    
+    Throws:
+    ----------
+    Will throw a warning if there are no bad channels to interpolate. 
+    In this case, it will simply return from the function. 
+    
+    Returns:
+    ----------
+    Instance of a modified Raw, Epochs, or Evoked after interpolation. 
+    """
+    return orig_raw.copy().interpolate_bads(reset_bads=reset_bads)
 
-bad_channels = raw.info['bads']
-picks = mne.pick_channels_regexp(raw.ch_names, regexp='FC.')
-raw.plot(order=picks, n_channels=len(picks))
-raw.load_data()
 
-# Construct montage for our data
-ten_twenty_montage = mne.channels.make_standard_montage('standard_1020')
-raw_1020 = raw.copy().set_montage(ten_twenty_montage)
-raw_1020_copy = raw_1020.copy().pick_types(meg=False, eeg=True, exclude=[])
+def plot_orig_and_interp(orig_raw, interp_raw):
+    """Used to plot the difference between the original data and 
+    the interpolated data. 
+    
+    Parameters:
+    ----------
+    orig_raw:   Raw 
+                Raw data in FIF format. Before interpolation. 
+    interp_raw: Raw
+                Raw data in FIF format. After interpolation. 
+    
+    Throws:
+    ----------
+    An error and will exit if any of the raw objects are null
 
-# Interpolate our data
-raw_interp = raw_1020_copy.copy().interpolate_bads(reset_bads=False)
+    Returns:
+    ----------
+    Graph plotting the difference between the original and
+    interpolated data
 
-# Plot the difference of original data and interpolated data
-for title, data in zip(['orig.', 'interp.'], [raw_1020_copy, raw_interp]):
-    fig = data.plot(butterfly=True, color='#00000022', bad_color='r')
-    fig.subplots_adjust(top=0.9)
-    fig.suptitle(title, size='xx-large', weight='bold')
+    """
+    if not orig_raw or not interp_raw:
+        print("Null raw objects")
+        sys.exit(1)
+
+    for title_, data_ in zip(['orig.', 'interp.'], [orig_raw, interp_raw]):
+        figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
+        figure.subplots_adjust(top=0.9)
+        figure.suptitle(title_, size='xx-large', weight='bold')
+
