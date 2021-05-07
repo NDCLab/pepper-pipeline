@@ -6,15 +6,41 @@ Welcome to baseEEG! The guidelines for development are as follows:
 * [Issues](#Issues)  
 * [Git-Workflow](#Git-Workflow)  
 * [CI-test](#CI-test)  
-* [Input-Data](#Input-Data)  
+* [Input-Data](#Example-Data)  
 * [Output-Data](#Output-Data)
 * [Reminders](#Reminders)  
 
 ## Roadmap
 
-All features (pipeline steps) can be worked on independently and in parallel. Any steps for which implementation relied on a prior step first being completed have been merged into one single feature (e.g., feature-ica contains three steps that must be implemented sequentially). Please self-assign to any feature, read the relevant documentation, reach out with questions, and begin implementation. There is no correct order to implement any of these steps.
+![pipelineUMLv3](https://user-images.githubusercontent.com/26397102/117484497-bed53e00-af2c-11eb-9efb-b642b4169e2b.png)
 
-The Preprocessing pipeline assumes that data is already in BIDS format. Thus, any scripts (e.g. feature-filter-io) to convert data to BIDS format are NOT part of the preprocessing pipeline. Thus, all steps of the preprocessing pipeline should be written in such a way as to assume a BIDS folder structure file already exists and that standard BIDS metadata files exist (which can be read in to govern preprocessing). 
+The UML diagram listed above details the pipeline steps that run for each subject:
+
+### Pipeline Input (load_data)
+- [raw EEG data](#Example-Data)  
+- [user_params.json](README.md)
+    ```json
+    {
+        "filter": {
+            "highPass": [0.3],
+            "lowpass": [50]
+        }, 
+        "segment": {
+            "tmin": [-0.2],
+            "tmax": [0.5]
+        }
+    }
+    ```
+    Details a series of parameters that the user defines.
+
+### Main Script 
+
+The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives the params dictionary and data from the main script. Detail on pipeline steps listed in the [readme.md](README.md). 
+
+Each feature function finishes by returning a dictionary of pipeline outputs.
+
+### Pipeline Output (output_preproc)
+At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. Detailed in [readme.md](README.md)
 
 ## Containers
 
@@ -56,9 +82,8 @@ Subsequently, branches follow this convention:
 ## CI-test
 [NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
 
-## Input-Data
+## Example-Data
 - [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development. 
-- [user_params.json](README.md)
 
 ## Output-Data
 - [output_preproc.json](README.md)

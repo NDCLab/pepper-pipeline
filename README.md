@@ -68,10 +68,16 @@ The long term goal is to automate the writing of these journal article sections 
 This singular input file defines all research-relevant features of the pipeline. The user may define these paremeters within the JSON file to infuence filtering and channel rejection
 
 Format:
-```javascript
+```json
 {
-    "highPass": [.3],
-    "lowpass": [50]
+    "filter": {
+        "highPass": [0.3],
+        "lowpass": [50]
+    }, 
+    "segment": {
+        "tmin": [-0.2],
+        "tmax": [0.5]
+    }
 }
 ```
 
