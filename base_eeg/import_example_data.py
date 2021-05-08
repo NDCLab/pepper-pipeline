@@ -93,7 +93,7 @@ for b in block_df.index:
     raw_cropped = raw.copy().crop(tmin=block_df.loc[b, 'start_time'],
                                   tmax=block_df.loc[b, 'end_time'],
                                   include_tmax=False)
-    temp_path = pathlib.Path.cwd() / (task_name + '_' + run_number + '_raw.fif')
+    temp_path = pathlib.Path.cwd() / f'{task_name}_{run_number}_raw.fif'
     raw_cropped.save(temp_path, overwrite=True)
 
     # read .fif back and write BIDS
@@ -118,6 +118,6 @@ for b in block_df.index:
 
 # update participants.tsv
 participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t')
-participant_data.loc[participant_data['participant_id'] == 'sub-' + participant_code, 'age'] = participant_age
-participant_data.loc[participant_data['participant_id'] == 'sub-' + participant_code, 'sex'] = participant_sex
+participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
+participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
 participant_data.to_csv(bids_root / 'participants.tsv', sep='\t')
