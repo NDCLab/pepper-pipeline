@@ -82,6 +82,10 @@ block_df['end_time'] = np.roll(block_df['start_time'], -1)
 block_df.loc[0, 'start_time'] = 0
 block_df.loc[block_df.index[-1], 'end_time'] = raw.times[-1]
 
+# subtract an amount of time equal to 1 sample from each end time
+# to avoid the next annotation from being included in cropped data
+block_df['end_time'] = block_df['end_time'] - (1 / raw.info['sfreq'])
+
 block_df['run'] = block_df.groupby('code').cumcount() + 1
 
 # write out each block as a separate file
