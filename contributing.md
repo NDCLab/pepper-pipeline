@@ -13,7 +13,7 @@ Welcome to baseEEG! The guidelines for development are as follows:
 
 ## Roadmap
 
-![pipleineUMLv4](https://user-images.githubusercontent.com/26397102/117683344-98581280-b179-11eb-8fb3-212ea86a7824.png)
+![pipelineUMLverdana](https://user-images.githubusercontent.com/26397102/117684554-b96d3300-b17a-11eb-9b6c-0013e032331d.png)
 
 The UML diagram listed above details the pipeline steps that run for each subject:
 
