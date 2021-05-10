@@ -1,6 +1,6 @@
 from pathlib import Path
-from os import walk, listdir
-from os.path import isfile, join
+from os import walk
+from os.path import join
 
 from bids_validator import BIDSValidator
 
