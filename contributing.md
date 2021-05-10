@@ -10,9 +10,10 @@ Welcome to baseEEG! The guidelines for development are as follows:
 * [Output-Data](#Output-Data)
 * [Reminders](#Reminders)  
 
+
 ## Roadmap
 
-![pipelineUMLv3](https://user-images.githubusercontent.com/26397102/117484497-bed53e00-af2c-11eb-9efb-b642b4169e2b.png)
+![pipleineUMLv4](https://user-images.githubusercontent.com/26397102/117683344-98581280-b179-11eb-8fb3-212ea86a7824.png)
 
 The UML diagram listed above details the pipeline steps that run for each subject:
 
@@ -41,10 +42,25 @@ Each feature function finishes by returning a dictionary of pipeline outputs.
 
 ### Pipeline Output (output_preproc)
 At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. Detailed in [readme.md](README.md)
+- [output_preproc.json](README.md)
+- [output.log](README.md)
+    To record function output to log-file, insert the following:
+    ```python 
+    # initialize log-file
+    logging.basicConfig(filename=subject_file_name, filemode='a', encoding='utf-8', level=logging.NOTSET)
+
+    # ... pipeline steps execute ...
+
+    logging.info("describe output of pipeline")
+    # record pipeline output
+    logging.info(mne.post.info)
+    ```
+
 
 ## Containers
 
 Please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/README.md`. 
+
 
 ## Issues
 
@@ -53,6 +69,7 @@ See issues for current/future work.
 Always assign yourself to an issue before beginning work on it!
 
 If someone is already assigned to an issue that you intend to work on, post a comment to ask if you can help before assigning yourself. If no response within 24 hours, then you are free to start work on the issue, but post another comment first to let them know what you will be doing.
+
 
 ## Git-Workflow 
 
@@ -79,26 +96,14 @@ Subsequently, branches follow this convention:
 - *only* branch available for personal development, must be branched off of `-->dev-feature-[featureName]` branch
 - Merged into `-->dev-feature-[featureName]` after pull-request (code review)
 
+
 ## CI-test
 [NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
+
 
 ## Example-Data
 - [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development. 
 
-## Output-Data
-- [output_preproc.json](README.md)
-- [output.log](README.md)
-    To record function output to log-file, insert the following:
-    ```python 
-    # initialize log-file
-    logging.basicConfig(filename=subject_file_name, filemode='a', encoding='utf-8', level=logging.NOTSET)
-
-    # ... pipeline steps execute ...
-
-    logging.info("describe output of pipeline")
-    # record pipeline output
-    logging.info(mne.post.info)
-    ```
 
 ## Reminders
 1. only push directly (without code review) to dev-feature-[featureName]-[yourName]
