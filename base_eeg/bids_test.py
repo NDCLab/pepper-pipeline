@@ -1,6 +1,7 @@
 from pathlib import Path
+from os import walk, listdir
+from os.path import isfile, join
 
-from mne_bids import BIDSPath
 from bids_validator import BIDSValidator
 
 import unittest
@@ -27,16 +28,15 @@ class BidsTest(unittest.TestCase):
         # init validator
         self.validator = BIDSValidator()
 
-        # get all available BIDS files
-        bids_root = Path('BIDS')
-        bids_path = BIDSPath(
-            datatype='eeg',
-            root=bids_root
-        )
-        # init list of BIDS files
-        self.files = map(str, bids_path.match())
+        root = Path('BIDS')
+        self.files = []
+        # "walk" through BIDS directory and append all found files
+        for (dirpath, dirnames, filenames) in walk(root):
+            path_filenames = [join(dirpath, name) for name in filenames]
+            self.files += path_filenames
 
     def test_if_valid(self):
+        # for each file found, inspect if BIDS
         for file in self.files:
             print("checking", file)
             self.assertTrue(self.validator.is_bids(file[4:]),
