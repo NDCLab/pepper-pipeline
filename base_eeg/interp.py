@@ -1,39 +1,73 @@
+"""
+    Interpolation Module to assist on interpolating missing channels
+    at the channel/epoch level using a spherical spline interpolation.
+    Will also write out to a dictionary to express what has occured
+    during this stage of the pipeline.
+"""
 import sys
 
 
-def interpolate_data(orig_raw, reset_bads=False):
-    """Used to return a Raw object that has been interpolated. 
-    
+def interpolate_data(orig_raw, user_params):
+    """Used to return a Raw object that has been interpolated
+
     Parameters:
     ----------:
     orig_raw:   Raw
-                Raw data in FIF format. Before interpolation. 
+                Raw data in FIF format. Before interpolation
+
+    output_dict:dict
+                Dictionary of parameters provided to the user for
+                manipulating specific values within the pipeline
+
+    mode:       str
+                String to determine the quality of the Legendre polynomial
+                expansion used for interpolation of channels
+
+    method:     dict
+                Method to use for each channel type, either a spline or
+                minimum-norm projection method
+
     reset_bads: bool
-                If true, removes the bads from info. 
-    
+                If true, removes the bads from info
+
     Throws:
     ----------
-    Will throw a warning if there are no bad channels to interpolate. 
-    In this case, it will simply return from the function. 
-    
+    Will throw errors and exit if:
+        - Null raw object
+        - Null output preprocessing dictionary
+
+    Will throw a warning if there are no bad channels to interpolate
+
     Returns:
     ----------
-    Instance of a modified Raw, Epochs, or Evoked after interpolation. 
+    Modified in place raw object and output dictionary
     """
-    return orig_raw.copy().interpolate_bads(reset_bads=reset_bads)
+    if orig_raw is None:
+        print("Null raw objects")
+        sys.exit(1)
+
+    if user_params is None:
+        print("Null user_params objects")
+        sys.exit(1)
+
+    orig_raw.interpolate_bads(mode=user_params["Interpolation"]["mode"],
+                              method=user_params["Interpolation"]["method"],
+                              reset_bads=user_params["Interpolation"]["reset_bads"]
+                              )
+    return {"Interpolation": {"Affected_Channels": orig_raw.info['bads']}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
-    """Used to plot the difference between the original data and 
-    the interpolated data. 
-    
+    """Used to plot the difference between the original data
+    and the interpolated data.
+
     Parameters:
     ----------
-    orig_raw:   Raw 
-                Raw data in FIF format. Before interpolation. 
+    orig_raw:   Raw
+                Raw data in FIF format. Before interpolation
     interp_raw: Raw
-                Raw data in FIF format. After interpolation. 
-    
+                Raw data in FIF format. After interpolation
+
     Throws:
     ----------
     An error and will exit if any of the raw objects are null
@@ -52,4 +86,3 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
         figure.suptitle(title_, size='xx-large', weight='bold')
-
