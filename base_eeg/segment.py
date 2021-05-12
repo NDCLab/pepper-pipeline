@@ -43,6 +43,14 @@ def segment_data(raw, user_params):
     events, event_id = mne.events_from_annotations(raw)
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
+                        tmin=user_params["Segment"]["tmin"],
+                        tmax=user_params["Segment"]["tmax"],
+                        baseline=user_params["Segment"]["baseline"],
+                        picks=user_params["Segment"]["picks"],
+                        reject_tmin=user_params["Segment"]["reject_tmin"],
+                        reject_tmax=user_params["Segment"]["reject_tmax"],
+                        decim=user_params["Segment"]["decim"],
+                        verbose=user_params["Segment"]["verbose"],
                         preload=user_params["Segment"]["preload"])
 
     return epochs, {"Segment": epochs.info}
