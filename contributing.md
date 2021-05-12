@@ -57,7 +57,7 @@ Subsequently, branches follow this convention:
 [NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
 
 ## Input-Data
-- [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development. 
+- [BIDS.zip](https://drive.google.com/drive/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-?usp=sharing) is used as the test input file for all pipeline feature development. 
 - [user_params.json](README.md)
 
 ## Output-Data
