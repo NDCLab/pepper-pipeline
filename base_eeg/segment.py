@@ -1,24 +1,82 @@
-#!/usr/bin/python3
+"""
+    Segmentation module to cut the continuous data
+    into epochs of data, such that the zero point
+    for each epoch is a given marker of interest
+"""
+
+
+import sys
 import mne
-from pathlib import Path
-from mne_bids import BIDSPath, read_raw_bids
 
-# Read BIDS data
-bids_root = Path('eeg_matchingpennies')
-bids_path = BIDSPath(subject='05',
-                     task='matchingpennies',
-                     datatype='eeg',
-                     root=bids_root)
-raw = read_raw_bids(bids_path)
 
-# extract events and event_id from our raw object
-events, event_id = mne.events_from_annotations(raw)
+def segment_data(raw, user_params):
+    """Used to segment continuous data into epochs
 
-# we can go ahead and plot the events
-mne.viz.plot_events(events, event_id=event_id)
+    Parameters:
+    -----------
+    raw:    Raw
+            Raw data in FIF format
 
-# create an epoch object and we can extract information off of it
-epochs = mne.Epochs(raw, events, event_id=event_id, preload=True)
-epochs.plot(n_epochs=10)
-print(epochs.info)
-print(epochs[['left', 'right']])
+    user_params:dict
+                Dictionary of user manipulated values
+
+    Throws:
+    -----------
+    Will throw errors and exit if:
+        - Null raw object
+        - Null user_params dictionary
+
+    Returns:
+    -----------
+    Will return epochs and a dictionary of epochs information
+    during segmentation stage
+    """
+
+    if raw is None:
+        print("Invalid raw object")
+        sys.exit(1)
+
+    if user_params is None:
+        print("Invalid user_params dictionary")
+        sys.exit(1)
+
+    events, event_id = mne.events_from_annotations(raw)
+
+    epochs = mne.Epochs(raw, events, event_id=event_id,
+                        preload=user_params["Segment"]["preload"])
+
+    return epochs, {"Segment": epochs.info}
+
+
+def plot_sensor_locations(epochs, user_params):
+    """Used to plot sensor locations given epochs
+
+    Parameters:
+    -----------
+    epochs: Epoch
+            Epochs extracted from a Raw instance
+
+    user_params:dict
+                Dictionary of user manipulated values
+
+    Throws:
+    -----------
+    Will throw errors and exit if:
+        - Null epoch object
+        - Null user_params dictionary
+
+    Returns:
+    -----------
+    Graph plotting of sensor locations
+    """
+
+    if epochs is None:
+        print("Invalid epoch object")
+        sys.exit(1)
+
+    if user_params is None:
+        print("Invalid user_params dictionary")
+        sys.exit(1)
+
+    epochs.plot_sensors(kind=user_params["Segment"]["Plotting Information"]["Kinds"],
+                        ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"])
