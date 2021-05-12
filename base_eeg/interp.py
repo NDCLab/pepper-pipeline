@@ -19,22 +19,11 @@ def interpolate_data(orig_raw, user_params):
                 Dictionary of parameters provided to the user for
                 manipulating specific values within the pipeline
 
-    mode:       str
-                String to determine the quality of the Legendre polynomial
-                expansion used for interpolation of channels
-
-    method:     dict
-                Method to use for each channel type, either a spline or
-                minimum-norm projection method
-
-    reset_bads: bool
-                If true, removes the bads from info
-
     Throws:
     ----------
     Will throw errors and exit if:
         - Null raw object
-        - Null output preprocessing dictionary
+        - Null user_params dictionary
 
     Will throw a warning if there are no bad channels to interpolate
 
