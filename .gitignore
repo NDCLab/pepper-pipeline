@@ -128,7 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# OS specific files
+# IDE specific 
+.vscode
+
+# OS specific 
 .DS_Store
 .DS_Store?
 ._*
