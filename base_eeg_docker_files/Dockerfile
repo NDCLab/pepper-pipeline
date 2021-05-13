@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM continuumio/miniconda3
 
 MAINTAINER Steven W. Tolbert <stolb002@fiu.edu> 
 
@@ -24,9 +24,13 @@ RUN apt-get update && apt-get -y upgrade\
 
 RUN locale-gen en_US.UTF-8
 
-COPY requirements.txt /tmp
 WORKDIR /tmp
-RUN pip3 install -r requirements.txt
+
+# Create the environment:
+COPY environment.yml .
+RUN conda env create -f environment.yml
+
+RUN apt-get -y install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 
 # Disable password and not ask for finger info
 RUN adduser --disabled-password --gecos '' ubuntu
@@ -35,6 +39,4 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER ubuntu
 
-
-WORKDIR /home/ubuntu
-
+WORKDIR /projects
