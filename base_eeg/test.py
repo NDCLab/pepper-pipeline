@@ -18,12 +18,8 @@ def main():
     # Generate events to segment data into epochs 
     events, event_id = mne.events_from_annotations(raw)
     epochs = mne.Epochs(raw, events, event_id=event_id, preload=True)
-    #get montage
-    with open("BIDS/sub-NDARAB793GL3/ses-01/eeg/sub-NDARAB793GL3_ses-01_task-ContrastChangeBlock1_run-01_eeg.json", mode='r') as f:
-        cap_json = json.load(f)
-        montage_found = get_montage(cap_json)
     # Set montage
-    easy_montage = mne.channels.make_standard_montage(montage_found)
+    easy_montage = mne.channels.make_standard_montage('GSN-HydroCel-129')
     epochs.set_montage(easy_montage)
 
     #Sample user parameter 
