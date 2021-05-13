@@ -6,12 +6,19 @@ import collections
 
 def final_reject_epoch(user_params_dict, epochs, raw):
     """Final and automatic rejection of bad epochs
-    @ preconditions: user parameters with the minimum and maximum for mne.Epoch() 
-    @ preconditions: epochs specifically segments the raw dataset
-    @ modifies: raw 
-    @ postconditions: 
-        - raw retains former dimensions  
-            pre: (m x n) -- final_reject --> (m x n)
+    Parameters
+    ----------
+    user_params_dict : python dictionary
+        user defined variables like tmin and tmax,
+    epochs: mne.Epochs object
+        instance of the mne.Epochs,
+    raw: mne.io.Raw object
+        data as mne Raw object
+
+    Returns 
+    ----------
+    output_dict_finalRej: dictionary
+        dictionary with epochs droped per channel and channels interpolated
     """
     
     #creates the output dictionary to store the function output
