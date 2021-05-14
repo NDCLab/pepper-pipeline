@@ -121,7 +121,7 @@ for b in block_df.index:
     os.remove(temp_path)
 
 # update participants.tsv
-participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t')
+participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t', na_filter=False)
 participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
 participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
-participant_data.to_csv(bids_root / 'participants.tsv', sep='\t')
+participant_data.to_csv(bids_root / 'participants.tsv', sep='\t', index=False)
