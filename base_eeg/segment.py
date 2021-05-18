@@ -9,7 +9,8 @@ import sys
 import mne
 
 
-def segment_data(raw, user_params):
+def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
+                 decim, verbose, preload):
     """Used to segment continuous data into epochs
 
     Parameters:
@@ -17,14 +18,38 @@ def segment_data(raw, user_params):
     raw:    Raw
             Raw data in FIF format
 
-    user_params:dict
-                Dictionary of user manipulated values
+    tmin:   float
+            time before event
+
+    tmax:   float
+            time after event
+
+    baseline:   None | tuple of length 2
+                The time interval to consider as “baseline” when applying
+                baseline correction
+
+    picks:  str | list | slice | None
+            Channels to include.
+
+    reject_tmin:    float | None
+                    Start of the time window used to reject epochs.
+
+    reject_tmax: float | None
+        End of the time window used to reject epochs.
+
+    decim:  int
+            Factor by which to subsample the data.
+
+    verbose:    bool | str | int | None
+                default verbose level
+
+    preload:    bool
+                Indicates whether epochs are in memory.
 
     Throws:
     -----------
     Will throw errors and exit if:
         - Null raw object
-        - Null user_params dictionary
 
     Returns:
     -----------
@@ -36,24 +61,27 @@ def segment_data(raw, user_params):
         print("Invalid raw object")
         sys.exit(1)
 
-    if user_params is None:
-        print("Invalid user_params dictionary")
-        sys.exit(1)
-
     events, event_id = mne.events_from_annotations(raw)
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
-                        tmin=user_params["Segment"]["tmin"],
-                        tmax=user_params["Segment"]["tmax"],
-                        baseline=user_params["Segment"]["baseline"],
-                        picks=user_params["Segment"]["picks"],
-                        reject_tmin=user_params["Segment"]["reject_tmin"],
-                        reject_tmax=user_params["Segment"]["reject_tmax"],
-                        decim=user_params["Segment"]["decim"],
-                        verbose=user_params["Segment"]["verbose"],
-                        preload=user_params["Segment"]["preload"])
+                        tmin=tmin,
+                        tmax=tmax,
+                        baseline=baseline,
+                        picks=picks,
+                        reject_tmin=reject_tmin,
+                        reject_tmax=reject_tmax,
+                        decim=decim,
+                        verbose=verbose,
+                        preload=preload
+                        )
 
-    return epochs, {"Segment": epochs.info}
+    # get count of all epochs to output dictionary
+    ch_names = epochs.info.ch_names
+    ch_epochs = {}
+    for name in ch_names:
+        ch_epochs[name] = epochs.get_data(picks=name).shape[0]
+
+    return epochs, {"Segment": {"Generated Epochs": ch_epochs}}
 
 
 def plot_sensor_locations(epochs, user_params):
@@ -86,5 +114,7 @@ def plot_sensor_locations(epochs, user_params):
         print("Invalid user_params dictionary")
         sys.exit(1)
 
-    epochs.plot_sensors(kind=user_params["Segment"]["Plotting Information"]["Kinds"],
-                        ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"])
+    epochs.plot_sensors(
+        kind=user_params["Segment"]["Plotting Information"]["Kinds"],
+        ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"]
+        )
