@@ -7,43 +7,43 @@
 import sys
 
 
-def interpolate_data(orig_raw, user_params):
-    """Used to return a Raw object that has been interpolated
+def interpolate_data(epochs, mode, method, reset_bads):
+    """Used to return an epoch object that has been interpolated
 
     Parameters:
     ----------:
-    orig_raw:   Raw
-                Raw data in FIF format. Before interpolation
+    epochs: mne.Epochs
+            epochs before interpolation
 
-    output_dict:dict
-                Dictionary of parameters provided to the user for
-                manipulating specific values within the pipeline
+    mode:   str
+            Either 'accurate' or 'fast'
+
+    method: dict
+            Method to use for each channel type.
+
+    reset_bads: bool
+                If True, remove the bads from info.
 
     Throws:
     ----------
     Will throw errors and exit if:
         - Null raw object
-        - Null user_params dictionary
 
     Will throw a warning if there are no bad channels to interpolate
 
     Returns:
     ----------
-    Modified in place raw object and output dictionary
+    Modified in place epochs object and output dictionary
     """
-    if orig_raw is None:
+    if epochs is None:
         print("Null raw objects")
         sys.exit(1)
 
-    if user_params is None:
-        print("Null user_params objects")
-        sys.exit(1)
-
-    orig_raw.interpolate_bads(mode=user_params["Interpolation"]["mode"],
-                              method=user_params["Interpolation"]["method"],
-                              reset_bads=user_params["Interpolation"]["reset_bads"]
-                              )
-    return {"Interpolation": {"Affected_Channels": orig_raw.info['bads']}}
+    epochs.interpolate_bads(mode=mode,
+                            method=method,
+                            reset_bads=reset_bads
+                            )
+    return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
