@@ -1,17 +1,43 @@
-import matplotlib
 import pathlib
-import mne
 import mne_bids
 
-def baseeeg_preprocessing_filter(raw: mne.io.Raw, l_freq=0.3, h_freq=40) -> mne.io.Raw:
+
+def baseeeg_preprocessing_filter(raw, l_freq=0.3, h_freq=40):
+    """Final and automatic rejection of bad epochs
+    Parameters
+    ----------
+    raw:    mne.io.Raw
+            initially loaded raw object of EEG data
+
+    l_freq: float
+            lower pass-band edge
+
+    h_freq: float
+            higher pass-band edge
+
+    Returns
+    ----------
+    raw_filtered:   mne.io.Raw
+                    instance of "cleaned" raw data using filter
+
+    output_dict_flter:  dictionary
+                        dictionary with relevant filter information
+    """
     try:
         raw.load_data()
-        return raw.copy().filter(l_freq=l_freq, h_freq=h_freq)
-        
+        raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
+
+        return raw_filtered, {"Filter": {
+            "Highpass corner frequency": raw_filtered.info["highpass"],
+            "Lowpass corner frequency": raw_filtered.info["lowpass"],
+            "Sampling Rate": raw_filtered.info["sfreq"],
+            }
+        }
     except TypeError:
         print('Type Error')
     except Exception:
         print('Unknown Error')
+
 
 # Read BIDS data
 bids_root = pathlib.Path('raw_data/eegmatchingpennies')
@@ -24,6 +50,7 @@ raw = mne_bids.read_raw_bids(bids_path)
 raw.plot()
 
 # filter
-raw_filtered = baseeeg_preprocessing_filter(raw)
+raw_filtered, output_filter = baseeeg_preprocessing_filter(raw)
 
 raw_filtered.plot()
+print(output_filter)
