@@ -1,7 +1,7 @@
 ---
 name: "\U0001F4DC Documentation request"
 about: Request documentation creation or update
-title: ''
+title: 'document <feature/data/etc name>'
 labels: documentation
 assignees: ''
 
