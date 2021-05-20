@@ -114,7 +114,7 @@ def plot_sensor_locations(epochs, user_params):
         print("Invalid user_params dictionary")
         sys.exit(1)
 
-    epochs.plot_sensors(
-            kind=user_params["Segment"]["Plotting Information"]["Kinds"],
-            ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"]
-                        )
+    kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
+    ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
+
+    epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
