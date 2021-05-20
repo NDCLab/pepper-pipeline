@@ -13,5 +13,5 @@ assignees: ''
 **Blocks/Challenges**
 * List of current challenges to be resolved/turned into issues
 
-**Plans**
+**Next Actions**
 * Next actions for progressing pipeline
