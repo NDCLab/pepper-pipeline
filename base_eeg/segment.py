@@ -115,6 +115,6 @@ def plot_sensor_locations(epochs, user_params):
         sys.exit(1)
 
     epochs.plot_sensors(
-        kind=user_params["Segment"]["Plotting Information"]["Kinds"],
-        ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"]
-        )
+            kind=user_params["Segment"]["Plotting Information"]["Kinds"],
+            ch_type=user_params["Segment"]["Plotting Information"]["Ch_type"]
+                        )
