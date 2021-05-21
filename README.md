@@ -5,6 +5,57 @@ Lab-wide EEG scripts
 
 Development guidelines and details are listed in [contributing.md](contributing.md)
 
+## Usage
+
+This project comes with a default `user_params.json` file which directly controls the order of pipeline steps and their parameters:
+
+```json
+{
+    "data": {
+        "Bids_data_root": "PATH"
+    },
+    "preprocess": {
+        "filter": {
+            "param1": "VALUE"
+        },
+        "segment_data": {
+            "param1": "VALUE",
+            "param2": "VALUE"
+        },
+        "final_reject_epoch": {
+        }, 
+        "interpolate_data": {
+            "param1": "VALUE"
+        }
+    }
+}
+```
+
+To influence parameters, which functions are called, and in which order, edit this file.
+
+Run `run.py` to interpret this file and output cleaned EEG data.  
+## Output 
+
+### output_preproc.json
+
+These output files will contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). This file will be built iteratively as the pipeline progresses
+
+Each file name generated on a subject will follow the BIDS naming standard: `output_preproc_XXX_task_YYY_run_ZZZ.json`
+
+Format:
+```javascript
+{
+    "globalBad_Chans": [1, 23, 119],
+    "icArtifacts": [1, 3, 9]
+}
+```
+
+### output_sub.log
+
+These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output
+
+Each file name generated on a subject will follow the BIDS naming standard: `output_XXX_task_YYY_run_ZZZ.log`
+
 ## Pipeline Steps
 
 ### 1) Feature-filter
@@ -54,51 +105,4 @@ One way around this is to first make a copy of the eeg data. For the copy, use a
 ### 7) Feature-reref
 - re-reference the data to the average of all electrodes (“average reference”) using the mne function
 - write to output file that data were re-referenced to average
-
-## Input/Output Files
-
-The pipeline reads from a user-supplied json file called [user_params.json](#user_params.json) and writes to many output files called [output_preproc.json](#output_preproc.json) and [output.log](#output_sub.log) for each subject
-
-Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were
-
-The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc
-
-### user_params.json
-
-This singular input file defines all research-relevant features of the pipeline. The user may define these paremeters within the JSON file to infuence filtering and channel rejection
-
-Format:
-```json
-{
-    "filter": {
-        "highPass": [0.3],
-        "lowpass": [50]
-    }, 
-    "segment": {
-        "tmin": [-0.2],
-        "tmax": [0.5]
-    }
-}
-```
-
-### output_preproc.json
-
-These output files will contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). This file will be built iteratively as the pipeline progresses
-
-Each file name generated on a subject will follow the BIDS naming standard: `output_preproc_XXX_task_YYY_run_ZZZ.json`
-
-Format:
-```javascript
-{
-    "globalBad_Chans": [1, 23, 119],
-    "icArtifacts": [1, 3, 9]
-}
-```
-
-### output_sub.log
-
-These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output
-
-Each file name generated on a subject will follow the BIDS naming standard: `output_XXX_task_YYY_run_ZZZ.log`
-
 

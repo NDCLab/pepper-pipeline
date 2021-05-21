@@ -34,9 +34,14 @@ The UML diagram listed above details the pipeline steps that run for each subjec
     Motivation behind each pipeline step listed in the [readme.md](README.md). 
 
 3. Pipeline Output
-At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. Detailed in [readme.md](README.md)
+At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
 - [output_preproc.json](README.md)
 - [output.log](README.md)
+
+Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were
+
+The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc
+
 
 ### Directory-Structure
 ```yml
