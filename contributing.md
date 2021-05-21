@@ -2,18 +2,20 @@
 Welcome to baseEEG! The guidelines for development are as follows: 
 
 * [Roadmap](#Roadmap)  
+    * [Overview](#Overview)
+    * [Structure](#Directory-Structure)
+    * [Function-Standards](#Function-Standards)
 * [Containers](#Containers)
 * [Issues](#Issues)  
 * [Git-Workflow](#Git-Workflow)  
 * [CI-test](#CI-test)  
-* [Input-Data](#Example-Data)  
 * [Output-Data](#Output-Data)
 * [Reminders](#Reminders)  
 
 
 ## Roadmap
 
-![UMLEpochs](https://user-images.githubusercontent.com/26397102/118705708-2bc6be80-b7de-11eb-87a7-703de2ef18ae.png)
+![UMLrawread](https://user-images.githubusercontent.com/26397102/119166320-1642d600-ba24-11eb-8dd6-0d35430831b0.png)
 
 The UML diagram listed above details the pipeline steps that run for each subject:
 
@@ -36,9 +38,11 @@ The UML diagram listed above details the pipeline steps that run for each subjec
 
 ### Main Script 
 
-The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives the params dictionary and data from the main script. Detail on pipeline steps listed in the [readme.md](README.md). 
+The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
 
-Each feature function finishes by returning a dictionary of pipeline outputs.
+Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
+
+Motivation behind each pipeline step listed in the [readme.md](README.md). 
 
 ### Pipeline Output (output_preproc)
 At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. Detailed in [readme.md](README.md)
