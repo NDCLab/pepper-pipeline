@@ -15,51 +15,82 @@ Welcome to baseEEG! The guidelines for development are as follows:
 
 ## Roadmap
 
+### Overview 
+
 ![UMLrawread](https://user-images.githubusercontent.com/26397102/119166320-1642d600-ba24-11eb-8dd6-0d35430831b0.png)
 
 The UML diagram listed above details the pipeline steps that run for each subject:
 
-### Pipeline Input (load_data)
+1. Pipeline Input (load_data)
 - [raw EEG data](#Example-Data)  
 - [user_params.json](README.md)
-    ```json
-    {
-        "filter": {
-            "highPass": [0.3],
-            "lowpass": [50]
-        }, 
-        "segment": {
-            "tmin": [-0.2],
-            "tmax": [0.5]
-        }
-    }
-    ```
-    Details a series of parameters that the user defines.
 
-### Main Script 
+2. Main Script
 
-The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
+    The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
 
-Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
+    Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
 
-Motivation behind each pipeline step listed in the [readme.md](README.md). 
+    Motivation behind each pipeline step listed in the [readme.md](README.md). 
 
-### Pipeline Output (output_preproc)
+3. Pipeline Output
 At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. Detailed in [readme.md](README.md)
 - [output_preproc.json](README.md)
 - [output.log](README.md)
-    To record function output to log-file, insert the following:
-    ```python 
-    # initialize log-file
-    logging.basicConfig(filename=subject_file_name, filemode='a', encoding='utf-8', level=logging.NOTSET)
 
-    # ... pipeline steps execute ...
+### Directory-Structure
+```yml
+baseEEG
+├── run.py
+├── user_params.json
+├── scripts
+|    ├──__init__.py
+|    ├──data
+|    |    ├──__init__.py
+|    |    ├──data_load.py
+|    |    ├──data_write.py
+|    ├──postprocess
+|    |    ├──__init__.py
+|    |    ├──postprocess.py
+|    ├──preprocess
+|    |    ├──__init__.py
+|    |    ├──preprocess.py
+```
+All pipeline functions reside within their respective modules. For example, functions that are part of the preprocessing pipeline reside in `preprocess.py`, while functions that are part of postprocessing reside in `postprocess.py`.
 
-    logging.info("describe output of pipeline")
-    # record pipeline output
-    logging.info(mne.post.info)
-    ```
+### Function-Standards 
 
+#### preprocess
+
+All functions for the preprocessing pipeline must contain the following parameter list and return values to satisfy `run.py` constraints.
+```python
+def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
+     """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations 
+    """
+    # code to do pipeline step
+
+    return EEG_object_modified, output_dict 
+```
 
 ## Containers
 
