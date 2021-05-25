@@ -5,7 +5,7 @@ import os
 import pathlib
 import pandas as pd
 
-bids_root = pathlib.Path.cwd() / 'BIDS'
+bids_root = pathlib.Path.cwd() / 'CMI/rawdata'
 
 # TODO: load and merge phenotype metadata files from all batches of data
 meta_data = pd.read_csv(pathlib.Path.cwd() / 'HBN_R2_1_Pheno.csv')
