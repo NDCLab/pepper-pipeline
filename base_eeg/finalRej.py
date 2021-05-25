@@ -26,7 +26,8 @@ def final_reject_epoch(epochs):
 
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
-    epochs_clean = autoRej.fit_transform(epochs)
+    autoRej.fit(epochs)
+    epochs_clean = autoRej.transform(epochs)
 
     # Create a rejection log
     reject_log = autoRej.get_reject_log(epochs)
