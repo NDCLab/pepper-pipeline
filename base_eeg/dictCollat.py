@@ -1,5 +1,5 @@
 """
-Sample Data dictionaries to simulate the 
+Sample Data dictionaries to simulate the
 dictionaries being returned from each step
 within the pipeline
 """
