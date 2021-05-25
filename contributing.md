@@ -2,23 +2,105 @@
 Welcome to baseEEG! The guidelines for development are as follows: 
 
 * [Roadmap](#Roadmap)  
+    * [Overview](#Overview)
+    * [Structure](#Directory-Structure)
+    * [Function-Standards](#Function-Standards)
 * [Containers](#Containers)
 * [Issues](#Issues)  
 * [Git-Workflow](#Git-Workflow)  
 * [CI-test](#CI-test)  
-* [Input-Data](#Input-Data)  
 * [Output-Data](#Output-Data)
 * [Reminders](#Reminders)  
 
+
 ## Roadmap
 
-All features (pipeline steps) can be worked on independently and in parallel. Any steps for which implementation relied on a prior step first being completed have been merged into one single feature (e.g., feature-ica contains three steps that must be implemented sequentially). Please self-assign to any feature, read the relevant documentation, reach out with questions, and begin implementation. There is no correct order to implement any of these steps.
+### Overview 
 
-The Preprocessing pipeline assumes that data is already in BIDS format. Thus, any scripts (e.g. feature-filter-io) to convert data to BIDS format are NOT part of the preprocessing pipeline. Thus, all steps of the preprocessing pipeline should be written in such a way as to assume a BIDS folder structure file already exists and that standard BIDS metadata files exist (which can be read in to govern preprocessing). 
+![UMLrawread](https://user-images.githubusercontent.com/26397102/119166320-1642d600-ba24-11eb-8dd6-0d35430831b0.png)
+
+The UML diagram listed above details the pipeline steps that run for each subject:
+
+1. Pipeline Input (load_data)
+- [raw EEG data](#Example-Data)  
+- [user_params.json](README.md)
+
+2. Main Script
+
+    The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
+
+    Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
+
+    Motivation behind each pipeline step listed in the [readme.md](README.md). 
+
+3. Pipeline Output
+At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
+- [output_preproc.json](README.md)
+- [output.log](README.md)
+
+Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were
+
+The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc
+
+
+### Directory-Structure
+```yml
+baseEEG
+├── run.py
+├── user_params.json
+├── scripts
+|    ├──__init__.py
+|    ├──data
+|    |    ├──__init__.py
+|    |    ├──data_load.py
+|    |    ├──data_write.py
+|    ├──postprocess
+|    |    ├──__init__.py
+|    |    ├──postprocess.py
+|    ├──preprocess
+|    |    ├──__init__.py
+|    |    ├──preprocess.py
+```
+All pipeline functions reside within their respective modules. For example, functions that are part of the preprocessing pipeline reside in `preprocess.py`, while functions that are part of postprocessing reside in `postprocess.py`.
+
+### Function-Standards 
+
+#### preprocess
+
+All functions for the preprocessing pipeline must contain the following parameter list and return values to satisfy `run.py` constraints.
+```python
+def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
+     """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations 
+    """
+    # code to do pipeline step
+
+    return EEG_object_modified, output_dict 
+```
 
 ## Containers
 
 Please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage located in `base_eeg_docker_files/README.md`. 
+
 
 ## Issues
 
@@ -27,6 +109,7 @@ See issues for current/future work.
 Always assign yourself to an issue before beginning work on it!
 
 If someone is already assigned to an issue that you intend to work on, post a comment to ask if you can help before assigning yourself. If no response within 24 hours, then you are free to start work on the issue, but post another comment first to let them know what you will be doing.
+
 
 ## Git-Workflow 
 
@@ -53,27 +136,13 @@ Subsequently, branches follow this convention:
 - *only* branch available for personal development, must be branched off of `-->dev-feature-[featureName]` branch
 - Merged into `-->dev-feature-[featureName]` after pull-request (code review)
 
+
 ## CI-test
 [NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
 
-## Input-Data
-- [BIDS.zip](https://drive.google.com/drive/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-?usp=sharing) is used as the test input file for all pipeline feature development. 
-- [user_params.json](README.md)
+## Example-Data
+- [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development. 
 
-## Output-Data
-- [output_preproc.json](README.md)
-- [output.log](README.md)
-    To record function output to log-file, insert the following:
-    ```python 
-    # initialize log-file
-    logging.basicConfig(filename=subject_file_name, filemode='a', encoding='utf-8', level=logging.NOTSET)
-
-    # ... pipeline steps execute ...
-
-    logging.info("describe output of pipeline")
-    # record pipeline output
-    logging.info(mne.post.info)
-    ```
 
 ## Reminders
 1. only push directly (without code review) to dev-feature-[featureName]-[yourName]
