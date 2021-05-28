@@ -34,13 +34,14 @@ The UML diagram listed above details the pipeline steps that run for each subjec
     Motivation behind each pipeline step listed in the [readme.md](README.md). 
 
 3. Pipeline Output
-At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
+
+   At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
 - [output_preproc.json](README.md)
 - [output.log](README.md)
 
-Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were
+Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were.
 
-The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc
+The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the pressence of any warning/errors, etc.
 
 
 ### Directory-Structure
@@ -115,25 +116,25 @@ If someone is already assigned to an issue that you intend to work on, post a co
 
 ![ndcworkflow](https://user-images.githubusercontent.com/26397102/116148813-00512800-a6a7-11eb-9624-cd81f11d3ada.png)
 
-Development is driven by the [feature branch workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow), where each new feature is encapsulated in a branch. This ensures changes are properly tested & integrated while still allowing for development to be done in parallel
+Development is driven by the [feature branch workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow), where each new feature is encapsulated in a branch. This ensures changes are properly tested & integrated while still allowing for development to be done in parallel.
 
 Subsequently, branches follow this convention:
 
 `main`
-- no test features
+- No test features
 - 100% stable and usable by any lab members 
-- *no direct commits*
+- *No direct commits*
 
 `->dev`
 - Up to date development branch with properly tested/reviewed features 
-- *no direct commits*
+- *No direct commits*
 
 `-->dev-feature-[featureName]`
 - Ongoing development and testing of feature to be pull requested into `dev` 
-- *no direct commits*
+- *No direct commits*
 
 `--->dev-feature-[featureName]-[yourName]`
-- *only* branch available for personal development, must be branched off of `-->dev-feature-[featureName]` branch
+- *Only* branch available for personal development, must be branched off of `-->dev-feature-[featureName]` branch
 - Merged into `-->dev-feature-[featureName]` after pull-request (code review)
 
 
@@ -145,7 +146,7 @@ Subsequently, branches follow this convention:
 
 
 ## Reminders
-1. only push directly (without code review) to dev-feature-[featureName]-[yourName]
+1. Only push directly (without code review) to dev-feature-[featureName]-[yourName]
 2. Must initiate pull request (and assign at least one person) for any higher-level branch
 3. Mandatory code review by one person for all pull requests 
 4. If there is no BIDS standard for a type of file that a feature outputs, the developer should set things up in a way that is in line with [general BIDS principles](https://www.nature.com/articles/s41597-019-0104-8).
