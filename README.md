@@ -38,7 +38,7 @@ Run `run.py` to interpret this file and output cleaned EEG data.
 
 ### output_preproc.json
 
-These output files will contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). This file will be built iteratively as the pipeline progresses
+These output files will contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). This file will be built iteratively as the pipeline progresses.
 
 Each file name generated on a subject will follow the BIDS naming standard: `output_preproc_XXX_task_YYY_run_ZZZ.json`
 
@@ -65,8 +65,8 @@ Each file name generated on a subject will follow the BIDS naming standard: `out
 
 ### 2) Feature-badchans
 
-- auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
-- write to output file to indicate which channels were detected as bad (write to field "globalBad_chans")
+- Auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
+- Write to output file to indicate which channels were detected as bad (write to field "globalBad_chans")
 
 ### 3) Feature-ica
 
@@ -90,19 +90,19 @@ One way around this is to first make a copy of the eeg data. For the copy, use a
     - Write to the output file which ica components were identified as artifacts in the "icArtifacts" field
 
 ### 4) Feature-segment
-- segment/epoch (cut) the continuous data into epochs of data, such that the zero point for each epoch is a given marker of interest
-- write to output file which markers were used for epoching purposes, how many of each epoch were created, and how many ms appear before/after the markers of interest
+- Segment/epoch (cut) the continuous data into epochs of data, such that the zero point for each epoch is a given marker of interest
+- Write to output file which markers were used for epoching purposes, how many of each epoch were created, and how many ms appear before/after the markers of interest
 
 ### 5) Feature-finalrej
-- loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
-- write to the output file which channel/epoch intersections were rejected
+- Loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
+- Write to the output file which channel/epoch intersections were rejected
 
 ### 6) Feature-interp
-- interpolate missing channels, at the channel/epoch level using a spherical spline interpolation, as implemented in mne
-- interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in mne
-- write to output file which channels were interpolated and using what method
+- Interpolate missing channels, at the channel/epoch level using a spherical spline interpolation, as implemented in mne
+- Interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in mne
+- Write to output file which channels were interpolated and using what method
 
 ### 7) Feature-reref
-- re-reference the data to the average of all electrodes (“average reference”) using the mne function
-- write to output file that data were re-referenced to average
+- Re-reference the data to the average of all electrodes (“average reference”) using the mne function
+- Write to output file that data were re-referenced to average
 
