@@ -40,5 +40,6 @@ dependencies:
 - ipywidgets==7.6.3
 - pip:
   - ipyvtk-simple==0.1.4
+  - autoreject==0.2.1
   - mne-bids==0.7
   - pybv==0.5.0
