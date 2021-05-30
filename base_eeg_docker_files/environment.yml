@@ -26,6 +26,8 @@ dependencies:
 - vtk>=9.0.1
 - pyvista==0.29.0
 - pyvistaqt==0.3.0
+- qdarkstyle==3.0.2
+- darkdetect==0.3.1
 - mayavi==4.7.2
 - PySurfer==0.11.0
 - dipy==1.4.0
@@ -33,10 +35,11 @@ dependencies:
 - nilearn==0.7.1
 - python-picard==0.4
 - pyqt==5.12.3
-- mne==0.22.1
+- mne==0.23.0
 - mffpy==0.6.2
 - ipywidgets==7.6.3
 - pip:
   - ipyvtk-simple==0.1.4
+  - autoreject==0.2.1
   - mne-bids==0.7
   - pybv==0.5.0
