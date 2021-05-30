@@ -129,6 +129,7 @@ dmypy.json
 .pyre/
 
 # IDE specific 
+.idea
 .vscode
 
 # OS specific 
