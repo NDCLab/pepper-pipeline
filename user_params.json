@@ -1,0 +1,24 @@
+{
+    "filter": {
+      "l_freq": 0.3, 
+      "h_freq": 40
+    },
+    "segment_data": {
+      "tmin": -0.2, 
+      "tmax": 0.5, 
+      "baseline": null, 
+      "picks": null, 
+      "reject_tmin": null, 
+      "reject_tmax": null, 
+      "decim": 1, 
+      "verbose": false, 
+      "preload": true
+    },
+    "final_reject_epoch": {
+    }, 
+    "interpolate_data": {
+      "mode": "accurate", 
+      "method": null,
+      "reset_bads": true
+    }
+  }
