@@ -27,12 +27,15 @@ def baseeeg_preprocessing_filter(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
 
-        return raw_filtered, {"Filter": {
-            "Highpass corner frequency": raw_filtered.info["highpass"],
-            "Lowpass corner frequency": raw_filtered.info["lowpass"],
-            "Sampling Rate": raw_filtered.info["sfreq"],
-            }
-        }
+        h_pass = raw_filtered.info["highpass"]
+        l_pass = raw_filtered.info["lowpass"]
+        samp_freq = raw_filtered.info["sfreq"]
+
+        filter_details = {"Highpass corner frequency": h_pass,
+                          "Lowpass corner frequency": l_pass,
+                          "Sampling Rate": samp_freq}
+
+        return raw_filtered, {"Filter": filter_details}
     except TypeError:
         print('Type Error')
     except Exception:
