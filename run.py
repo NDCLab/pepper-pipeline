@@ -15,9 +15,12 @@ eeg_obj = load_data.load_raw(
     "eeg"
 )
 
+# specify preprocess steps
+preprocess_steps = user_params["preprocess"]
+
 # for each pipeline step in user_params, execute with specified parameters
-func_outputs = [None] * len(user_params)
-for idx, (func, params) in enumerate(user_params.items()):
+func_outputs = [None] * len(preprocess_steps)
+for idx, (func, params) in enumerate(preprocess_steps.items()):
     eeg_obj, func_outputs[idx] = getattr(preproc, func)(eeg_obj, **params)
 
 # collect outputs of each step and annotate changes
