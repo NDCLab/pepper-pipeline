@@ -17,9 +17,13 @@ Welcome to baseEEG! The guidelines for development are as follows:
 
 ### Overview 
 
-![UMLrawread](https://user-images.githubusercontent.com/26397102/119166320-1642d600-ba24-11eb-8dd6-0d35430831b0.png)
+![UML-outer](https://user-images.githubusercontent.com/26397102/120357442-13b96980-c2cb-11eb-8507-49487db23624.png)
+*UML diagram for run, which references to run:preprocess*
 
-The UML diagram listed above details the pipeline steps that run for each subject:
+![UML-inner](https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png)
+*UML diagram for run:preprocess*
+
+The UML diagrams described above detail the pipeline steps that run for each subject:
 
 1. Pipeline Input (load_data)
 - [raw EEG data](#Example-Data)  
