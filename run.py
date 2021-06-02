@@ -4,11 +4,8 @@ from scripts.data import write_annotate
 import scripts.preprocess.preprocess as preproc
 from collections import ChainMap
 
-# get user_params from user_params.json
+# get user_params and raw
 user_params = load_data.load_param("user_params.json")
-
-# for each pipeline step in user_params, execute with specified parameters
-func_outputs = [None] * len(user_params)
 eeg_obj = load_data.load_raw(
     "CMI/rawdata/",
     "NDARAB793GL3",
@@ -17,7 +14,13 @@ eeg_obj = load_data.load_raw(
     "01",
     "eeg"
 )
-for idx, (func, params) in enumerate(user_params.items()):
+
+# specify preprocess steps
+preprocess_steps = user_params["preprocess"]
+
+# for each pipeline step in user_params, execute with specified parameters
+func_outputs = [None] * len(preprocess_steps)
+for idx, (func, params) in enumerate(preprocess_steps.items()):
     eeg_obj, func_outputs[idx] = getattr(preproc, func)(eeg_obj, **params)
 
 # collect outputs of each step and annotate changes
