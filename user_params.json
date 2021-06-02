@@ -1,5 +1,9 @@
 {
-    "filter": {
+  "load_data": {
+  }, 
+
+  "preprocess": {
+    "filter_data": {
       "l_freq": 0.3, 
       "h_freq": 40
     },
@@ -21,4 +25,8 @@
       "method": null,
       "reset_bads": true
     }
+  },
+  
+  "postprocess": {
   }
+}
