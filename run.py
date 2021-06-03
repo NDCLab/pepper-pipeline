@@ -1,5 +1,5 @@
 from scripts.data import load_data
-from scripts.data import write_annotate
+from scripts.data import write_data
 
 import scripts.preprocess.preprocess as preproc
 from collections import ChainMap
@@ -22,7 +22,8 @@ preprocess_steps = user_params["preprocess"]
 func_outputs = [None] * len(preprocess_steps)
 for idx, (func, params) in enumerate(preprocess_steps.items()):
     eeg_obj, func_outputs[idx] = getattr(preproc, func)(eeg_obj, **params)
+    write_data.write_eeg_data(eeg_obj, func, subject, session, task, datatype, root)
 
 # collect outputs of each step and annotate changes
 output = dict(ChainMap(*func_outputs))
-write_annotate.read_dict_to_json(output)
+write_data.read_dict_to_json(output)

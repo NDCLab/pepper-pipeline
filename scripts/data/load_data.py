@@ -3,7 +3,6 @@ import mne_bids
 import json
 
 
-# load raw data
 def load_raw(path, sub, ses, task, run, datatype):
     bids_root = pathlib.Path(path)
     bids_path = mne_bids.BIDSPath(subject=sub,
