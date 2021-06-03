@@ -1,6 +1,6 @@
 import json
 import sys
-import os 
+import os
 
 
 def read_dict_to_json(dict_array):
