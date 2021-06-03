@@ -46,6 +46,64 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         print('Unknown Error')
 
 
+def bad_channels(EEG_object, user_param1):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
+
+
+def ica(EEG_object, user_param1):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
+
+
 def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
                  decim, verbose, preload):
     """Used to segment continuous data into epochs
@@ -271,3 +329,32 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
         figure.suptitle(title_, size='xx-large', weight='bold')
+
+
+def rereference_data(EEG_object, user_param1):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
