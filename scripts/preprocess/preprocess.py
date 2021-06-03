@@ -46,7 +46,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         print('Unknown Error')
 
 
-def bad_channels(EEG_object, user_param1):
+def bad_channels(EEG_object):
     """Function description
     Parameters
     ----------
@@ -75,7 +75,7 @@ def bad_channels(EEG_object, user_param1):
     return EEG_object, output_dict
 
 
-def ica(EEG_object, user_param1):
+def ica(EEG_object):
     """Function description
     Parameters
     ----------
@@ -331,7 +331,7 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure.suptitle(title_, size='xx-large', weight='bold')
 
 
-def rereference_data(EEG_object, user_param1):
+def rereference_data(EEG_object):
     """Function description
     Parameters
     ----------
