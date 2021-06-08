@@ -18,8 +18,6 @@ eeg_obj = load_data.load_raw(
 # specify preprocess steps
 preprocess_steps = user_params["preprocess"]
 
-print("test push")
-
 # for each pipeline step in user_params, execute with specified parameters
 func_outputs = [None] * len(preprocess_steps)
 for idx, (func, params) in enumerate(preprocess_steps.items()):
