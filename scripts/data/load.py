@@ -30,4 +30,4 @@ def load_param(user_param_path):
 
 def init_data(user_params):
     init_data = user_params["load_data"]
-    return init_data["root"], init_data["subjects"], init_data["channel"]
+    return init_data["root"], init_data["subjects"], init_data["channel-type"]
