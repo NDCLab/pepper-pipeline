@@ -274,53 +274,53 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
         figure.suptitle(title_, size='xx-large', weight='bold')
-        
+
 
 def hurst(data):
     """Estimate Hurst exponent on a timeseries.
-    
+
     Parameters:
     ----------
     data:    1D numpy array
              The timeseries to estimate the Hurst exponent for.
-    
+
     Returns
     -------
     h:    float
           The estimation of the Hurst exponent for the given timeseries.
     """
-    
-    npoints=data.size
-    yvals=np.zeros(npoints)
-    xvals=np.zeros(npoints)
-    data2=np.zeros(npoints)
 
-    index=0
-    binsize=1
+    npoints = data.size
+    yvals = np.zeros(npoints)
+    xvals = np.zeros(npoints)
+    data2 = np.zeros(npoints)
 
-    while npoints>4:
-        y=np.std(data)
-        index=index+1
-        xvals[index-1]=binsize
-        yvals[index-1]=binsize*y
-    
-        npoints=(np.fix(npoints/2)).astype(np.int32)
-        binsize=binsize*2
-    
+    index = 0
+    binsize = 1
+
+    while npoints > 4:
+        y = np.std(data)
+        index = index + 1
+        xvals[index - 1] = binsize
+        yvals[index - 1] = binsize*y
+
+        npoints = (np.fix(npoints / 2)).astype(np.int32)
+        binsize = binsize * 2
+
         # average adjacent points in pairs
         for i in range(npoints):
-            index_i=(i+1)*2-1
-            data2[i]=(data[index_i]+data[index_i-1])*0.5
-    
-        data=data2[0:npoints]
-    
-    xvals=xvals[0:index]
-    yvals=yvals[0:index]
-    
+            index_i = (i + 1) * 2 - 1
+            data2[i] = (data[index_i] + data[index_i - 1]) * 0.5
+
+        data = data2[0:npoints]
+
+    xvals = xvals[0:index]
+    yvals = yvals[0:index]
+
     try:
-        logx=np.log(xvals)
-        logy=np.log(yvals)
-        p2=np.polyfit(logx,logy,1)
+        logx = np.log(xvals)
+        logy = np.log(yvals)
+        p2 = np.polyfit(logx, logy, 1)
     except Exception:
         print('Log Error!')
         return np.nan
@@ -331,61 +331,60 @@ def hurst(data):
 
 def identify_badchans_raw(raw):
     """Automatic bad channel identification - raw data is modified in place
-    
+
     Parameters:
     ----------:
     raw:    mne.io.Raw
             initially loaded raw object of EEG data
-            
+
     Returns:
     ----------
     raw:   mne.io.Raw
            instance of "cleaned" raw data
-           
+
     output_dict_flter:  dictionary
                         dictionary with relevant bad channel information
     """
-    
+
     # get raw data matrix
     raw_data = raw.get_data()
-    
+
     # get spherical and polar coordinates
     chs_x = np.array([loc['loc'][1] for loc in raw.info['chs']])
-    chs_y = np.array([loc['loc'][0]*(-1) for loc in raw.info['chs']])
+    chs_y = np.array([loc['loc'][0] * (-1) for loc in raw.info['chs']])
     chs_z = np.array([loc['loc'][2] for loc in raw.info['chs']])
-    sph_radius = np.sqrt(chs_x**2 + chs_y**2 + chs_z**2)
-    sph_phi = (np.arctan2(chs_z, np.sqrt(chs_x**2 + chs_y**2)))/np.pi*180
-    sph_theta = (np.arctan2(chs_y,chs_x))/np.pi*180
+    sph_phi = (np.arctan2(chs_z, np.sqrt(chs_x**2 + chs_y**2))) / np.pi * 180
+    sph_theta = (np.arctan2(chs_y,chs_x)) / np.pi * 180
     theta = sph_theta * (-1)
-    radius = 0.5 - sph_phi/180
-    chanlocs = pd.DataFrame({'x':chs_x, 'y':chs_y, 'z':chs_z,
-                         'theta':theta,
-                         'radius':radius})
-    
+    radius = 0.5 - sph_phi / 180
+    chanlocs = pd.DataFrame({'x': chs_x,
+                             'y': chs_y,
+                             'z': chs_z,
+                             'theta': theta,
+                             'radius': radius})
+
     # compute the distance between each channel and reference
     # -- should be edited later to take reference from user_params
     # -- need to confirm the naming of channels across systems
     ref_theta = chanlocs.iloc[128]['theta']
     ref_radius = chanlocs.iloc[128]['radius']
-    f=lambda x:np.sqrt(x['radius']**2 + ref_radius**2
-                       - 2*x['radius']*ref_radius*np.cos(x['theta']/180*np.pi-ref_theta/180*np.pi))
-    chanlocs['distance'] = chanlocs.apply(f,axis=1)
+    chanlocs['distance'] = chanlocs.apply(lambda x:np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis = 1)
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
     reg_var = np.polyfit(chanlocs['distance'], chns_var, 2)
-    fitcurve_var = np.polyval(reg_var,chanlocs['distance'])
+    fitcurve_var = np.polyval(reg_var, chanlocs['distance'])
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
                                                         threshold=3.0,
                                                         max_iter=1,
                                                         tail=0)]
-    
+
     # find bad channels based on correlations and correct for the distance
     chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
     chns_cor[128] = np.nanmean(chns_cor)
     reg_cor = np.polyfit(chanlocs['distance'], chns_cor, 2)
-    fitcurve_cor = np.polyval(reg_cor,chanlocs['distance'])
+    fitcurve_cor = np.polyval(reg_cor, chanlocs['distance'])
     corrected_cor = chns_cor - fitcurve_cor
     bads_cor = [raw.ch_names[i] for i in _find_outliers(corrected_cor,
                                                         threshold=3.0,
@@ -394,13 +393,13 @@ def identify_badchans_raw(raw):
 
     # find bad channels based on hurst exponent
     hurst_exp = np.array([hurst(i) for i in raw_data])
-    hurst_exp[np.isnan(hurst_exp)]=np.nanmean(hurst_exp)
-    bads_loc = np.where(abs(zscore(hurst_exp))>3)[0]
+    hurst_exp[np.isnan(hurst_exp)] = np.nanmean(hurst_exp)
+    bads_loc = np.where(abs(zscore(hurst_exp)) > 3)[0]
     bads_hurst = [raw.ch_names[i] for i in bads_loc]
-    
+
     # mark bad channels
-    raw.info['bads'].extend(bads_var+bads_cor+bads_hurst)
-    
+    raw.info['bads'].extend(bads_var + bads_cor + bads_hurst)
+
     badchans_details = {"badchans based on variances": bads_var,
                         "badchans based on correlations": bads_cor,
                         "badchans based on hurst exponent": bads_hurst}
