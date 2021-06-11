@@ -302,7 +302,7 @@ def hurst(data):
         y = np.std(data)
         index = index + 1
         xvals[index - 1] = binsize
-        yvals[index - 1] = binsize*y
+        yvals[index - 1] = binsize * y
 
         npoints = (np.fix(npoints / 2)).astype(np.int32)
         binsize = binsize * 2
@@ -354,7 +354,7 @@ def identify_badchans_raw(raw):
     chs_y = np.array([loc['loc'][0] * (-1) for loc in raw.info['chs']])
     chs_z = np.array([loc['loc'][2] for loc in raw.info['chs']])
     sph_phi = (np.arctan2(chs_z, np.sqrt(chs_x**2 + chs_y**2))) / np.pi * 180
-    sph_theta = (np.arctan2(chs_y,chs_x)) / np.pi * 180
+    sph_theta = (np.arctan2(chs_y, chs_x)) / np.pi * 180
     theta = sph_theta * (-1)
     radius = 0.5 - sph_phi / 180
     chanlocs = pd.DataFrame({'x': chs_x,
@@ -368,7 +368,7 @@ def identify_badchans_raw(raw):
     # -- need to confirm the naming of channels across systems
     ref_theta = chanlocs.iloc[128]['theta']
     ref_radius = chanlocs.iloc[128]['radius']
-    chanlocs['distance'] = chanlocs.apply(lambda x:np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis = 1)
+    chanlocs['distance'] = chanlocs.apply(lambda x: np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis=1)
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
