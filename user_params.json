@@ -1,7 +1,13 @@
 {
   "load_data": {
     "root": "CMI/rawdata",
-    "subjects": ["NDARAB793GL3"],
+    "subjects": ["*"],
+    "tasks": ["*"],
+    "exceptions": {
+      "subjects": ["NDARAB793GL3"],
+      "tasks": ["ContrastBlockChange1"], 
+      "runs": ["01"]
+    },
     "channel-type": "eeg"
   }, 
   "preprocess": {
