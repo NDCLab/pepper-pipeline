@@ -471,7 +471,7 @@ def ica_raw(raw):
 
     ica_details = {"original epochs": epochs_original,
                    "bad epochs": epochs_bads,
-                   "bad epochs rate": epochs_bads/epochs_original,
+                   "bad epochs rate": epochs_bads / epochs_original,
                    "eog indices": eog_indices,
                    "eog_scores": eog_scores}
 
