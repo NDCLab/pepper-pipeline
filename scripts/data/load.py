@@ -6,19 +6,6 @@ from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 from itertools import product
 
 
-def load_raw(path, sub, ses, task, run, datatype):
-    """Load BIDS path and read raw at path
-    """
-    bids_root = pathlib.Path(path)
-    bids_path = mne_bids.BIDSPath(subject=sub,
-                                  session=ses,
-                                  task=task,
-                                  run=run,
-                                  datatype=datatype,
-                                  root=bids_root)
-    return mne_bids.read_raw_bids(bids_path)
-
-
 def load_params(user_param_path):
     with open(user_param_path) as fp:
         user_params = json.load(fp)
@@ -26,7 +13,19 @@ def load_params(user_param_path):
 
 
 def init_subjects(filter_sub, root, ch_type):
-    """Initialize collection of files by loading seleced subjects
+    """Initialize collection of files by loading selected subjects
+    Parameters
+    ----------
+    filter_sub : list
+                   any integer
+    root : str
+           any integer
+    ch_type: str
+             
+
+    Returns
+    ----------
+    files: list
     """
     if filter_sub == ["*"]:
         filter_sub = mne_bids.get_entity_vals(root, 'subject')
@@ -48,7 +47,17 @@ def init_subjects(filter_sub, root, ch_type):
 
 
 def filter_tasks(filter_tasks, files):
-    """Select tasks as defined by user
+    """Select tasks as defined by user_params
+    Parameters
+    ----------
+    filter_tasks : list
+                   any integer
+    files : list
+            any integer
+
+    Returns
+    ----------
+    files: list
     """
     if filter_tasks == ["*"]:
         return files
@@ -57,7 +66,21 @@ def filter_tasks(filter_tasks, files):
 
 
 def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
-    """Remove exceptions as defined by user
+    """Remove exceptions as defined by user_params
+    Parameters
+    ----------
+    subjects : list
+               any integer
+    tasks : list
+            any integer
+    runs: dict
+    files: list
+    root: str
+    ch_type: str
+
+    Returns
+    ----------
+    files: list
     """
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
@@ -86,9 +109,23 @@ def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     return [f for f in files if f not in exceptions]
 
 
-def load_files(root, ch_type, data_params):
+def load_files(data_params):
+    """ Load subject files and filter according to load_params of user_params
+    Parameters
+    ----------
+    data_params: dict
+                 dictionary containing metadata of BIDS dataset and selection of subjects, tasks,
+                 and exceptions
+
+    Returns
+    ----------
+    files: list
+           a list of 
     """
-    """
+    # get metadata
+    root = data_params["root"]
+    ch_type = data_params["channel-type"]
+
     # get selection of subjects & tasks
     subjects_sel = data_params["subjects"]
     tasks_sel = data_params["tasks"]
