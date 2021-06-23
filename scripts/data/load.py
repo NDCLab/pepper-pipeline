@@ -1,17 +1,13 @@
 import pathlib
 import mne_bids
 import json
+from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
-
-def load_subject_files(path, sub, datatype):
-    bids_root = pathlib.Path(path)
-    bids_path = mne_bids.BIDSPath(subject=sub,
-                                  datatype=datatype,
-                                  root=bids_root)
-    return bids_path.match()
-
+from itertools import product
 
 def load_raw(path, sub, ses, task, run, datatype):
+    """Load BIDS path and read raw at path
+    """
     bids_root = pathlib.Path(path)
     bids_path = mne_bids.BIDSPath(subject=sub,
                                   session=ses,
@@ -22,12 +18,81 @@ def load_raw(path, sub, ses, task, run, datatype):
     return mne_bids.read_raw_bids(bids_path)
 
 
-def load_param(user_param_path):
+def load_params(user_param_path):
     with open(user_param_path) as fp:
         user_params = json.load(fp)
         return user_params
 
 
-def init_data(user_params):
-    init_data = user_params["load_data"]
-    return init_data["root"], init_data["subjects"], init_data["channel-type"]
+def init_subjects(filter_sub, root, ch_type):
+    """Initialize collection of files by loading seleced subjects
+    """
+    if filter_sub == ["*"]:
+        filter_sub = mne_bids.get_entity_vals(root, 'subject')
+
+    filered_subjects = []
+    bids_root = pathlib.Path(root)
+    type_extension = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
+
+    for subject in filter_sub:
+        bids_path = mne_bids.BIDSPath(subject=subject,
+                                      datatype=ch_type,
+                                      root=bids_root)
+
+        files = bids_path.match()
+        files_eeg = [f for f in files if f.extension.lower() in type_extension]
+        filered_subjects += files_eeg
+
+    return filered_subjects
+
+
+def filter_tasks(filter_tasks, files):
+    """Select tasks as defined by user
+    """
+    if filter_tasks == ["*"]:
+        return files
+
+    return [f for f in files if f.task in filter_tasks]
+
+
+def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
+    """Remove exceptions as defined by user
+    """
+    # get cartesian product of subjects, tasks, and runs
+    exceptions = list(product(subjects, tasks, runs))
+
+    exceptions_filtered = []
+    for file in exceptions:
+        sub = "sub-" + file[0]
+        task = "task-" + file[1]
+        run = "run-" + file[2]
+
+
+
+    return exceptions_filtered
+
+
+def load_files(root, ch_type, data_params):
+    """
+    """
+    # get selection of subjects & tasks
+    subjects_sel = data_params["subjects"]
+    tasks_sel = data_params["tasks"]
+
+    # Get selection of exceptions
+    exceptions = data_params["exceptions"]
+    e_sub = exceptions["subjects"]
+    e_tasks = exceptions["tasks"]
+    e_runs = exceptions["runs"]
+
+    # initialize files by loading selected subjects
+    files = init_subjects(subjects_sel, root, ch_type)
+
+    # filter tasks
+    files = filter_tasks(tasks_sel, files)
+    print(files)
+
+    # filter exceptions
+    # files = filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
+
+    return files

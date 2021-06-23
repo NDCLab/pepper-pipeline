@@ -4,9 +4,9 @@
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
-      "subjects": ["NDARAB793GL3"],
-      "tasks": ["ContrastBlockChange1"], 
-      "runs": ["01"]
+      "subjects": "",
+      "tasks": "", 
+      "runs": ""
     },
     "channel-type": "eeg"
   }, 

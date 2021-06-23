@@ -1,34 +1,36 @@
-from scripts.data import load
-from scripts.data import write
+from scripts.data.load import load_params, load_raw, load_files
+from scripts.data.write import read_dict_to_json, write_eeg_data
+from scripts.preprocess import preprocess
 
-import scripts.preprocess.preprocess as preproc
 from collections import ChainMap
 
-user_params = load.load_param("user_params.json")
+# load all parameters
+user_params = load_params("user_params.json")
 
-# get preprocessing steps
-preprocess_steps = user_params["preprocess"]
-# get collection of subjects from user_params
-root, subjects, ch_type = load.init_data(user_params)
+# get preprocessing and data parameters
+preprocess_params = user_params["preprocess"]
+data_params = user_params["load_data"]
 
-# TODO: Should analysis be run on select tasks, runs, sessions for subjects?
-for subj in subjects:
-    subject_files = load.load_subject_files(root, subj, ch_type)
-    # get only eeg data files
-    subject_files = [s for s in subject_files if s.suffix == ch_type]
+# get root and channel type of data
+root = data_params["root"]
+ch_type = data_params["channel-type"]
 
-    for file in subject_files:
+# get set of subjects & tasks to run while omitting existing exceptions
+data = load_files(root, ch_type, data_params)
 
-        ses, task, run = file.session, file.task, file.run
-        eeg_obj = load.load_raw(root, subj, ses, task, run, ch_type)
+'''
+# for each file
+for file in data:
+    subj, ses, task, run = file.subject, file.session, file.task, file.run
+    eeg_obj = load_raw(root, subj, ses, task, run, ch_type)
 
-        outputs = [None] * len(preprocess_steps)
-        # for each pipeline step in user_params, execute with parameters
-        for idx, (func, params) in enumerate(preprocess_steps.items()):
-            eeg_obj, outputs[idx] = getattr(preproc, func)(eeg_obj, **params)
-            write.write_eeg_data(eeg_obj, func, subj, ses, task, ch_type, root)
+    outputs = [None] * len(preprocess_params)
+    # for each pipeline step in user_params, execute with parameters
+    for idx, (func, params) in enumerate(preprocess_params.items()):
+        eeg_obj, outputs[idx] = getattr(preprocess, func)(eeg_obj, **params)
+        write_eeg_data(eeg_obj, func, subj, ses, task, ch_type, root)
 
-        # TODO: write output_preproc to appropriate path
-        # collect outputs of each step and annotate changes
-        output = dict(ChainMap(*outputs))
-        write.read_dict_to_json(output)
+    # collect annotations of each step
+    output = dict(ChainMap(*outputs))
+    read_dict_to_json(output)
+'''
