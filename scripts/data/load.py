@@ -17,15 +17,16 @@ def init_subjects(filter_sub, root, ch_type):
     Parameters
     ----------
     filter_sub : list
-                   any integer
+                 a list of subjects to select from all BIDS files
     root : str
-           any integer
+           root of BIDS dataset
     ch_type: str
-             
+             type of BIDS dataset
 
     Returns
     ----------
     files: list
+           a list of partially filtered BIDS paths according to subjects
     """
     if filter_sub == ["*"]:
         filter_sub = mne_bids.get_entity_vals(root, 'subject')
@@ -51,13 +52,14 @@ def filter_tasks(filter_tasks, files):
     Parameters
     ----------
     filter_tasks : list
-                   any integer
+                   list of tasks to run pipeline on
     files : list
-            any integer
+            list of BIDS paths filtered according to subjects
 
     Returns
     ----------
     files: list
+           a list of partially filtered BIDS paths according to tasks
     """
     if filter_tasks == ["*"]:
         return files
@@ -69,18 +71,20 @@ def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     """Remove exceptions as defined by user_params
     Parameters
     ----------
-    subjects : list
-               any integer
-    tasks : list
-            any integer
-    runs: dict
+    subjects, tasks, runs : list
+                            a list of subjects, tasks, and runs to be
+                            cartesian multiplied to get omitted files
     files: list
+           list of partially filtered files according to subject and tasks
     root: str
+          root of BIDS dataset
     ch_type: str
+             type of BIDS dataset
 
     Returns
     ----------
     files: list
+           a list of fully filtered BIDS paths according to exceptions
     """
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
@@ -114,13 +118,13 @@ def load_files(data_params):
     Parameters
     ----------
     data_params: dict
-                 dictionary containing metadata of BIDS dataset and selection of subjects, tasks,
-                 and exceptions
+                 dictionary containing metadata of BIDS dataset and selection
+                 of subjects, tasks, and exceptions
 
     Returns
     ----------
     files: list
-           a list of 
+           a list of completely filtered BIDS paths
     """
     # get metadata
     root = data_params["root"]
