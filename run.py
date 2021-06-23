@@ -5,7 +5,7 @@ from scripts.preprocess import preprocess
 from collections import ChainMap
 
 # load all parameters
-user_params = load_params("user_params.json")
+user_params = load_params("user_params_except.json")
 
 # get preprocessing and data parameters
 preprocess_params = user_params["preprocess"]
@@ -18,8 +18,7 @@ ch_type = data_params["channel-type"]
 # get set of subjects & tasks to run while omitting existing exceptions
 data = load_files(root, ch_type, data_params)
 
-'''
-# for each file
+# for each file in filtered data
 for file in data:
     subj, ses, task, run = file.subject, file.session, file.task, file.run
     eeg_obj = load_raw(root, subj, ses, task, run, ch_type)
@@ -33,4 +32,3 @@ for file in data:
     # collect annotations of each step
     output = dict(ChainMap(*outputs))
     read_dict_to_json(output)
-'''

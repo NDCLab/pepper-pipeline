@@ -5,6 +5,7 @@ from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
 
+
 def load_raw(path, sub, ses, task, run, datatype):
     """Load BIDS path and read raw at path
     """
@@ -32,7 +33,7 @@ def init_subjects(filter_sub, root, ch_type):
 
     filered_subjects = []
     bids_root = pathlib.Path(root)
-    type_extension = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
+    type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
 
     for subject in filter_sub:
         bids_path = mne_bids.BIDSPath(subject=subject,
@@ -40,7 +41,7 @@ def init_subjects(filter_sub, root, ch_type):
                                       root=bids_root)
 
         files = bids_path.match()
-        files_eeg = [f for f in files if f.extension.lower() in type_extension]
+        files_eeg = [f for f in files if f.extension.lower() in type_exten]
         filered_subjects += files_eeg
 
     return filered_subjects
@@ -61,15 +62,28 @@ def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
 
-    exceptions_filtered = []
-    for file in exceptions:
-        sub = "sub-" + file[0]
-        task = "task-" + file[1]
-        run = "run-" + file[2]
+    bids_root = pathlib.Path(root)
+    type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
+    # turn each exception into a BIDS path
+    for i in range(len(exceptions)):
+        file = exceptions[i]
 
+        sub = file[0]
+        task = file[1]
+        run = file[2]
 
+        bids_path = mne_bids.BIDSPath(subject=sub,
+                                      task=task,
+                                      run=run,
+                                      datatype=ch_type,
+                                      root=bids_root)
+        e_files = bids_path.match()
+        e_files_eeg = [f for f in e_files if f.extension.lower() in type_exten]
 
-    return exceptions_filtered
+        exceptions[i] = e_files_eeg[0]
+
+    # remove any file in files that shows up in exceptions and return
+    return [f for f in files if f not in exceptions]
 
 
 def load_files(root, ch_type, data_params):
@@ -90,9 +104,8 @@ def load_files(root, ch_type, data_params):
 
     # filter tasks
     files = filter_tasks(tasks_sel, files)
-    print(files)
 
     # filter exceptions
-    # files = filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
+    files = filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
 
     return files
