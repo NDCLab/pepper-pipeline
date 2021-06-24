@@ -19,7 +19,6 @@ def read_dict_to_json(dict_array):
         file.write(str)
 
 
-
 def write_eeg_data(raw, func, subject, session, task, datatype, root):
     """Used to store the modified raw file after each processing step
     Parameters:
