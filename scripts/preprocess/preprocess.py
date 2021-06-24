@@ -329,13 +329,16 @@ def hurst(data):
     return p2[0]
 
 
-def identify_badchans_raw(raw):
+def identify_badchans_raw(raw, ref_elec_name):
     """Automatic bad channel identification - raw data is modified in place
 
     Parameters:
     ----------:
     raw:    mne.io.Raw
             initially loaded raw object of EEG data
+
+    ref_elec_name:    str
+                      reference electrode name
 
     Returns:
     ----------
@@ -348,6 +351,15 @@ def identify_badchans_raw(raw):
 
     # get raw data matrix
     raw_data = raw.get_data()
+
+    # get the index of reference electrode
+    try:
+        ref_index = raw.ch_names.index(ref_elec_name)
+    except ValueError:
+        print('the reference electrode name is not in the list')
+        ref_error = 'The expected reference electrode name is NOT provided or in the list'
+        badchans_details = {"ERROR": ref_error}
+        return raw, {"Badchans": badchans_details}
 
     # get spherical and polar coordinates
     chs_x = np.array([loc['loc'][1] for loc in raw.info['chs']])
@@ -366,8 +378,8 @@ def identify_badchans_raw(raw):
     # compute the distance between each channel and reference
     # -- should be edited later to take reference from user_params
     # -- need to confirm the naming of channels across systems
-    ref_theta = chanlocs.iloc[128]['theta']
-    ref_radius = chanlocs.iloc[128]['radius']
+    ref_theta = chanlocs.iloc[ref_index]['theta']
+    ref_radius = chanlocs.iloc[ref_index]['radius']
     chanlocs['distance'] = chanlocs.apply(lambda x: np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis=1)
 
     # find bad channels based on their variances and correct for the distance
@@ -382,7 +394,7 @@ def identify_badchans_raw(raw):
 
     # find bad channels based on correlations and correct for the distance
     chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
-    chns_cor[128] = np.nanmean(chns_cor)
+    chns_cor[ref_index] = np.nanmean(chns_cor)
     reg_cor = np.polyfit(chanlocs['distance'], chns_cor, 2)
     fitcurve_cor = np.polyval(reg_cor, chanlocs['distance'])
     corrected_cor = chns_cor - fitcurve_cor
