@@ -405,3 +405,74 @@ def identify_badchans_raw(raw):
                         "badchans based on hurst exponent": bads_hurst}
 
     return raw, {"Badchans": badchans_details}
+
+
+def ica_raw(raw):
+    """Automatic artifacts identification - raw data is modified in place
+
+    Parameters:
+    ----------:
+    raw:    mne.io.Raw
+            raw object of EEG data after processing by previous steps (filter and
+            bad channels removal)
+
+    Returns:
+    ----------
+    raw:   mne.io.Raw
+           instance of raw data after revmoing artifacts (eog)
+
+    output_dict_ica:  dictionary
+                      dictionary with relevant ica information
+    """
+
+    # set montage
+    # Note: should be edited later
+    raw.set_montage('standard_1020')
+
+    # prepica - step1 - filter
+    # High-pass with 1. Hz
+    raw_filtered_1 = raw.copy()
+    raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
+
+    # prepica - step2 - segment the continuous EEG into arbitrary 1-second epochs
+    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
+                                               duration=1.0,
+                                               overlap=0.0,
+                                               preload=True)
+    # compute the number of original epochs
+    epochs_original = epochs_prep.__len__()
+
+    # drop epochs that are excessively “noisy”
+    reject_criteria = dict(eeg=1000e-6)       # 1000 µV
+    flat_criteria = dict(eeg=1e-6)           # 1 µV
+    epochs_prep.drop_bad(reject=reject_criteria, flat=flat_criteria)
+
+    # compute the number of epochs after removal
+    epochs_bads_removal = epochs_prep.__len__()
+    epochs_bads = epochs_original - epochs_bads_removal
+
+    # ica
+    method = 'picard'
+    max_iter = 500
+    fit_params = dict(fastica_it=5)
+    ica = mne.preprocessing.ICA(n_components=None,
+                                method=method,
+                                max_iter=max_iter,
+                                fit_params=fit_params)
+    ica.fit(epochs_prep)
+
+    # exclude eog
+    # Note: should be edited later for "ch_name"
+    eog_indices, eog_scores = ica.find_bads_eog(epochs_prep, ch_name='FC1')
+    ica.exclude = eog_indices
+
+    # reapplying the matrix back to raw data -- modify in place
+    raw_icaed = ica.apply(raw.load_data())
+
+    ica_details = {"original epochs": epochs_original,
+                   "bad epochs": epochs_bads,
+                   "bad epochs rate": epochs_bads / epochs_original,
+                   "eog indices": eog_indices,
+                   "eog_scores": eog_scores}
+
+    return raw_icaed, {"Ica": ica_details}
