@@ -12,11 +12,17 @@ This project comes with a default `user_params.json` file which directly control
 ```json
 {
     "data": {
-        "Bids_data_root": "PATH"
+        "root": "CMI/rawdata",
+        "subjects": ["subject1", "subject2"],
+        "channel-type": "eeg"
     },
     "preprocess": {
         "filter": {
             "param1": "VALUE"
+        },
+        "bad_channels": {
+        },
+        "ica": {
         },
         "segment_data": {
             "param1": "VALUE",
@@ -26,14 +32,16 @@ This project comes with a default `user_params.json` file which directly control
         }, 
         "interpolate_data": {
             "param1": "VALUE"
+        },
+        "rereference_data": {
         }
+    },
+    "postprocess": {
     }
 }
 ```
 
-To influence parameters, which functions are called, and in which order, edit this file.
-
-Run `run.py` to interpret this file and output cleaned EEG data.  
+Run `run.py` to interpret this file and output cleaned EEG data for each subject specified. Each listed function in `preprocess` will run with the given parameters. 
 ## Output 
 
 ### output_preproc.json

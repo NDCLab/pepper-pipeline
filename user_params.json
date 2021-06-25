@@ -1,11 +1,23 @@
 {
   "load_data": {
+    "root": "CMI/rawdata",
+    "subjects": ["*"],
+    "tasks": ["*"],
+    "exceptions": {
+      "subjects": "",
+      "tasks": "", 
+      "runs": ""
+    },
+    "channel-type": "eeg"
   }, 
-
   "preprocess": {
     "filter_data": {
       "l_freq": 0.3, 
       "h_freq": 40
+    },
+    "bad_channels": {
+    },
+    "ica": {
     },
     "segment_data": {
       "tmin": -0.2, 
@@ -24,6 +36,8 @@
       "mode": "accurate", 
       "method": null,
       "reset_bads": true
+    },
+    "rereference_data": {
     }
   },
   
