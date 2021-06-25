@@ -131,7 +131,8 @@ Format:
 }
 ```
 
-## Raw-Derivatives
+### Raw-Derivatives
+For every pipeline step that executes, an intermediate dataset is written to the specified path. 
 
 ### Log-Files
 
