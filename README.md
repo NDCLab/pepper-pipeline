@@ -1,3 +1,5 @@
+![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
+
 # baseEEG
 A Python software tool. Simply execute `run.py` to generate clean EEG data. Details below! 
 
@@ -18,9 +20,6 @@ A Python software tool. Simply execute `run.py` to generate clean EEG data. Deta
   * [Final-Reject-Epochs](#Final-Reject-Epochs)
   * [Interpolate](#Interpolate)
   * [Rereference](#Rereference)
-
-![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
-
 
 Development guidelines and details are listed in [CONTRIBUTING.md](contributing.md)
 
