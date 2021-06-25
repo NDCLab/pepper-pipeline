@@ -36,7 +36,7 @@ A subset of raw data described in `load_data` of `user_params.json` is extracted
     The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
 
     Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
-
+    
     Motivation behind each pipeline step listed in the [README.md](README.md). 
 
 3. `output_preproc`

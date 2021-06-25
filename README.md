@@ -32,6 +32,7 @@ To select data and edit parameters, directly edit the fields of this file.
 
 ```json
 {
+
     "load_data": {
         "root": "path-to-data-root",
         "subjects": ["sub1", "sub2"],
@@ -53,6 +54,10 @@ To select data and edit parameters, directly edit the fields of this file.
         "ica": {
             "param1": "VALUE"
         },
+        "bad_channels": {
+        },
+        "ica": {
+        },
         "segment_data": {
             "param1": "VALUE",
             "param2": "VALUE"
@@ -66,6 +71,8 @@ To select data and edit parameters, directly edit the fields of this file.
         "rereference_data": {
             "param1": "VALUE"
         }
+    },
+    "postprocess": {
     }
 }
 ```
