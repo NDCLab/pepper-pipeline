@@ -1,21 +1,56 @@
 # baseEEG
-Lab-wide EEG scripts
+A Python software tool. Simply execute `run.py` to generate clean EEG data. Details below! 
+
+## Outline
+
+* [Usage](#Usage)
+  * [Load-Data](#Load-Data)
+  * [Preprocess](#Preprocess)
+* [Output](#Output)
+  * [Annotations](#Annotations)
+  * [Raw-Derivatives](#Raw-Derivatives)
+  * [Log-Files](#Log-Files)
+* [Pipeline-Steps](#Pipeline-Steps)
+  * [Filter](#Filter)
+  * [Reject-Bad-Channels](#Reject-Bad-Channels)
+  * [ICA](#ICA)
+  * [Segment](#Segment)
+  * [Final-Reject-Epochs](#Final-Reject-Epochs)
+  * [Interpolate](#Interpolate)
+  * [Rereference](#Rereference)
 
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
 
-Development guidelines and details are listed in [contributing.md](contributing.md)
+
+Development guidelines and details are listed in [CONTRIBUTING.md](contributing.md)
 
 ## Usage
 
-This project comes with a default `user_params.json` file which directly controls the order of pipeline steps and their parameters:
+This project comes with a default `user_params.json` file which directly controls data selection, the order of pipeline steps, and their respective parameters. 
+
+To select data and edit parameters, directly edit the fields of this file. 
 
 ```json
 {
-    "data": {
-        "Bids_data_root": "PATH"
+    "load_data": {
+        "root": "path-to-data-root",
+        "subjects": ["sub1", "sub2"],
+        "tasks": ["task1"],
+        "exceptions": {
+            "subjects": ["sub1"],
+            "tasks": ["task1"], 
+            "runs": ["run1"]
+        },
+        "channel-type": "type"
     },
     "preprocess": {
-        "filter": {
+        "filter_data": {
+            "param1": "VALUE"
+        },
+        "bad_channels": {
+            "param1": "VALUE"
+        },
+        "ica": {
             "param1": "VALUE"
         },
         "segment_data": {
@@ -23,20 +58,60 @@ This project comes with a default `user_params.json` file which directly control
             "param2": "VALUE"
         },
         "final_reject_epoch": {
+            "param1": "VALUE"
         }, 
         "interpolate_data": {
+            "param1": "VALUE"
+        },
+        "rereference_data": {
             "param1": "VALUE"
         }
     }
 }
 ```
 
-To influence parameters, which functions are called, and in which order, edit this file.
+### Load-Data
+Use this section to select a subset of data, to specify the root, data-type, desired subjects, tasks, and any exceptions that you would like to omit.
 
-Run `run.py` to interpret this file and output cleaned EEG data.  
+For any field where you like to select **all** available data, specify `["*"]` in the respective field. For example, the following selects all available subjects and all available tasks:
+
+```json
+"load_data": {
+    "root": "path-to-data-root",
+    "subjects": ["*"],
+    "tasks": ["*"],
+    "exceptions": {
+        "subjects": ["01"],
+        "tasks": ["A"], 
+        "runs": ["01", "02"]
+    },
+    "channel-type": "type"
+}
+```
+
+The exceptions field works by taking the [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product) of all exception fields. For example, if you would like to omit the datafiles associated with subject-01, task-A, run-01 and run-02, you would specify the following fields:
+
+```json
+"load_data": {
+    "root": "path-to-data-root",
+    "subjects": ["*"],
+    "tasks": ["*"],
+    "exceptions": {
+        "subjects": "",
+        "tasks": "", 
+        "runs": ""
+    },
+    "channel-type": "type"
+}
+```
+### Preprocess
+Use this section to specify preprocessing pipeline steps and their respective parameters. The default parameter file describes the [pipeline steps](#Pipeline-Steps) described below. 
+
+Directly edit the parameter fields to customize preprocessing attributes. 
+
 ## Output 
 
-### output_preproc.json
+### Annotations
 
 These output files will contain all research-relevant outputs of the pipeline (e.g. # bad channels rejected, # ICA artifacts rejected, etc.). This file will be built iteratively as the pipeline progresses.
 
@@ -50,25 +125,27 @@ Format:
 }
 ```
 
-### output_sub.log
+## Raw-Derivatives
+
+### Log-Files
 
 These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output
 
 Each file name generated on a subject will follow the BIDS naming standard: `output_XXX_task_YYY_run_ZZZ.log`
 
-## Pipeline Steps
+## Pipeline-Steps
 
-### 1) Feature-filter
+### 1) Filter
 
 - High pass filter the data using mne function
 - Read in the the "highPass" "lowpass" fields from the "user_params.json" file to define filter parameters
 
-### 2) Feature-badchans
+### 2) Reject-Bad-Channels
 
 - Auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
 - Write to output file to indicate which channels were detected as bad (write to field "globalBad_chans")
 
-### 3) Feature-ica
+### 3) ICA
 
 Overview: ICA requires a decent amount of [stationarity](https://towardsdatascience.com/stationarity-in-time-series-analysis-90c94f27322#:~:text=In%20t%20he%20most%20intuitive,not%20itself%20change%20over%20time.) in the data. This is often violated by raw EEG. 
     
@@ -89,20 +166,20 @@ One way around this is to first make a copy of the eeg data. For the copy, use a
     - Remove the data corresponding to the ica-identified-artifacts
     - Write to the output file which ica components were identified as artifacts in the "icArtifacts" field
 
-### 4) Feature-segment
+### 4) Segment
 - Segment/epoch (cut) the continuous data into epochs of data, such that the zero point for each epoch is a given marker of interest
 - Write to output file which markers were used for epoching purposes, how many of each epoch were created, and how many ms appear before/after the markers of interest
 
-### 5) Feature-finalrej
+### 5) Final-Reject-Epochs
 - Loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
 - Write to the output file which channel/epoch intersections were rejected
 
-### 6) Feature-interp
+### 6) Interpolate
 - Interpolate missing channels, at the channel/epoch level using a spherical spline interpolation, as implemented in mne
 - Interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in mne
 - Write to output file which channels were interpolated and using what method
 
-### 7) Feature-reref
+### 7) Rereference
 - Re-reference the data to the average of all electrodes (“average reference”) using the mne function
 - Write to output file that data were re-referenced to average
 
