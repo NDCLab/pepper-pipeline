@@ -9,6 +9,54 @@ from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
 
+def reref_raw(raw, ref_channels=None):
+    """Re-reference the data to the average of all electrodes
+    Parameters
+    ----------
+    raw:    mne.io.Raw
+            raw object of EEG data
+    ref_channels: list
+            list of reference channels
+
+    Throws
+    ----------
+    TypeError:
+                returns if raw is improper type
+    Exception:
+                returns if unexpected error is encountered
+    Returns
+    ----------
+    raw_filtered:   mne.io.Raw
+                    instance of rereferenced data
+    output_dict_reference:  dictionary
+                            dictionary with relevant information on re-ref
+    """
+    try:
+        raw.load_data()
+
+        # add back reference channel (all zero)
+        if ref_channels is None:
+            raw_new_ref = raw
+        else:
+            raw_new_ref = mne.add_reference_channels(raw,
+                                                     ref_channels=ref_channels)
+
+        ref_type = "average"
+        raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
+
+        ref_details = {
+            "Reference Type": ref_type
+        }
+        # return average reference
+        return raw_new_ref, {"Reference": ref_details}
+
+    except TypeError:
+        print('Type Error')
+
+    except Exception:
+        print('Unknown Error')
+
+
 def filter_data(raw, l_freq=0.3, h_freq=40):
     """Final and automatic rejection of bad epochs
     Parameters
@@ -47,6 +95,64 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         print('Type Error')
     except Exception:
         print('Unknown Error')
+
+
+def bad_channels(EEG_object):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
+
+
+def ica(EEG_object):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
 
 
 def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
@@ -276,6 +382,35 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure.suptitle(title_, size='xx-large', weight='bold')
 
 
+def rereference_data(EEG_object):
+    """Function description
+    Parameters
+    ----------
+    EEG_object: EEG_object type
+            description
+    user_param1:    type
+                    description
+    user_param2:    type
+                    description
+    ...
+
+    Throws
+    ----------
+    What errors are thrown if anything
+
+    Returns
+    ----------
+    EEG_object_modified:    EEG_object_modified type
+                            description
+    output_dictionary:  dictionary
+                        description of annotations
+    """
+    # code to do pipeline step
+
+    output_dict = {}
+    return EEG_object, output_dict
+
+
 def hurst(data):
     """Estimate Hurst exponent on a timeseries.
 
@@ -368,6 +503,7 @@ def identify_badchans_raw(raw):
     # -- need to confirm the naming of channels across systems
     ref_theta = chanlocs.iloc[128]['theta']
     ref_radius = chanlocs.iloc[128]['radius']
+
     chanlocs['distance'] = chanlocs.apply(lambda x: np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis=1)
 
     # find bad channels based on their variances and correct for the distance
