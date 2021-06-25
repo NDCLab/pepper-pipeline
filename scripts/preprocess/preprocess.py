@@ -444,8 +444,7 @@ def ica_raw(raw):
 
     # drop epochs that are excessively “noisy”
     reject_criteria = dict(eeg=1000e-6)       # 1000 µV
-    flat_criteria = dict(eeg=1e-6)           # 1 µV
-    epochs_prep.drop_bad(reject=reject_criteria, flat=flat_criteria)
+    epochs_prep.drop_bad(reject=reject_criteria)
 
     # compute the number of epochs after removal
     epochs_bads_removal = epochs_prep.__len__()
