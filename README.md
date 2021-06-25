@@ -77,7 +77,7 @@ To select data and edit parameters, directly edit the fields of this file.
 ```
 
 ### Load-Data
-Use this section to select a subset of data, to specify the root, data-type, desired subjects, tasks, and any exceptions that you would like to omit.
+Use this section to select a subset of data by selecting desired subjects, tasks, and any exceptions that you would like to omit. Meta-data `root` and `channel-type` are additionally required. 
 
 For any field where you like to select **all** available data, specify `["*"]` in the respective field. For example, the following selects all available subjects and all available tasks:
 
@@ -87,9 +87,9 @@ For any field where you like to select **all** available data, specify `["*"]` i
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
-        "subjects": ["01"],
-        "tasks": ["A"], 
-        "runs": ["01", "02"]
+        "subjects": "",
+        "tasks": "", 
+        "runs": ""
     },
     "channel-type": "type"
 }
@@ -103,9 +103,9 @@ The exceptions field works by taking the [cartesian product](https://en.wikipedi
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
-        "subjects": "",
-        "tasks": "", 
-        "runs": ""
+        "subjects": ["01"],
+        "tasks": ["A"], 
+        "runs": ["01", "02"]
     },
     "channel-type": "type"
 }
