@@ -1,5 +1,5 @@
-from scripts.data.load import load_params, load_files
-from scripts.data.write import read_dict_to_json, write_eeg_data
+from scripts.data.load_data import load_params, load_files
+from scripts.data.write_annotate import read_dict_to_json, write_eeg_data
 from scripts.preprocess import preprocess
 
 from collections import ChainMap
