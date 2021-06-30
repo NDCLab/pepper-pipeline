@@ -1,7 +1,11 @@
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
 
 # baseEEG
-A Python software tool. Simply execute `run.py` to generate clean EEG data. Details below! 
+A set of python-based tools for EEG processing geared towards developmental EEG researchers. baseEEG tools build off of MNE-python and the sciPy stack. Some tools are convenient wrappers for existing code, whereas others implement novel data processing steps. Note the purpose of baseEEG is not to reinvent/reimplement the algorithems already implemented by MNE-python. Instead, the "added value" of baseEEG is in providing a set of user-friendly pipelines for EEG pre (and post) processing geared towards developmental EEG researchers.
+
+Currently, the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
+
+Current readme and contributing files focus on the baseEEG-preprocessing pipeline.
 
 ## Outline
 
