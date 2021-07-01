@@ -7,8 +7,7 @@ def read_dict_to_json(dict_array, root):
     if dict_array is None:
         print("Invalid dictionary array", file=sys.stderr)
         sys.exit(1)
-        
-    #Creates the directory if it does not exist
+    # Creates the directory if it does not exist
     dir_path = f'{root}/raw_derivatives/'.split("/")
     temp = ""
     for sec in dir_path:
