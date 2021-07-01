@@ -3,12 +3,21 @@ import sys
 import os
 
 
-def read_dict_to_json(dict_array):
+def read_dict_to_json(dict_array, root):
     if dict_array is None:
         print("Invalid dictionary array", file=sys.stderr)
         sys.exit(1)
+        
+    #Creates the directory if it does not exist
+    dir_path = f'{root}/raw_derivatives/'.split("/")
+    temp = ""
+    for sec in dir_path:
+        temp += sec + "/"
+        # checks that the directory path doesn't already exist
+        if not os.path.isdir(temp):
+            os.mkdir(temp)  # creates the directory path
 
-    with open('output_preproc.json', 'w') as file:
+    with open(f'{root}/raw_derivatives/output_preproc.json', 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
         file.write(str)
