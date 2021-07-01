@@ -55,18 +55,22 @@ def write_eeg_data(raw, func, subject, session, task, datatype, root):
     raw.save(raw_savePath, overwrite=True)
 
 
-def write_template_params(root, subjects=None, tasks=None, to_file=None):
+def write_template_params(root, subjects=None, tasks=None,
+                          e_subj=None, e_task=None, e_run=None, to_file=None):
     """Function to write out default user_params.json file
     Parameters:
     -----------
     root:   string
             string of path to data root
     subjects:   list | None
-                a list of subjects to include in the parameters. All if None.
+                a list of subjects for subject selection. None is default
     tasks:  list | None
-            a list of tasks to include in the parameters. All if None.
+            a list of tasks for task selection. None is default
+    e_subj, e_task, e_run:  list(s) | None
+                            list to compose cartesian product of exceptions
+                            None if default
     to_file:    string | None
-                path to write user_params to. None if no writing required
+                path to write user_params to. None if no writing required.
 
     Returns:
     ----------
@@ -76,9 +80,9 @@ def write_template_params(root, subjects=None, tasks=None, to_file=None):
 
     # Create default values of exceptions
     exceptions = {
-        "subjects": "",
-        "tasks": "",
-        "runs": ""
+        "subjects": "" if e_subj is None else e_subj,
+        "tasks": "" if e_task is None else e_task,
+        "runs": "" if e_run is None else e_run
     }
 
     # set up default load_data params
