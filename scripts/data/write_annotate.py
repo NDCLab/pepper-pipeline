@@ -66,7 +66,7 @@ def write_eeg_data(raw, func, file, datatype, root):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}.json'.format(
+    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}'.format(
         subj, ses, task, run, datatype, func)
 
     raw.save(raw_savePath, overwrite=True)
