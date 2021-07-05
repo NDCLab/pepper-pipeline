@@ -53,3 +53,87 @@ def write_eeg_data(raw, func, subject, session, task, datatype, root):
         subject, task, datatype, func)
 
     raw.save(raw_savePath, overwrite=True)
+
+
+def write_template_params(root, subjects=None, tasks=None,
+                          e_subj=None, e_task=None, e_run=None, to_file=None):
+    """Function to write out default user_params.json file
+    Parameters:
+    -----------
+    root:   string
+            string of path to data root
+    subjects:   list | None
+                a list of subjects for subject selection. None is default
+    tasks:  list | None
+            a list of tasks for task selection. None is default
+    e_subj, e_task, e_run:  list(s) | None
+                            list to compose cartesian product of exceptions
+                            None if default
+    to_file:    string | None
+                path to write user_params to. None if no writing required.
+
+    Returns:
+    ----------
+    A dictionary of the default user_params
+    """
+    user_params = {}
+
+    # Create default values of exceptions
+    exceptions = {
+        "subjects": "" if e_subj is None else e_subj,
+        "tasks": "" if e_task is None else e_task,
+        "runs": "" if e_run is None else e_run
+    }
+
+    # set up default load_data params
+    user_params["load_data"] = {
+        "root": root,
+        "subjects": ["*"] if subjects is None else subjects,
+        "tasks": ["*"] if tasks is None else tasks,
+        "exceptions": exceptions,
+        "channel_type": "eeg"
+    }
+
+    # set up default preprocess params
+    user_params["preprocess"] = {
+        "filter_data": {
+            "l_freq": 0.3,
+            "h_freq": 40
+        },
+        "bad_channels": {
+        },
+        "ica": {
+        },
+        "segment_data": {
+            "tmin": -0.2,
+            "tmax": 0.5,
+            "baseline": None,
+            "picks": None,
+            "reject_tmin": None,
+            "reject_tmax": None,
+            "decim": 1,
+            "verbose": False,
+            "preload": None
+        },
+        "final_reject_epoch": {
+        },
+        "interpolate_data": {
+            "mode": "accurate",
+            "method": None,
+            "reset_bads": None
+        },
+        "rereference_data": {
+        }
+    }
+
+    # set up postprocess params Pipeline has not yet been implemented!
+    user_params["postprocess"] = {}
+
+    if to_file is not None:
+        path_to_file = os.path.join(to_file, "user_params.json")
+        with open(path_to_file, 'w') as file:
+            str = json.dumps(user_params, indent=4)
+            file.seek(0)
+            file.write(str)
+
+    return user_params

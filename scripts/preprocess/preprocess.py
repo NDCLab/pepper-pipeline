@@ -24,6 +24,7 @@ def reref_raw(raw, ref_channels=None):
                 returns if raw is improper type
     Exception:
                 returns if unexpected error is encountered
+
     Returns
     ----------
     raw_filtered:   mne.io.Raw
