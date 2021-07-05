@@ -20,9 +20,10 @@ def read_dict_to_json(dict_array, file, datatype, root):
         if not os.path.isdir(temp):
             os.mkdir(temp)  # creates the directory path
 
-    bids_format = 'sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(subj, ses, task, run, datatype)
+    bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
+        subj, ses, task, run, datatype)
 
-    with open(f'{root}/raw_derivatives/output_preproc_' + bids_format, 'w') as file:
+    with open(f'{root}/raw_derivatives/' + bids_format, 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
         file.write(str)
@@ -65,7 +66,7 @@ def write_eeg_data(raw, func, file, datatype, root):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = dir_path + 'sub-{}_task-{}_{}_{}'.format(
-        subj, task, datatype, func)
+    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}.json'.format(
+        subj, ses, task, run, datatype, func)
 
     raw.save(raw_savePath, overwrite=True)
