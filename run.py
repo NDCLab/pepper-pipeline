@@ -7,23 +7,23 @@ from collections import ChainMap
 import mne_bids
 
 # load all parameters
-user_params = load_params("user_params_except.json")
+user_params = load_params("user_params.json")
 
-# get preprocessing and data parameters
+# get data and metadata parameters
 preprocess_params = user_params["preprocess"]
 data_params = user_params["load_data"]
+write_params = user_params["output_data"]
 
-# get root and channel type of data
-root = data_params["root"]
+# get output root and channel type of data
 ch_type = data_params["channel-type"]
+output_path = write_params["root"]
 
 # get set of subjects & tasks to run while omitting existing exceptions
 data = load_files(data_params)
 
 # for each file in filtered data
 for file in data:
-    # get attributes and load raw data
-    subj, ses, task, run = file.subject, file.session, file.task, file.run
+    # load raw data
     eeg_obj = mne_bids.read_raw_bids(file)
 
     outputs = [None] * len(preprocess_params)
@@ -31,9 +31,9 @@ for file in data:
     for idx, (func, params) in enumerate(preprocess_params.items()):
         eeg_obj, outputs[idx] = getattr(preprocess, func)(eeg_obj, **params)
         # TODO: refactor function below to take in path to reduce param size
-        write_eeg_data(eeg_obj, func, subj, ses, task, ch_type, root)
+        write_eeg_data(eeg_obj, func, file, ch_type, output_path)
 
     # collect annotations of each step
     output = dict(ChainMap(*outputs))
     # TODO: read output_preproc into CMI
-    read_dict_to_json(output)
+    read_dict_to_json(output, file, ch_type, output_path)

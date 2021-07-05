@@ -10,6 +10,7 @@
     },
     "channel-type": "eeg"
   }, 
+
   "preprocess": {
     "filter_data": {
       "l_freq": 0.3, 
@@ -42,5 +43,9 @@
   },
   
   "postprocess": {
+  },
+
+  "output_data": {
+    "root": "CMI"
   }
 }

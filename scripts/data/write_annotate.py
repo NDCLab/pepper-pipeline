@@ -3,10 +3,14 @@ import sys
 import os
 
 
-def read_dict_to_json(dict_array, root):
+def read_dict_to_json(dict_array, file, datatype, root):
     if dict_array is None:
         print("Invalid dictionary array", file=sys.stderr)
         sys.exit(1)
+
+    # get file metadata
+    subj, ses, task, run = file.subject, file.session, file.task, file.run
+
     # Creates the directory if it does not exist
     dir_path = f'{root}/raw_derivatives/'.split("/")
     temp = ""
@@ -16,13 +20,15 @@ def read_dict_to_json(dict_array, root):
         if not os.path.isdir(temp):
             os.mkdir(temp)  # creates the directory path
 
-    with open(f'{root}/raw_derivatives/output_preproc.json', 'w') as file:
+    bids_format = 'sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(subj, ses, task, run, datatype)
+
+    with open(f'{root}/raw_derivatives/output_preproc_' + bids_format, 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
         file.write(str)
 
 
-def write_eeg_data(raw, func, subject, session, task, datatype, root):
+def write_eeg_data(raw, func, file, datatype, root):
     """Used to store the modified raw file after each processing step
     Parameters:
     -----------
@@ -41,10 +47,12 @@ def write_eeg_data(raw, func, subject, session, task, datatype, root):
     root:   String
             directory from where the data was loaded
     """
+    # get file metadata
+    subj, ses, task, run = file.subject, file.session, file.task, file.run
 
     # puts together the path to be created
     dir_path = '{}/raw_derivatives/preprocessed/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], subject, session, datatype)
+        root.split("/")[0], subj, ses, datatype)
 
     dir_section = dir_path.split("/")
 
@@ -57,7 +65,7 @@ def write_eeg_data(raw, func, subject, session, task, datatype, root):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = dir_path + 'ses-{}_task-{}_{}_{}'.format(
-        subject, task, datatype, func)
+    raw_savePath = dir_path + 'sub-{}_task-{}_{}_{}'.format(
+        subj, task, datatype, func)
 
     raw.save(raw_savePath, overwrite=True)
