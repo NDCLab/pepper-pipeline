@@ -110,7 +110,7 @@ def ica_raw(raw, montage):
     Returns:
     ----------
     raw:   mne.io.Raw
-           instance of raw data after revmoing artifacts (eog)
+           instance of raw data after removing artifacts (eog)
     output_dict_ica:  dictionary
                       dictionary with relevant ica information
     """
@@ -120,20 +120,23 @@ def ica_raw(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        print("Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', 'GSN-HydroCel-128', \
-        'GSN-HydroCel-129', 'GSN-HydroCel-256', 'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0', \
-        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160', 'biosemi256', 'biosemi32', \
-        'biosemi64', 'easycap-M1', 'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', \
-        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed', 'standard_primed', \
-        'artinis-octamon', and 'artinis-brite23'.")
+        print("Invalid value for the 'montage' parameter. Allowed values are\
+        'EGI_256', 'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
+        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
+        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
+        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
+        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
+        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
+        'standard_primed', 'artinis-octamon', and 'artinis-brite23'.")
 
         montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
-        'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256', 'GSN-HydroCel-257', \
-        'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0', 'GSN-HydroCel-65_1.0', 'biosemi128', \
-        'biosemi16', 'biosemi160', 'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', \
-        'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', 'standard_alphabetic', \
-        'standard_postfixed', 'standard_prefixed', 'standard_primed', 'artinis-octamon', \
-        and 'artinis-brite23'."
+        'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
+        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
+        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
+        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
+        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
+        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
+        'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
 
         ica_details = {"ERROR": montage_error}
         return raw, {"Ica": ica_details}
@@ -143,7 +146,7 @@ def ica_raw(raw, montage):
     raw_filtered_1 = raw.copy()
     raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
 
-    # prepica - step2 - segment the continuous EEG into arbitrary 1-second epochs
+    # prepica - step2 - segment continuous EEG into arbitrary 1-second epochs
     epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
                                                duration=1.0,
                                                overlap=0.0,
