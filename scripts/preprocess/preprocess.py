@@ -98,62 +98,90 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         print('Unknown Error')
 
 
-def bad_channels(EEG_object):
-    """Function description
-    Parameters
+def ica_raw(raw, montage):
+    """Automatic artifacts identification - raw data is modified in place
+    Parameters:
+    ----------:
+    raw:    mne.io.Raw
+            raw object of EEG data after processing by previous steps (filter and
+            bad channels removal)
+    montage:    str
+                montage
+    Returns:
     ----------
-    EEG_object: EEG_object type
-            description
-    user_param1:    type
-                    description
-    user_param2:    type
-                    description
-    ...
-
-    Throws
-    ----------
-    What errors are thrown if anything
-
-    Returns
-    ----------
-    EEG_object_modified:    EEG_object_modified type
-                            description
-    output_dictionary:  dictionary
-                        description of annotations
+    raw:   mne.io.Raw
+           instance of raw data after revmoing artifacts (eog)
+    output_dict_ica:  dictionary
+                      dictionary with relevant ica information
     """
-    # code to do pipeline step
 
-    output_dict = {}
-    return EEG_object, output_dict
+    # set montage
+    # return if value is invalid
+    try:
+        raw.set_montage(montage)
+    except ValueError:
+        print("Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', 'GSN-HydroCel-128', \
+        'GSN-HydroCel-129', 'GSN-HydroCel-256', 'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0', \
+        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160', 'biosemi256', 'biosemi32', \
+        'biosemi64', 'easycap-M1', 'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', \
+        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed', 'standard_primed', \
+        'artinis-octamon', and 'artinis-brite23'.")
+        montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
+        'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256', 'GSN-HydroCel-257', \
+        'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0', 'GSN-HydroCel-65_1.0', 'biosemi128', \
+        'biosemi16', 'biosemi160', 'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', \
+        'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', 'standard_alphabetic', \
+        'standard_postfixed', 'standard_prefixed', 'standard_primed', 'artinis-octamon', \
+        and 'artinis-brite23'."
+        ica_details = {"ERROR": montage_error}
+        return raw, {"Ica": ica_details}
 
+    # prepica - step1 - filter
+    # High-pass with 1. Hz
+    raw_filtered_1 = raw.copy()
+    raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
 
-def ica(EEG_object):
-    """Function description
-    Parameters
-    ----------
-    EEG_object: EEG_object type
-            description
-    user_param1:    type
-                    description
-    user_param2:    type
-                    description
-    ...
+    # prepica - step2 - segment the continuous EEG into arbitrary 1-second epochs
+    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
+                                               duration=1.0,
+                                               overlap=0.0,
+                                               preload=True)
+    # compute the number of original epochs
+    epochs_original = epochs_prep.__len__()
 
-    Throws
-    ----------
-    What errors are thrown if anything
+    # drop epochs that are excessively “noisy”
+    reject_criteria = dict(eeg=1000e-6)       # 1000 µV
+    epochs_prep.drop_bad(reject=reject_criteria)
 
-    Returns
-    ----------
-    EEG_object_modified:    EEG_object_modified type
-                            description
-    output_dictionary:  dictionary
-                        description of annotations
-    """
-    # code to do pipeline step
+    # compute the number of epochs after removal
+    epochs_bads_removal = epochs_prep.__len__()
+    epochs_bads = epochs_original - epochs_bads_removal
 
-    output_dict = {}
-    return EEG_object, output_dict
+    # ica
+    method = 'picard'
+    max_iter = 500
+    fit_params = dict(fastica_it=5)
+    ica = mne.preprocessing.ICA(n_components=None,
+                                method=method,
+                                max_iter=max_iter,
+                                fit_params=fit_params)
+    ica.fit(epochs_prep)
+
+    # exclude eog
+    # Note: should be edited later for "ch_name"
+    eog_indices, eog_scores = ica.find_bads_eog(epochs_prep, ch_name='FC1')
+    ica.exclude = eog_indices
+
+    # reapplying the matrix back to raw data -- modify in place
+    raw_icaed = ica.apply(raw.load_data())
+
+    ica_details = {"original epochs": epochs_original,
+                   "bad epochs": epochs_bads,
+                   "bad epochs rate": epochs_bads / epochs_original,
+                   "eog indices": eog_indices,
+                   "eog_scores": eog_scores}
+
+    return raw_icaed, {"Ica": ica_details}
 
 
 def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
@@ -268,7 +296,7 @@ def plot_sensor_locations(epochs, user_params):
 
 
 def final_reject_epoch(epochs):
-    """Final and automatic rejection of bad epochs
+    """Final and automatic rejection of  epochs
     Parameters
     ----------
     epochs: mne.Epochs object
@@ -381,35 +409,6 @@ def plot_orig_and_interp(orig_raw, interp_raw):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
         figure.suptitle(title_, size='xx-large', weight='bold')
-
-
-def rereference_data(EEG_object):
-    """Function description
-    Parameters
-    ----------
-    EEG_object: EEG_object type
-            description
-    user_param1:    type
-                    description
-    user_param2:    type
-                    description
-    ...
-
-    Throws
-    ----------
-    What errors are thrown if anything
-
-    Returns
-    ----------
-    EEG_object_modified:    EEG_object_modified type
-                            description
-    output_dictionary:  dictionary
-                        description of annotations
-    """
-    # code to do pipeline step
-
-    output_dict = {}
-    return EEG_object, output_dict
 
 
 def hurst(data):
