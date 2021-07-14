@@ -103,8 +103,8 @@ def ica_raw(raw, montage):
     Parameters:
     ----------:
     raw:    mne.io.Raw
-            raw object of EEG data after processing by previous steps (filter and
-            bad channels removal)
+            raw object of EEG data after processing by previous steps (filter
+            and bad channels removal)
     montage:    str
                 montage
     Returns:
@@ -126,6 +126,7 @@ def ica_raw(raw, montage):
         'biosemi64', 'easycap-M1', 'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', \
         'standard_alphabetic', 'standard_postfixed', 'standard_prefixed', 'standard_primed', \
         'artinis-octamon', and 'artinis-brite23'.")
+
         montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
         'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256', 'GSN-HydroCel-257', \
         'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0', 'GSN-HydroCel-65_1.0', 'biosemi128', \
@@ -133,6 +134,7 @@ def ica_raw(raw, montage):
         'easycap-M10', 'mgh60', 'mgh70', 'standard_1005', 'standard_1020', 'standard_alphabetic', \
         'standard_postfixed', 'standard_prefixed', 'standard_primed', 'artinis-octamon', \
         and 'artinis-brite23'."
+
         ica_details = {"ERROR": montage_error}
         return raw, {"Ica": ica_details}
 
