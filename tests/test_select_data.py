@@ -1,5 +1,6 @@
-from scripts.data.write_annotate import write_template_params
+import scripts as s
 
+import pytest
 import unittest
 from pathlib import Path
 import mne_bids
@@ -53,7 +54,7 @@ class LoadFilesTest(unittest.TestCase):
     def setUp(self):
         # init default parameters
         self.root = Path("../CMI/rawdata")
-        self.default_params = write_template_params(self.root)
+        self.default_params = s.write_annotate.write_template_params(self.root)
         self.available_subj = mne_bids.get_entity_vals(self.root, 'subject')
 
     def test_select_all(self):
