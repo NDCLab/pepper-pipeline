@@ -375,8 +375,9 @@ def interpolate_data(epochs, mode, method, reset_bads):
     Modified in place epochs object and output dictionary
     """
     if epochs is None:
-        print("Null raw objects")
-        sys.exit(1)
+        error = "Null raw objects"
+        print(error)
+        return epochs, {"Interpolation": {"ERROR": error}}
 
     epochs.interpolate_bads(mode=mode,
                             method=method,
