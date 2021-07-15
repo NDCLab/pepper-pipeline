@@ -52,10 +52,12 @@ def reref_raw(raw, ref_channels=None):
         return raw_new_ref, {"Reference": ref_details}
 
     except TypeError:
-        print('Type Error')
-
+        error = 'Type Error'
     except Exception:
-        print('Unknown Error')
+        error = 'Unknown Error'
+    print(error)
+    reref_details = {"ERROR": error}
+    return raw, {"Reference": reref_details}
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
