@@ -98,7 +98,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         error = 'Unknown Error'
     print(error)
     filter_details = {"ERROR": error}
-    return raw, {"Ica": filter_details}
+    return raw, {"Filter": filter_details}
 
 
 def ica_raw(raw, montage):
