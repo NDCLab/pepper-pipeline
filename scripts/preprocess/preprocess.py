@@ -238,8 +238,9 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     """
 
     if raw is None:
-        print("Invalid raw object")
-        sys.exit(1)
+        error = "Invalid raw object"
+        print(error)
+        return raw, {"Segment": {"ERROR": error}}
 
     events, event_id = mne.events_from_annotations(raw)
 
