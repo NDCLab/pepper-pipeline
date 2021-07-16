@@ -91,7 +91,7 @@ def write_template_params(root, subjects=None, tasks=None,
         "subjects": ["*"] if subjects is None else subjects,
         "tasks": ["*"] if tasks is None else tasks,
         "exceptions": exceptions,
-        "channel_type": "eeg"
+        "channel-type": "eeg"
     }
 
     # set up default preprocess params
