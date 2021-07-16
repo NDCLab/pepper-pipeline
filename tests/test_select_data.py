@@ -1,9 +1,12 @@
-import scripts as s
+from scripts.data.load import load_files
+from scripts.data.write import write_template_params
 
 import pytest
 import unittest
 from pathlib import Path
+
 import mne_bids
+import pandas as pd
 
 
 class LoadFilesTest(unittest.TestCase):
@@ -53,24 +56,93 @@ class LoadFilesTest(unittest.TestCase):
     """
     def setUp(self):
         # init default parameters
-        self.root = Path("../CMI/rawdata")
-        self.default_params = s.write_annotate.write_template_params(self.root)
+        self.root = Path("CMI/rawdata")
+        self.default_params = write_template_params(self.root)
         self.available_subj = mne_bids.get_entity_vals(self.root, 'subject')
 
+        # create a dictionary of subjects and corresponding files
+        self.subjects = {}
+        for subject in self.available_subj:
+            bids_path = mne_bids.BIDSPath(subject=subject, root=self.root)
+
+            files = bids_path.match()
+            scans_file = [f for f in files if "scans" in f.suffix][0]
+            scans_info = pd.read_csv(scans_file, sep='\t')
+            self.subjects[subject] = scans_info["filename"].to_list()
+
     def test_select_all(self):
-        return
+        # Load data using the default parameters
+        data = load_files(self.default_params["load_data"])
+
+        count = 0
+        # check if the number of files matches the number per subject
+        for subject in self.available_subj:
+            count += len(self.subjects[subject])
+        assert len(data) == count
 
     def test_select_participants(self):
-        return
+        # select participants (make this a random selection?)
+        selected_participants = ["NDARAB793GL3"]
+        self.default_params["load_data"]["subjects"] = selected_participants
+
+        # Load data using the default parameters
+        data = load_files(self.default_params["load_data"])
+
+        count = 0
+        # check if the number of files matches the number per subject
+        for subject in selected_participants:
+            count += len(self.subjects[subject])
+        assert len(data) == count
 
     def test_select_tasks(self):
-        return
+        # select tasks (make this a random selection?)
+        selected_tasks = ["ContrastChangeBlock1"]
+        self.default_params["load_data"]["tasks"] = selected_tasks
+
+        # Load data using the default parameters
+        data = load_files(self.default_params["load_data"])
+
+        count = 0
+        # check if the number of files matches the number per subject
+        for subject in self.available_subj:
+            for file in self.subjects[subject]:
+                if file.task in selected_tasks:
+                    count += 1
+        assert len(data) == count
 
     def test_select_particip_tasks(self):
-        return
+        # select subjects & tasks
+        selected_participants = ["NDARAB793GL3"]
+        selected_tasks = ["ContrastChangeBlock1"]
+
+        self.default_params["load_data"]["subjects"] = selected_participants
+        self.default_params["load_data"]["tasks"] = selected_tasks
+
+        # Load data using the default parameters
+        data = load_files(self.default_params["load_data"])
+
+        count = 0
+        # check if the number of files matches the number per subject
+        for subject in self.available_subj:
+            for file in self.subjects[subject]:
+                if file.task in selected_tasks:
+                    count += 1
+        assert len(data) == count
 
     def test_except_subjects(self):
-        return
+        exclude_participants = ["NDARAB793GL3"]
+
+        self.default_params["load_data"]["exceptions"]["subjects"] = exclude_participants
+        # Load data using the default parameters
+        data = load_files(self.default_params["load_data"])
+
+        count = 0
+        # check if the number of files matches the number per subject
+        for subject in self.available_subj:
+            for file in self.subjects[subject]:
+                if file.task in selected_tasks:
+                    count += 1
+        assert len(data) == count
 
     def test_except_tasks(self):
         return
@@ -107,4 +179,4 @@ class LoadFilesTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    LoadFilesTest.main()
+    unittest.main()
