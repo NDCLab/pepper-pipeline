@@ -26,7 +26,7 @@ def avail_subjects(root):
 
 
 @pytest.fixture
-def subj_to_files(avail_subjects):
+def subj_to_files(avail_subjects, root):
     # create a dictionary of subjects and corresponding files
     subjects = {}
     for subject in avail_subjects:
@@ -44,9 +44,9 @@ def test_select_all(default_params, avail_subjects, subj_to_files):
     # Load data using the default parameters
     data = load.load_files(default_params["load_data"])
 
-    count = 0
     # check if the number of files loaded matches
     # the number of all files available
+    count = 0
     for subject in avail_subjects:
         count += len(subj_to_files[subject])
     assert len(data) == count
@@ -60,9 +60,9 @@ def test_select_participants(default_params, subj_to_files):
     # Load data using the selected participants
     data = load.load_files(default_params["load_data"])
 
-    count = 0
     # check if the number of files loaded matches
     # the total number of files for all selected subjects
+    count = 0
     for subject in selected_participants:
         count += len(subj_to_files[subject])
     assert len(data) == count
@@ -76,55 +76,70 @@ def test_select_tasks(default_params, avail_subjects, subj_to_files):
     # Load data using the selected task
     data = load.load_files(default_params["load_data"])
 
-    count = 0
     # check if the number of files loaded matches
     # the total number of files for all selected task
+    count = 0
     for subject in avail_subjects:
         for file in subj_to_files[subject]:
+
             # split and find task of file (TODO: need to BIDSIFY)
-            task = [s for s in file.split("_") if "task" in s]
-            print(task)
-            # if file.task in selected_tasks:
-                # count += 1
+            task_id = [s for s in file.split("_") if "task" in s][0]
+            task = [s for s in task_id.split("-") if s != "task"][0]
+
+            if task in selected_tasks:
+                count += 1
     assert len(data) == count
 
-'''
+
 def test_select_particip_tasks(default_params, avail_subjects, subj_to_files):
-    # select subjects & tasks
+    # select subjects & tasks (randomize?)
     selected_participants = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
 
     default_params["load_data"]["subjects"] = selected_participants
     default_params["load_data"]["tasks"] = selected_tasks
 
-    # Load data using the default parameters
+    # Load data using the selected subjects & tasks
     data = load.load_files(default_params["load_data"])
 
+    # check if the number of files loaded matches
+    # the total number of files for all selected tasks & subjects
     count = 0
-    # check if the number of files matches the number per subject
-    for subject in available_subj:
-        for file in subjects[subject]:
-            if file.task in selected_tasks:
+    for subject in selected_participants:
+        for file in subj_to_files[subject]:
+
+            # split and find task of file (TODO: need to BIDSIFY)
+            task_id = [s for s in file.split("_") if "task" in s][0]
+            task = [s for s in task_id.split("-") if s != "task"][0]
+
+            if task in selected_tasks:
                 count += 1
     assert len(data) == count
 
 
 def test_except_subjects(default_params , avail_subjects, subj_to_files):
-    exclude_participants = ["NDARAB793GL3"]
+    # select excluded subjects (randomize?)
+    exclude_part = ["NDARAB793GL3"]
+    default_params["load_data"]["exceptions"]["subjects"] = exclude_part
 
-    .default_params["load_data"]["exceptions"]["subjects"] = exclude_participants
-    # Load data using the default parameters
+    # Load data using the excluded subjects
     data = load.load_files(default_params["load_data"])
 
     count = 0
-    # check if the number of files matches the number per subject
-    for subject in available_subj:
-        for file in subjects[subject]:
+
+    # get the excluded subset of subjects
+    
+
+    # check if the number of files loaded matches
+    # the total number of all subjects apart from the excluded
+    for subject in avail_subjects:
+        for file in avail_subjects[subject]:
             # if file.task in selected_tasks:
             count += 1
     assert len(data) == count
 
 
+'''
 def test_except_tasks(default_params, avail_subjects):
     return
 
