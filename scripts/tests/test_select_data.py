@@ -3,6 +3,7 @@ from scripts.data import write, load
 import pytest
 
 from pathlib import Path
+import os
 
 import mne_bids
 import pandas as pd
@@ -15,73 +16,79 @@ def root():
 
 
 @pytest.fixture
-def default_params(root):
-    default_params = write.write_template_params(root)
-    return default_params
+def default_param(root):
+    default_param = write.write_template_params(root)
+    return default_param
 
 
 @pytest.fixture
-def avail_subjects(root):
+def avail_subj(root):
     avail_subj = mne_bids.get_entity_vals(root, 'subject')
     return avail_subj
 
 
 @pytest.fixture
-def subj_to_files(avail_subjects, root):
+def subj_files(avail_subj, root):
     # create a dictionary of subjects and corresponding files
     subjects = {}
-    for subject in avail_subjects:
+    for subject in avail_subj:
         bids_path = mne_bids.BIDSPath(subject=subject, root=root)
 
         files = bids_path.match()
         scans_file = [f for f in files if "scans" in f.suffix][0]
-        scans_info = pd.read_csv(scans_file, sep='\t')
-        subjects[subject] = scans_info["filename"].to_list()
 
+        scans_info = pd.read_csv(scans_file, sep='\t')
+        filenames = scans_info["filename"].to_list()
+
+        cleaned_filenames = []
+        for file in filenames:
+            _, tail = os.path.split(file)
+            cleaned_filenames.append(tail)
+        subjects[subject] = cleaned_filenames
     return subjects
 
 
-def test_select_all(default_params, avail_subjects, subj_to_files):
+def test_select_all(default_param, avail_subj, subj_files):
     # Load data using the default parameters
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the number of all files available
     count = 0
-    for subject in avail_subjects:
-        count += len(subj_to_files[subject])
+    for subject in avail_subj:
+        count += len(subj_files[subject])
     assert len(data) == count
 
 
-def test_select_subjects(default_params, subj_to_files):
+def test_select_subj(default_param, subj_files):
     # select participants (make this a random selection?)
     selected_subjects = ["NDARAB793GL3"]
-    default_params["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["subjects"] = selected_subjects
 
     # Load data using the selected participants
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects
     count = 0
     for subject in selected_subjects:
-        count += len(subj_to_files[subject])
+        count += len(subj_files[subject])
     assert len(data) == count
 
 
-def test_select_tasks(default_params, avail_subjects, subj_to_files):
+def test_select_task(default_param, avail_subj, subj_files):
     # select tasks (make this a random selection?)
     selected_tasks = ["ContrastChangeBlock1"]
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # Load data using the selected task
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected task
     count = 0
-    for subject in avail_subjects:
-        for file in subj_to_files[subject]:
+    for subject in avail_subj:
+        for file in subj_files[subject]:
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
@@ -92,22 +99,22 @@ def test_select_tasks(default_params, avail_subjects, subj_to_files):
     assert len(data) == count
 
 
-def test_select_subjects_tasks(default_params, subj_to_files):
+def test_select_subj_task(default_param, subj_files):
     # select subjects & tasks (randomize?)
     selected_subjects = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
 
-    default_params["load_data"]["subjects"] = selected_subjects
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected tasks & subjects
     count = 0
     for subject in selected_subjects:
-        for file in subj_to_files[subject]:
+        for file in subj_files[subject]:
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
@@ -118,151 +125,163 @@ def test_select_subjects_tasks(default_params, subj_to_files):
     assert len(data) == count
 
 
-def test_except_subjects(default_params, avail_subjects, subj_to_files):
+def test_except_subj(default_param, avail_subj, subj_files):
     # select excluded subjects (randomize?)
-    exclude_subject = set(["NDARAB793GL3"])
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    exc_subj = ["NDARAB793GL3"]
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = ["*"]
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the excluded subjects
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # get the excluded subset of subjects
-    exclude_set = set(avail_subjects).difference(exclude_subject)
+    subjects_diff = set(avail_subj).difference(set(exc_subj))
 
     # check if the number of files loaded matches
     # the total number of all subjects apart from the excluded
     count = 0
-    for subject in exclude_set:
-        count += len(subj_to_files[subject])
+    for subject in subjects_diff:
+        count += len(subj_files[subject])
     assert len(data) == count
 
 
-def test_except_tasks(default_params, avail_subjects):
+def test_except_task(default_param, avail_subj, subj_files):
     # select excluded tasks (randomize?)
-    exclude_task = set(["ContrastChangeBlock1"])
-    default_params["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    exc_task = ["ContrastChangeBlock1"]
+    default_param["load_data"]["exceptions"]["subjects"] = ["*"]
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the excluded tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all tasks apart from the excluded
     count = 0
-    for subject in avail_subjects:
-        for file in subj_to_files[subject]:
+    for subject in avail_subj:
+        for file in subj_files[subject]:
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
-            if task in exclude_task:
+            if task in exc_task:
                 continue
             count += 1
     assert len(data) == count
 
 
-def test_except_subjects_tasks(default_params):
+def test_except_subj_task(default_param, avail_subj, subj_files):
     # select excluded subjects & tasks (randomize?)
-    exclude_subject = set(["NDARAB793GL3"])
-    exclude_task = set(["ContrastChangeBlock1"])
+    exc_subj = ["NDARAB793GL3"]
+    exc_task = ["ContrastChangeBlock1"]
 
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all subjects & tasks apart from the excluded
     count = 0
-    for subject in exclude_subject:
-        for file in subj_to_files[subject]:
+    for subject in avail_subj:
+        for file in subj_files[subject]:
+
+            file_vals = file.split("_")
+
+            # split and find subject of file (TODO: need to BIDSIFY)
+            sub_id = [s for s in file_vals if "sub" in s][0]
+            sub = [s for s in sub_id.split("-") if s != "sub"][0]
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
-            if task in exclude_task:
+            if sub in exc_subj and task in exc_task:
                 continue
             count += 1
     assert len(data) == count
 
 
-def test_except_subjects_tasks_runs(default_params):
+def test_except_subj_task_run(default_param, avail_subj, subj_files):
     # select excluded subjects, tasks, & runs (randomize?)
-    exclude_subject = set(["NDARAB793GL3"])
-    exclude_task = set(["ContrastChangeBlock1"])
-    exclude_run = set(["01"])
+    exc_subj = ["NDARAB793GL3"]
+    exc_task = ["ContrastChangeBlock1"]
+    exc_run = ["01"]
 
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = exclude_run
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = exc_run
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all subjects & tasks apart from the excluded
     count = 0
-    for subject in exclude_subject:
-        for file in subj_to_files[subject]:
+    for subject in avail_subj:
+        for file in subj_files[subject]:
+
+            file_vals = file.split("_")
+
+            # split and find subject of file (TODO: need to BIDSIFY)
+            sub_id = [s for s in file_vals if "sub" in s][0]
+            sub = [s for s in sub_id.split("-") if s != "sub"][0]
 
             # split and find task of file (TODO: need to BIDSIFY)
-            task_id = [s for s in file.split("_") if "task" in s][0]
+            task_id = [s for s in file_vals if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
             # split and find run of file (TODO: need to BIDSIFY)
-            run_id = [s for s in file.split("_") if "run" in s][0]
+            run_id = [s for s in file_vals if "run" in s][0]
             run = [s for s in run_id.split("-") if s != "run"][0]
 
-            if task in exclude_task and run in exclude_run:
+            if sub in exc_subj and task in exc_task and run in exc_run:
                 continue
             count += 1
     assert len(data) == count
 
 
-def test_except_all(default_params):
+def test_except_all(default_param):
     # select all for exceptions
-    default_params["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_params["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    default_param["load_data"]["exceptions"]["subjects"] = ["*"]
+    default_param["load_data"]["exceptions"]["tasks"] = ["*"]
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # assert nothing is selected
     assert len(data) == 0
 
 
-def test_select_subjects_tasks_except_subjects(default_params):
+def test_select_subj_task_except_subj(default_param, subj_files):
     # select subjects (randomize?)
     selected_subjects = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
-    default_params["load_data"]["subjects"] = selected_subjects
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # select excluded subjects (randomize?)
-    exclude_subject = set(["NDARAB793GL3"])
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    exc_subj = ["NDARAB793GL3"]
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = ["*"]
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # get the excluded subset of subjects
-    subjects_diff = set(selected_subjects).difference(exclude_subject)
+    subjects_diff = set(selected_subjects).difference(set(exc_subj))
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
     count = 0
     for subject in subjects_diff:
-        for file in subj_to_files[subject]:
+        for file in subj_files[subject]:
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
@@ -273,100 +292,108 @@ def test_select_subjects_tasks_except_subjects(default_params):
     assert len(data) == count
 
 
-def test_select_subjects_tasks_except_tasks(default_params):
+def test_select_subj_task_except_task(default_param, subj_files):
     # select subjects & tasks (randomize?)
     selected_subjects = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
-    default_params["load_data"]["subjects"] = selected_subjects
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # select excluded subjects (randomize?)
-    exclude_task = ["ContrastChangeBlock1"]
-    default_params["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    exc_task = ["ContrastChangeBlock1"]
+    default_param["load_data"]["exceptions"]["subjects"] = ["*"]
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_params["load_data"])
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
     count = 0
     for subject in selected_subjects:
-        for file in subj_to_files[subject]:
+        for file in subj_files[subject]:
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
-            if task in exclude_task:
+            if task in exc_task:
                 continue
-            count += 1
+            elif task in selected_tasks:
+                count += 1
     assert len(data) == count
 
 
-def test_select_subjects_tasks_except_subj_tasks(default_params):
+def test_sel_subj_task_except_subj_task(default_param, avail_subj, subj_files):
     # select subjects & tasks (randomize?)
     selected_subjects = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
-    default_params["load_data"]["subjects"] = selected_subjects
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # select excluded subjects (randomize?)
-    exclude_subject = ["NDARAB793GL3"]
-    exclude_task = ["ContrastChangeBlock1"]
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    exc_subj = ["NDARAB793GL3"]
+    exc_task = ["ContrastChangeBlock1"]
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_params["load_data"])
-
-    # get the excluded subset of subjects
-    subjects_diff = set(selected_subjects).difference(set(exclude_subject))
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
     count = 0
-    for subject in subjects_diff:
-        for file in subj_to_files[subject]:
+    for subject in avail_subj:
+        for file in subj_files[subject]:
+
+            file_vals = file.split("_")
+
+            # split and find subject of file (TODO: need to BIDSIFY)
+            sub_id = [s for s in file_vals if "sub" in s][0]
+            sub = [s for s in sub_id.split("-") if s != "sub"][0]
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
-            if task in exclude_task:
+            if sub in exc_subj and task in exc_task:
                 continue
-            count += 1
+            elif task in selected_tasks:
+                count += 1
     assert len(data) == count
 
 
-def test_select_subjects_tasks_except_subj_tasks_runs(default_params):
+def test_select_subj_task_except_subj_task_run(default_param, subj_files):
     # select subjects & tasks (randomize?)
     selected_subjects = ["NDARAB793GL3"]
     selected_tasks = ["ContrastChangeBlock1"]
-    default_params["load_data"]["subjects"] = selected_subjects
-    default_params["load_data"]["tasks"] = selected_tasks
+    default_param["load_data"]["subjects"] = selected_subjects
+    default_param["load_data"]["tasks"] = selected_tasks
 
     # select excluded subjects (randomize?)
-    exclude_subject = ["NDARAB793GL3"]
-    exclude_task = ["ContrastChangeBlock1"]
-    exclude_run = ["01"]
-    default_params["load_data"]["exceptions"]["subjects"] = exclude_subject
-    default_params["load_data"]["exceptions"]["tasks"] = exclude_task
-    default_params["load_data"]["exceptions"]["runs"] = exclude_run
+    exc_subj = ["NDARAB793GL3"]
+    exc_task = ["ContrastChangeBlock1"]
+    exc_run = ["01"]
+    default_param["load_data"]["exceptions"]["subjects"] = exc_subj
+    default_param["load_data"]["exceptions"]["tasks"] = exc_task
+    default_param["load_data"]["exceptions"]["runs"] = exc_run
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_params["load_data"])
-
-    # get the excluded subset of subjects
-    subjects_diff = set(selected_subjects).difference(set(exclude_subject))
+    data = load.load_files(default_param["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
     count = 0
-    for subject in subjects_diff:
-        for file in subj_to_files[subject]:
+    for subject in selected_subjects:
+        for file in subj_files[subject]:
+
+            file_vals = file.split("_")
+
+            # split and find subject of file (TODO: need to BIDSIFY)
+            sub_id = [s for s in file_vals if "sub" in s][0]
+            sub = [s for s in sub_id.split("-") if s != "sub"][0]
 
             # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
@@ -376,77 +403,78 @@ def test_select_subjects_tasks_except_subj_tasks_runs(default_params):
             run_id = [s for s in file.split("_") if "run" in s][0]
             run = [s for s in run_id.split("-") if s != "run"][0]
 
-            if task in exclude_task and run in exclude_run:
+            if sub in exc_subj and task in exc_task and run in exc_run:
                 continue
-            count += 1
+            elif task in selected_tasks:
+                count += 1
     assert len(data) == count
 
 
-def test_missing_subjects(default_params):
+def test_missing_subj(default_param):
     # input invalid value for subjects
-    default_params["load_data"]["subjects"] = ""
+    default_param["load_data"]["subjects"] = ""
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_tasks(default_params):
+def test_missing_task(default_param):
     # input invalid value for tasks
-    default_params["load_data"]["tasks"] = ""
+    default_param["load_data"]["tasks"] = ""
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_except_subjects(default_params, avail_subjects):
+def test_missing_except_subj(default_param):
     # input invalid value for tasks
-    default_params["load_data"]["exceptions"]["subjects"] = ""
-    default_params["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    default_param["load_data"]["exceptions"]["subjects"] = ""
+    default_param["load_data"]["exceptions"]["tasks"] = ["*"]
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_except_tasks(default_params):
+def test_missing_except_task(default_param):
     # input invalid value for tasks
-    default_params["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_params["load_data"]["exceptions"]["tasks"] = ""
-    default_params["load_data"]["exceptions"]["runs"] = ["*"]
+    default_param["load_data"]["exceptions"]["subjects"] = ["*"]
+    default_param["load_data"]["exceptions"]["tasks"] = ""
+    default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_except_runs(default_params):
+def test_missing_except_run(default_param):
     # input invalid value for tasks
-    default_params["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_params["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_params["load_data"]["exceptions"]["runs"] = ""
+    default_param["load_data"]["exceptions"]["subjects"] = ["*"]
+    default_param["load_data"]["exceptions"]["tasks"] = ["*"]
+    default_param["load_data"]["exceptions"]["runs"] = ""
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_data(default_params, tmp_path):
+def test_missing_data(default_param, tmp_path):
     # create empty and temporary directory
     empty_data = tmp_path / "empty"
     empty_data.mkdir()
 
     # input invalid value for tasks
-    default_params["load_data"]["root"] = empty_data
+    default_param["load_data"]["root"] = empty_data
 
     # Load data using the invalid field
     with pytest.raises(Exception):
-        load.load_files(default_params["load_data"])
+        load.load_files(default_param["load_data"])
         assert True
