@@ -61,7 +61,7 @@ def write_eeg_data(raw, func, file, datatype, root):
     dir_path = '{}/rawderivatives/preprocessed'.format(root.split("/")[0])
 
     bids_path = BIDSPath(subject=subj, session=ses, task=task,
-                         run=run, processing=funcBIDS, datatype=datatype, 
+                         run=run, processing=funcBIDS, datatype=datatype,
                          root=dir_path)
 
     # save file using mne if epoch datatype
