@@ -2,6 +2,9 @@ import json
 import sys
 import os
 
+from mne_bids import write_raw_bids, BIDSPath
+import mne
+
 
 def read_dict_to_json(dict_array, file, datatype, root):
     if dict_array is None:
@@ -51,25 +54,27 @@ def write_eeg_data(raw, func, file, datatype, root):
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
+    # BIDSify function name (TODO: properly handle)
+    funcBIDS = func.replace("_", "")
+
     # puts together the path to be created
-    dir_path = '{}/raw_derivatives/preprocessed/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], subj, ses, datatype)
+    dir_path = '{}/rawderivatives/preprocessed'.format(root.split("/")[0])
 
-    dir_section = dir_path.split("/")
+    bids_path = BIDSPath(subject=subj, session=ses, task=task,
+                         run=run, processing=funcBIDS, datatype=datatype, 
+                         root=dir_path)
 
-    # creates the directory path
-    temp = ""
-    for sec in dir_section:
-        temp += sec + "/"
-        # checks that the directory path doesn't already exist
-        if not os.path.isdir(temp):
-            os.mkdir(temp)  # creates the directory path
+    # save file using mne if epoch datatype
+    if isinstance(raw, mne.Epochs):
+        full_path = dir_path + '/sub-{}/ses-{}/{}/'.format(subj, ses, datatype)
+        format = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}_epo.fif'.\
+            format(subj, ses, task, run, funcBIDS, datatype)
 
-    # saves the raw file in the directory
-    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}'.format(
-        subj, ses, task, run, datatype, func)
+        raw.save(full_path + format, overwrite=True)
+        return
 
-    raw.save(raw_savePath, overwrite=True)
+    write_raw_bids(raw=raw, bids_path=bids_path, format="BrainVision",
+                   allow_preload=True, overwrite=True)
 
 
 def write_template_params(root, subjects=None, tasks=None,
