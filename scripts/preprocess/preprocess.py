@@ -52,10 +52,12 @@ def reref_raw(raw, ref_channels=None):
         return raw_new_ref, {"Reference": ref_details}
 
     except TypeError:
-        print('Type Error')
-
+        error = 'Type Error'
     except Exception:
-        print('Unknown Error')
+        error = 'Unknown Error'
+    print(error)
+    reref_details = {"ERROR": error}
+    return raw, {"Reference": reref_details}
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
@@ -93,9 +95,12 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
 
         return raw_filtered, {"Filter": filter_details}
     except TypeError:
-        print('Type Error')
+        error = 'Type Error'
     except Exception:
-        print('Unknown Error')
+        error = 'Unknown Error'
+    print(error)
+    filter_details = {"ERROR": error}
+    return raw, {"Filter": filter_details}
 
 
 def ica_raw(raw, montage):
@@ -149,8 +154,8 @@ def ica_raw(raw, montage):
     # prepica - step2 - segment continuous EEG into arbitrary 1-second epochs
     epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
                                                duration=1.0,
-                                               overlap=0.0,
-                                               preload=True)
+                                               preload=True,
+                                               overlap=0.0)
     # compute the number of original epochs
     epochs_original = epochs_prep.__len__()
 
@@ -238,8 +243,9 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     """
 
     if raw is None:
-        print("Invalid raw object")
-        sys.exit(1)
+        error = "Invalid raw object"
+        print(error)
+        return raw, {"Segment": {"ERROR": error}}
 
     events, event_id = mne.events_from_annotations(raw)
 
@@ -323,7 +329,18 @@ def final_reject_epoch(epochs):
 
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
-    autoRej.fit(epochs)
+    try:
+        autoRej.fit(epochs)
+    except ValueError:
+        fr_error = "The least populated class in y has only 1 member, which is too\
+             few. The minimum number of groups for any class cannot be\
+             less than 2."
+
+        print(fr_error)
+
+        ica_details = {"ERROR": fr_error}
+        return epochs, {"Final Reject": ica_details}
+
     epochs_clean = autoRej.transform(epochs)
 
     # Create a rejection log
@@ -375,8 +392,9 @@ def interpolate_data(epochs, mode, method, reset_bads):
     Modified in place epochs object and output dictionary
     """
     if epochs is None:
-        print("Null raw objects")
-        sys.exit(1)
+        error = "Null raw objects"
+        print(error)
+        return epochs, {"Interpolation": {"ERROR": error}}
 
     epochs.interpolate_bads(mode=mode,
                             method=method,

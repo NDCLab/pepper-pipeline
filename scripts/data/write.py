@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import mne
 
 
 def read_dict_to_json(dict_array, file, datatype, root):
@@ -12,7 +13,7 @@ def read_dict_to_json(dict_array, file, datatype, root):
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
     # Creates the directory if it does not exist
-    dir_path = f'{root}/raw_derivatives/'.split("/")
+    dir_path = f'{root}/rawderivatives/'.split("/")
     temp = ""
     for sec in dir_path:
         temp += sec + "/"
@@ -23,18 +24,18 @@ def read_dict_to_json(dict_array, file, datatype, root):
     bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    with open(f'{root}/raw_derivatives/' + bids_format, 'w') as file:
+    with open(f'{root}/rawderivatives/' + bids_format, 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
         file.write(str)
 
 
-def write_eeg_data(raw, func, file, datatype, root):
+def write_eeg_data(obj, func, file, datatype, root):
     """Used to store the modified raw file after each processing step
     Parameters:
     -----------
-    raw:    Raw
-            Raw data in FIF format
+    obj:    mne.io.Raw | mne.Epochs
+            EEG Object generated from pipeline
     func:   String
             name of the function
     subject:    String
@@ -51,8 +52,11 @@ def write_eeg_data(raw, func, file, datatype, root):
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
+    # determine file extension based on object type
+    obj_type = "_epo.fif" if isinstance(obj, mne.Epochs) else ".fif"
+
     # puts together the path to be created
-    dir_path = '{}/raw_derivatives/preprocessed/sub-{}/ses-{}/{}/'.format(
+    dir_path = '{}/rawderivatives/preprocessed/sub-{}/ses-{}/{}/'.format(
         root.split("/")[0], subj, ses, datatype)
 
     dir_section = dir_path.split("/")
@@ -67,9 +71,9 @@ def write_eeg_data(raw, func, file, datatype, root):
 
     # saves the raw file in the directory
     raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}'.format(
-        subj, ses, task, run, datatype, func)
+        subj, ses, task, run, datatype, func) + obj_type
 
-    raw.save(raw_savePath, overwrite=True)
+    obj.save(raw_savePath, overwrite=True)
 
 
 def write_template_params(root, subjects=None, tasks=None,

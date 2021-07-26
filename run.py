@@ -32,5 +32,6 @@ for file in data:
         write.write_eeg_data(eeg_obj, func, file, ch_type, output_path)
 
     # collect annotations of each step
+    outputs.reverse()
     output = dict(ChainMap(*outputs))
     write.read_dict_to_json(output, file, ch_type, output_path)
