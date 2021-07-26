@@ -1,6 +1,6 @@
 {
   "load_data": {
-    "root": "CMI/rawdata",
+    "root": "/home/data/NDClab/data/base-eeg/CMI/rawdata",
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
@@ -47,6 +47,6 @@
   },
 
   "output_data": {
-    "root": "CMI"
+    "root": "/home/data/NDClab/data/base-eeg/CMI"
   }
 }

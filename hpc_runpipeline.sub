@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --qos medium
+#SBATCH --account iacc_gbuzzell
+#SBATCH --partition 6g-per-core
+
+
+#SBATCH --nodes=1                # node count
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --time=00:24:00          # total run time limit (HH:MM:SS)
+
+# Create new cache variables to prevent usage of home quota 
+export SINGULARITY_CACHEDIR=/scratch/gbuzzell/SINGULARITY_CACHE
+export SINGULARITY_TMPDIR=/tmp
+
+# load singularity module
+module load singularity-3.5.3
+singularity run container/singulImage.sif python run.py
