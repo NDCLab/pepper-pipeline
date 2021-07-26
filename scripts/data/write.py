@@ -112,7 +112,7 @@ def write_template_params(root, subjects=None, tasks=None,
         "subjects": ["*"] if subjects is None else subjects,
         "tasks": ["*"] if tasks is None else tasks,
         "exceptions": exceptions,
-        "channel_type": "eeg"
+        "channel-type": "eeg"
     }
 
     # set up default preprocess params
@@ -149,6 +149,11 @@ def write_template_params(root, subjects=None, tasks=None,
 
     # set up postprocess params Pipeline has not yet been implemented!
     user_params["postprocess"] = {}
+
+    # set up write_data params
+    user_params["output_data"] = {
+        "root": "CMI"
+    }
 
     if to_file is not None:
         path_to_file = os.path.join(to_file, "user_params.json")

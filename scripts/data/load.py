@@ -12,7 +12,7 @@ def load_params(user_param_path):
         return user_params
 
 
-def init_subjects(filter_sub, root, ch_type):
+def _init_subjects(filter_sub, root, ch_type):
     """Initialize collection of files by loading selected subjects
     Parameters
     ----------
@@ -47,7 +47,7 @@ def init_subjects(filter_sub, root, ch_type):
     return filered_subjects
 
 
-def filter_tasks(filter_tasks, files):
+def _filter_tasks(filter_tasks, files):
     """Select tasks as defined by user_params
     Parameters
     ----------
@@ -67,7 +67,7 @@ def filter_tasks(filter_tasks, files):
     return [f for f in files if f.task in filter_tasks]
 
 
-def filter_exceptions(subjects, tasks, runs, files, root, ch_type):
+def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     """Remove exceptions as defined by user_params
     Parameters
     ----------
@@ -141,12 +141,12 @@ def load_files(data_params):
     e_runs = exceptions["runs"]
 
     # initialize files by loading selected subjects
-    files = init_subjects(subjects_sel, root, ch_type)
+    files = _init_subjects(subjects_sel, root, ch_type)
 
     # filter tasks
-    files = filter_tasks(tasks_sel, files)
+    files = _filter_tasks(tasks_sel, files)
 
     # filter exceptions
-    files = filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
+    files = _filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
 
     return files
