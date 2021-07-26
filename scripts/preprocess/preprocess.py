@@ -152,8 +152,8 @@ def ica_raw(raw, montage):
     # prepica - step2 - segment continuous EEG into arbitrary 1-second epochs
     epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
                                                duration=1.0,
-                                               overlap=0.0,
-                                               preload=True)
+                                               preload=True,
+                                               overlap=0.0)
     # compute the number of original epochs
     epochs_original = epochs_prep.__len__()
 
@@ -327,7 +327,18 @@ def final_reject_epoch(epochs):
 
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
-    autoRej.fit(epochs)
+    try:
+        autoRej.fit(epochs)
+    except ValueError:
+        fr_error = "The least populated class in y has only 1 member, which is too\
+             few. The minimum number of groups for any class cannot be\
+             less than 2."
+
+        print(fr_error)
+
+        ica_details = {"ERROR": fr_error}
+        return epochs, {"Final Reject": ica_details}
+
     epochs_clean = autoRej.transform(epochs)
 
     # Create a rejection log

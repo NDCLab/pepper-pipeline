@@ -30,10 +30,9 @@ for file in data:
     # for each pipeline step in user_params, execute with parameters
     for idx, (func, params) in enumerate(preprocess_params.items()):
         eeg_obj, outputs[idx] = getattr(preprocess, func)(eeg_obj, **params)
-        # TODO: refactor function below to take in path to reduce param size
         write_eeg_data(eeg_obj, func, file, ch_type, output_path)
 
     # collect annotations of each step
+    outputs.reverse()
     output = dict(ChainMap(*outputs))
-    # TODO: read output_preproc into CMI
     read_dict_to_json(output, file, ch_type, output_path)
