@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3
 
-MAINTAINER Steven W. Tolbert <stolb002@fiu.edu> 
+LABEL MAINTAINER="Steven W. Tolbert <stolb002@fiu.edu>" 
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get -y upgrade\
@@ -29,6 +29,9 @@ WORKDIR /tmp
 # Create the environment:
 COPY environment.yml .
 RUN conda env create -f environment.yml
+
+# Make RUN commands use the new environment:
+SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]
 
 RUN apt-get -y install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 
