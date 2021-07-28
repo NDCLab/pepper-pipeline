@@ -18,13 +18,13 @@ Current readme and contributing files focus on the baseEEG pre-processing pipeli
   * [Raw Derivatives](#raw-derivatives)
   * [Log Files](#log-files)
 * [Pipeline Steps](#pipeline-steps)
-  * [Filter](#1)-filter)
-  * [Reject Bad Channels](#2)-reject-bad-channels)
-  * [ICA](#3)-ica)
-  * [Segment](#4)-segment)
-  * [Final Reject Epochs](#5)-final-reject-epochs)
-  * [Interpolate](#6)-interpolate)
-  * [Re-reference](#7)-re-reference)
+  * [Filter](#1.-filter)
+  * [Reject Bad Channels](#2.-reject-bad-channels)
+  * [ICA](#3.-ica)
+  * [Segment](#4/-segment)
+  * [Final Reject Epochs](#5/-final-reject-epochs)
+  * [Interpolate](#6/-interpolate)
+  * [Re-reference](#7/-re-reference)
 
 Development guidelines and details are listed in [CONTRIBUTING.md](CONTRIBUTING.md)
 
@@ -205,7 +205,7 @@ Each file generated follows BIDS naming conventions for file naming: `output_XXX
 
 ### Pipeline Steps
 
-#### 1) Filter
+#### 1. Filter
 
 - High-pass filter the data using MNE function
 - Read in the "highPass" "lowpass" fields from the `user_params.json` file to define filter parameters
@@ -214,12 +214,12 @@ __________________FROM JESS
 Should that be "functions" above?  That feels better to me grammatically, but only if there are, actually, more than one!  Also, is it correct that camelCase was used for "highPass" but not for "lowpass"?
 __________________FROM JESS
 
-#### 2) Reject Bad Channels
+#### 2. Reject Bad Channels
 
 - Auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
 - Write to output file (field "globalBad_chans") to indicate which channels were detected as bad
 
-#### 3) Independent Component Analysis
+#### 3. Independent Component Analysis
 
   Overview: ICA requires a decent amount of [stationarity](https://towardsdatascience.com/stationarity-in-time-series-analysis-90c94f27322#:~:text=In%20t%20he%20most%20intuitive,not%20itself%20change%20over%20time.) in the data. This is often violated by raw EEG. One way around this is to first make a copy of the EEG data using automated methods to detect noisy portions of data and removing these sections. ICA is then run on the copied data after cleaning. The ICA weights produced by the copied dataset are copied back into original recording. In this way, we do not have to “throw out” sections of noisy data, while, at the same time, we are able to derive an improved ICA decomposition.
 
@@ -242,20 +242,20 @@ __________________FROM JESS
     - Remove the data corresponding to the identified artifacts
     - Write to the output file (field "icArtifacts") which ICA components were identified as artifacts
 
-#### 4) Segment
+#### 4/ Segment
 - Segment by epoch to "cut" the continuous data into epochs of data such that the zero point for each epoch is a given marker of interest
 - Write to output file (field "XXX") which markers were used for epoching purposes, how many of each epoch were created, and how many milliseconds were retained before/after the markers of interest
 
-#### 5) Final Reject Epochs
+#### 5/ Final Reject Epochs
 - Loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
 - Write to the output file ("field XXX") which channel/epoch intersections were rejected
 
-#### 6) Interpolate
+#### 6/ Interpolate
 - Interpolate missing channels, at the channel/epoch level, using a spherical spline interpolation, as implemented in MNE
 - Interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in MNE
 - Write to output file (field "XXX") which channels were interpolated and using what method
 
-#### 7) Re-reference
+#### 7/ Re-reference
 - Re-reference the data to the average of all electrodes (“average reference”) using the MNE function
 - Write to output file (field "XXX") which data were re-referenced to average
 
