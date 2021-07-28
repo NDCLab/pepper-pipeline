@@ -17,16 +17,16 @@ Current readme and contributing files focus on the baseEEG pre-processing pipeli
   * [Annotations](#annotations)
   * [Raw Derivatives](#raw-derivatives)
   * [Log Files](#log-files)
-* [Pipeline-Steps](#pipeline-steps)
-  * [Filter](#filter)
-  * [Reject Bad Channels](#reject-bad-channels)
-  * [ICA](#ica)
-  * [Segment](#segment)
-  * [Final Reject Epochs](#final-reject-epochs)
-  * [Interpolate](#interpolate)
-  * [Re-reference](#re-reference)
+* [Pipeline Steps](#pipeline-steps)
+  * [Filter](#1)-filter)
+  * [Reject Bad Channels](#2)-reject-bad-channels)
+  * [ICA](#3)-ica)
+  * [Segment](#4)-segment)
+  * [Final Reject Epochs](#5)-final-reject-epochs)
+  * [Interpolate](#6)-interpolate)
+  * [Re-reference](#7)-re-reference)
 
-Development guidelines and details are listed in [CONTRIBUTING.md](contributing.md)
+Development guidelines and details are listed in [CONTRIBUTING.md](CONTRIBUTING.md)
 
 __________________FROM JESS
 It seems to me that "Outline" above should possibly be renamed "Usage" (as the vast majority of this file is usage instructions, right?  In which case, this "Usage" section should possibly be renamed "Selecting Parameters"?
