@@ -18,7 +18,7 @@ Current readme and contributing files focus on the baseEEG pre-processing pipeli
   * [Raw Derivatives](#raw-derivatives)
   * [Log Files](#log-files)
 * [Pipeline Steps](#pipeline-steps)
-  * [Filter](#1.-filter)
+  * [Filter](#1-filter)
   * [Reject Bad Channels](#2.-reject-bad-channels)
   * [ICA](#3.-ica)
   * [Segment](#4/-segment)
@@ -205,7 +205,7 @@ Each file generated follows BIDS naming conventions for file naming: `output_XXX
 
 ### Pipeline Steps
 
-#### 1. Filter
+#### 1-Filter
 
 - High-pass filter the data using MNE function
 - Read in the "highPass" "lowpass" fields from the `user_params.json` file to define filter parameters
