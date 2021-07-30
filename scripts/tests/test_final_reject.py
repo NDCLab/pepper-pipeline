@@ -84,5 +84,7 @@ def test_except_value(default_param, select_subjects, error_tasks):
         # attempt to reject epochs with data containing only one entire epoch
         # across each channel
         with pytest.raises(ValueError):
-            _, _ = pre.final_reject_epoch(epo)
+            _, output_dict = pre.final_reject_epoch(epo)
+
             assert True
+            assert isinstance(output_dict, dict)
