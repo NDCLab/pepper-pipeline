@@ -46,12 +46,13 @@ def test_return_values(default_param, select_subjects, select_tasks):
 
     # get the pipeline steps
     feature_params = default_param["preprocess"]
+    filt_param = feature_params["filter_data"]
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # filter data
-        filt_eeg, output_dict = pre.filter_data(eeg_obj, **feature_params["filter_data"])
+        filt_eeg, output_dict = pre.filter_data(eeg_obj, **filt_param)
 
         # assert that None does not exist in final reject
         assert None not in output_dict.viewvalues()
@@ -61,13 +62,12 @@ def test_return_values(default_param, select_subjects, select_tasks):
 
 
 def test_except_value(default_param):
-    # get the pipeline steps
-    feature_params = default_param["preprocess"]
-
     eeg_obj = None
 
     # attempt to reject epochs with data containing only one entire epoch
     # across each channel
-    with pytest.raises(TypeError):
-        _, _ = pre.filter_data(eeg_obj)
+    with pytest.raises(Exception):
+        _, output_dict = pre.filter_data(eeg_obj)
         assert True
+
+        assert isinstance(output_dict, dict)
