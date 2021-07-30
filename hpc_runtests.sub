@@ -12,10 +12,10 @@
 module load singularity-3.5.3
 
 # start singularity shell
-singularity shell container/eeg-pipe.simg
+singularity shell eeg-pipe.simg
 
 # activate environment using env name from file 
-source /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
+source /opt/conda/bin/activate $(head -n 1 conda/environment.yml | cut -f 2 -d ' ')
 
-# run pipeline using default params
-python run.py
+# run all available tests
+pytest
