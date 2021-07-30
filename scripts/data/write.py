@@ -3,6 +3,8 @@ import sys
 import os
 import mne
 
+from scripts.data.constants import pipe_label, interm, complete
+
 
 def read_dict_to_json(dict_array, file, datatype, root):
     if dict_array is None:
@@ -13,9 +15,11 @@ def read_dict_to_json(dict_array, file, datatype, root):
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
     # Creates the directory if it does not exist
-    dir_path = f'{root}/rawderivatives/'.split("/")
+    dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
+        root, pipe_label, pipe_label + complete, subj, ses, datatype)
+
     temp = ""
-    for sec in dir_path:
+    for sec in dir_path.split("/"):
         temp += sec + "/"
         # checks that the directory path doesn't already exist
         if not os.path.isdir(temp):
@@ -24,13 +28,13 @@ def read_dict_to_json(dict_array, file, datatype, root):
     bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    with open(f'{root}/rawderivatives/' + bids_format, 'w') as file:
+    with open(dir_path + bids_format, 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
         file.write(str)
 
 
-def write_eeg_data(obj, func, file, datatype, root):
+def write_eeg_data(obj, func, file, datatype, final, root):
     """Used to store the modified raw file after each processing step
     Parameters:
     -----------
@@ -46,6 +50,8 @@ def write_eeg_data(obj, func, file, datatype, root):
             name of the task
     datatype:   String
                 type of data(e.g EEG, MEG, etc )
+    final:  boolean
+            boolean that determines if eeg object written is the final
     root:   String
             directory from where the data was loaded
     """
@@ -55,9 +61,15 @@ def write_eeg_data(obj, func, file, datatype, root):
     # determine file extension based on object type
     obj_type = "_epo.fif" if isinstance(obj, mne.Epochs) else ".fif"
 
+    # determine directory child based on feature position
+    child_dir = pipe_label + complete if final else pipe_label + interm
+
+    # Un-standardize function names for close-to-BIDS standard
+    func = "" if final else func.replace("_", "")
+
     # puts together the path to be created
-    dir_path = '{}/rawderivatives/preprocessed/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], subj, ses, datatype)
+    dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
+        root.split("/")[0], pipe_label, child_dir, subj, ses, datatype)
 
     dir_section = dir_path.split("/")
 
@@ -70,8 +82,8 @@ def write_eeg_data(obj, func, file, datatype, root):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_{}_{}'.format(
-        subj, ses, task, run, datatype, func) + obj_type
+    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
+        subj, ses, task, run, func, datatype) + obj_type
 
     obj.save(raw_savePath, overwrite=True)
 
