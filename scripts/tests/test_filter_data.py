@@ -61,7 +61,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         assert isinstance(filt_eeg, Epochs)
 
 
-def test_except_value(default_param):
+def test_except_value():
     eeg_obj = None
 
     # attempt to reject epochs with data containing only one entire epoch
