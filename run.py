@@ -6,7 +6,7 @@ from collections import ChainMap
 import mne_bids
 
 # load all parameters
-user_params = load.load_params("user_params_except.json")
+user_params = load.load_params("user_params.json")
 
 # get data and metadata parameters
 preprocess_params = user_params["preprocess"]

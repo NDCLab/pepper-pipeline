@@ -8,10 +8,14 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --time=00:24:00          # total run time limit (HH:MM:SS)
 
-# Create new cache variables to prevent usage of home quota 
-export SINGULARITY_CACHEDIR=/scratch/gbuzzell/SINGULARITY_CACHE
-export SINGULARITY_TMPDIR=/tmp
-
 # load singularity module
 module load singularity-3.5.3
-singularity run container/singulImage.sif python run.py
+
+# start singularity shell
+singularity shell eeg-pipe.simg
+
+# activate environment using env name from file 
+source /opt/conda/bin/activate $(head -n 1 conda/environment.yml | cut -f 2 -d ' ')
+
+# run pipeline using default params
+python run.py

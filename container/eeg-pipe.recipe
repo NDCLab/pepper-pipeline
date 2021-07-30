@@ -1,0 +1,51 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+
+%help
+
+	.__   __.  _______   ______  __          ___      .______   
+	|  \ |  | |       \ /      ||  |        /   \     |   _  \  
+	|   \|  | |  .--.  |  ,----'|  |       /  ^  \    |  |_)  | 
+	|  . `  | |  |  |  |  |     |  |      /  /_\  \   |   _  <  
+	|  |\   | |  '--'  |  `----.|  `----./  _____  \  |  |_)  | 
+	|__| \__| |_______/ \______||_______/__/     \__\ |______/  
+                                                            
+	You are in a singularity image. All packages required to run this pipeline 
+	should now be installed! 
+
+%files
+	
+	environment.yml
+
+%post
+       
+	# update package repository list
+        apt-get -y update
+	
+	# download base software
+	apt-get -y upgrade bash-completion \
+	 build-essential \
+	 curl \
+	 git git-core \
+	 golang \
+	 htop \
+	 locales \
+	 man \
+	 nmap \
+	 python3-pip \
+	 ruby-full \
+	 strace \
+	 sudo \
+	 tig \
+	 vim \
+	 wget
+
+	# set time
+	locale-gen en_US.UTF-8
+	
+	# create a conda environent using the yml file
+	/opt/conda/bin/conda env create	-f environment.yml
+	
+	echo "Confirming conda environment creation"
+	echo "============================"
+	/opt/conda/bin/conda env list
