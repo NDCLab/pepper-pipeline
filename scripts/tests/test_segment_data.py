@@ -31,6 +31,11 @@ def select_tasks():
     return ["ContrastChangeBlock1"]
 
 
+@pytest.fixture
+def error_obj():
+    return None
+
+
 def test_return_values(default_param, select_subjects, select_tasks):
 
     default_param["load_data"]["subjects"] = select_subjects
@@ -56,8 +61,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
         assert isinstance(seg_epo, Epochs)
 
 
-def test_except_value(default_param):
-    eeg_obj = None
+def test_except_value(default_param, error_obj):
+    eeg_obj = error_obj
 
     # get the pipeline steps and seg params
     feature_params = default_param["preprocess"]
