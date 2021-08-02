@@ -3,7 +3,7 @@ import sys
 import os
 import mne
 
-from scripts.data.constants import pipe_label, interm, complete
+from scripts.data.constants import PIPE_NAME, INTERM, FINAL
 
 
 def read_dict_to_json(dict_array, file, datatype, root):
@@ -16,7 +16,7 @@ def read_dict_to_json(dict_array, file, datatype, root):
 
     # Creates the directory if it does not exist
     dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
-        root, pipe_label, pipe_label + complete, subj, ses, datatype)
+        root, PIPE_NAME, PIPE_NAME + FINAL, subj, ses, datatype)
 
     temp = ""
     for sec in dir_path.split("/"):
@@ -62,14 +62,14 @@ def write_eeg_data(obj, func, file, datatype, final, root):
     obj_type = "_epo.fif" if isinstance(obj, mne.Epochs) else ".fif"
 
     # determine directory child based on feature position
-    child_dir = pipe_label + complete if final else pipe_label + interm
+    child_dir = PIPE_NAME + FINAL if final else PIPE_NAME + INTERM
 
     # Un-standardize function names for close-to-BIDS standard
-    func = "" if final else func.replace("_", "")
+    func = PIPE_NAME if final else func.replace("_", "")
 
     # puts together the path to be created
     dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], pipe_label, child_dir, subj, ses, datatype)
+        root.split("/")[0], PIPE_NAME, child_dir, subj, ses, datatype)
 
     dir_section = dir_path.split("/")
 
