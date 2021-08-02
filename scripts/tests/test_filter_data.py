@@ -32,8 +32,8 @@ def select_tasks():
 
 
 @pytest.fixture
-def error_tasks():
-    return ["Video1"]
+def error_obj():
+    return None
 
 
 def test_return_values(default_param, select_subjects, select_tasks):
@@ -61,8 +61,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
         assert isinstance(filt_eeg, Epochs)
 
 
-def test_except_value():
-    eeg_obj = None
+def test_except_value(error_obj):
+    eeg_obj = error_obj
 
     # attempt to reject epochs with data containing only one entire epoch
     # across each channel
