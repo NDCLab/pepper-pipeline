@@ -10,8 +10,23 @@ From: continuumio/miniconda3
 	|  |\   | |  '--'  |  `----.|  `----./  _____  \  |  |_)  | 
 	|__| \__| |_______/ \______||_______/__/     \__\ |______/  
                                                             
-	You are in a singularity image. All packages required to run this pipeline 
-	should now be installed! 
+	Start this container to reliably run the base-eeg pipeline with all
+	necessary packages, environments, and libraries. 
+
+	Usage:
+	
+	To start a shell instance with the container image, execute
+		
+		singularity shell container/pipe-env.simg
+
+	To execute a command within the container, execute:
+		
+		singularity exec container/pipe-env.simg [command]
+
+	Lastly, to create an instance of the container that runs in the 
+	background, execute:
+
+		singularity instance start container/pipe-env.simg [name]
 
 %files
 	
@@ -46,6 +61,10 @@ From: continuumio/miniconda3
 	# create a conda environent using the yml file
 	/opt/conda/bin/conda env create	-f environment.yml
 	
-	echo "Confirming conda environment creation"
-	echo "============================"
+	# list the available conda environments
 	/opt/conda/bin/conda env list
+
+%runscript
+	
+	# activate the environment
+	source /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
