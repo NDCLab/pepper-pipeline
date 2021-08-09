@@ -64,7 +64,3 @@ From: continuumio/miniconda3
 	# list the available conda environments
 	/opt/conda/bin/conda env list
 
-%runscript
-	
-	# activate the environment
-	source /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')

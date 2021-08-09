@@ -1,9 +1,8 @@
-name: mne
+name: pipe
 channels:
 - conda-forge
 dependencies:
 - python==3.9.2
-- pytest==3.05
 - pip==21.0.1
 - numpy==1.20.2
 - scipy==1.6.2
@@ -36,6 +35,8 @@ dependencies:
 - nilearn==0.7.1
 - python-picard==0.4
 - pyqt==5.12.3
+- pathlib==1.0.1
+- pytest==6.2.4
 - mne==0.23.0
 - mffpy==0.6.2
 - ipywidgets==7.6.3
@@ -44,4 +45,3 @@ dependencies:
   - autoreject==0.2.1
   - mne-bids==0.7
   - pybv==0.5.0
-  - pathlib==1.0.1

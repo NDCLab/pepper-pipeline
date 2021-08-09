@@ -11,11 +11,6 @@
 # load singularity module
 module load singularity-3.5.3
 
-# start singularity shell
-singularity shell --bind /home/data/NDClab/data/base-eeg/CMI container/share-env.simg
+# run run.py using conda env within singularity env
+singularity exec --bind /home/data/NDClab/data/base-eeg/CMI container/share-env.simg conda run --no-capture-output -n pipe python run.py
 
-# activate environment using env name from file 
-source /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
-
-# run pipeline using default params
-python run.py
