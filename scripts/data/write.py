@@ -23,6 +23,7 @@ def read_dict_to_json(dict_array, file, datatype, root):
         temp += sec + "/"
         # checks that the directory path doesn't already exist
         if not os.path.isdir(temp):
+            os.chmod(temp, 0o644)  # set temp to be writable by user
             os.mkdir(temp)  # creates the directory path
 
     bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
@@ -155,7 +156,7 @@ def write_template_params(root, subjects=None, tasks=None,
             "method": None,
             "reset_bads": None
         },
-        "rereference_data": {
+        "reref_raw": {
         }
     }
 
