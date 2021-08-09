@@ -155,7 +155,7 @@ def write_template_params(root, subjects=None, tasks=None,
             "method": None,
             "reset_bads": None
         },
-        "rereference_data": {
+        "reref_raw": {
         }
     }
 
