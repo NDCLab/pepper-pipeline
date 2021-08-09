@@ -29,7 +29,10 @@ for file in data:
     # for each pipeline step in user_params, execute with parameters
     for idx, (func, params) in enumerate(preprocess_params.items()):
         eeg_obj, outputs[idx] = getattr(preprocess, func)(eeg_obj, **params)
-        write.write_eeg_data(eeg_obj, func, file, ch_type, output_path)
+
+        # check if this is the fully preprocessed eeg object
+        final = idx == len(preprocess_params.items()) - 1
+        write.write_eeg_data(eeg_obj, func, file, ch_type, final, output_path)
 
     # collect annotations of each step
     outputs.reverse()
