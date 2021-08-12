@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #SBATCH --qos medium
 #SBATCH --account iacc_gbuzzell
@@ -11,6 +12,11 @@
 # load singularity module
 module load singularity-3.5.3
 
-# run run.py using conda env within singularity env
-singularity exec --bind /home/data/NDClab/data/base-eeg/CMI container/share-env.simg conda run --no-capture-output -n pipe python run.py
+# create singularity instance which will run in background
+singularity instance start --bind /home/data/NDClab/data/base-eeg/CMI container/share-env.simg pipe-eeg
 
+# pass conda activation to instance
+singularity exec instance://pipe-eeg source /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
+
+# run main script
+singularity exec instance://pipe-eeg python run.py
