@@ -20,7 +20,7 @@ dependencies:
 - psutil==5.8.0
 - numexpr==2.7.3
 - imageio==2.9.0
-- tqdm==4.60.0
+- tqdm==4.62.0
 - spyder-kernels==2.0.1
 - imageio-ffmpeg==0.4.3
 - vtk>=9.0.1
