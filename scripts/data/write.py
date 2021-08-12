@@ -23,7 +23,6 @@ def read_dict_to_json(dict_array, file, datatype, root):
         temp += sec + "/"
         # checks that the directory path doesn't already exist
         if not os.path.isdir(temp):
-            os.chmod(temp, 0o644)  # set temp to be writable by user
             os.mkdir(temp)  # creates the directory path
 
     bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
@@ -70,7 +69,7 @@ def write_eeg_data(obj, func, file, datatype, final, root):
 
     # puts together the path to be created
     dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], PIPE_NAME, child_dir, subj, ses, datatype)
+        root, PIPE_NAME, child_dir, subj, ses, datatype)
 
     dir_section = dir_path.split("/")
 
