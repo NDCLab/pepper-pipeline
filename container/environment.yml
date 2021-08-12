@@ -21,6 +21,7 @@ dependencies:
 - numexpr==2.7.3
 - imageio==2.9.0
 - tqdm==4.62.0
+- twine==3.4.2
 - spyder-kernels==2.0.1
 - imageio-ffmpeg==0.4.3
 - vtk>=9.0.1
