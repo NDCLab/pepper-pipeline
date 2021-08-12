@@ -17,16 +17,23 @@ From: continuumio/miniconda3
 	
 	To start a shell instance with the container image, execute
 		
-		singularity shell container/pipe-env.simg
+		singularity shell container/run-env.simg
 
 	To execute a command within the container, execute:
 		
-		singularity exec container/pipe-env.simg [command]
+		singularity exec container/run-env.simg [command]
 
 	Lastly, to create an instance of the container that runs in the 
 	background, execute:
 
 		singularity instance start container/pipe-env.simg [name]
+
+	Commands can be passed to the instance using the following format
+
+		singularity exec instance://[name] [command]
+
+	To submit an issue visit https://github.com/NDCLab/baseEEG. We 
+	encourage open-source collaboration!
 
 %files
 	
@@ -63,4 +70,13 @@ From: continuumio/miniconda3
 	
 	# list the available conda environments
 	/opt/conda/bin/conda env list
+
+%runscript
+
+	# activate the required environment
+	. /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
+
+	# run the pipeline
+	python run.py
+
 
