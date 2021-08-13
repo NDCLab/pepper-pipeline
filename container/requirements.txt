@@ -1,4 +1,12 @@
+alabaster==0.7.12
+argh==0.26.2
+argon2-cffi==20.1.0
+asn1crypto==1.4.0
+astroid==2.4.2
+astropy==4.0.2
 async-generator==1.10
+atomicwrites==1.4.0
+attrs==20.3.0
 autopep8==1.5.4
 autoreject==0.2.2
 Babel==2.8.1
@@ -25,12 +33,6 @@ cloudpickle==1.6.0
 clyent==1.2.2
 colorama==0.4.4
 comtypes==1.1.7
-conda==4.10.1
-conda-build==3.20.5
-conda-package-handling==1.7.2
-conda-repo-cli==1.0.3
-conda-token==0.2.0
-conda-verify==3.4.2
 contextlib2==0.6.0.post1
 cryptography==3.1.1
 cycler==0.10.0
@@ -72,7 +74,6 @@ itsdangerous==1.1.0
 jdcal==1.4.1
 jedi==0.18.0
 Jinja2==2.11.2
-joblib==0.17.0
 json5==0.9.5
 jsonschema==3.2.0
 jupyter==1.0.0
