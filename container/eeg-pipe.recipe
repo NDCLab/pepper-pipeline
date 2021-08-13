@@ -71,12 +71,8 @@ From: continuumio/miniconda3
 	# list the available conda environments
 	/opt/conda/bin/conda env list
 
-%runscript
-
-	# activate the required environment
-	. /opt/conda/bin/activate $(head -n 1 container/environment.yml | cut -f 2 -d ' ')
-
-	# run the pipeline
-	python run.py
+	# create user and set as sudo
+	useradd -m ndc && echo "ndc:ndc" | chpasswd && adduser ndc sudo
+	su ndc
 
 
