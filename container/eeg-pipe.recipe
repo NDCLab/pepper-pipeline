@@ -37,7 +37,7 @@ From: continuumio/miniconda3
 
 %files
 	
-	environment.yml
+	requirements.txt
 
 %post
        
@@ -65,14 +65,13 @@ From: continuumio/miniconda3
 	# set time
 	locale-gen en_US.UTF-8
 	
-	# create a conda environent using the yml file
-	/opt/conda/bin/conda env create	-f environment.yml
-	
-	# list the available conda environments
-	/opt/conda/bin/conda env list
+	# install python packages
+	pip3 install -r requirements.txt
 
 	# create user and set as sudo
-	useradd -m ndc && echo "ndc:ndc" | chpasswd && adduser ndc sudo
+	adduser --disabled-password --gecos '' ndc
+	adduser ndc sudo
+	echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 	su ndc
 
 
