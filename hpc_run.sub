@@ -3,20 +3,27 @@
 #SBATCH --account iacc_gbuzzell
 #SBATCH --partition 6g-per-core
 
+# get collection of all available subjects
+ls /home/data/NDClab/data/base-eeg/CMI/rawdata/ -F | grep / > subjects.txt
+SUBJ_LINES=$(wc -l subjects.txt)
+COUNT=${SUBJ_LINES:0:1}
 
 #SBATCH --nodes=1                # use a single compute node
-#SBATCH --ntasks=5               # run 5 subjects in parallel
+#SBATCH --array=0-${COUNT}         # create as many arrays as subjects
 #SBATCH --time=00:02:00          # quit if job hangs after two hours
+#SBATCH --job-name=pipeline_run
 
 # load singularity module
 module load singularity-3.5.3
 
-# get collection of all available subjects
-ls /home/data/NDClab/data/base-eeg/CMI/rawdata/ -F | grep / > subjects.txt
+# turn subjects into array
+arr=()
+while IFS= read -r line; do
+  arr+=("$line")
+done < subjects.txt
 
-# get all subjects that were created
+# use singularity container for each available subject and run in parallel 
+singularity exec --bind /home/data/NDClab/data/base-eeg/CMI/,/home/data/NDClab/data/base-eeg/CMI/rawdata/${arr[${SLURM_ARRAY_TASK_ID}]} container/run-container.simg python3 run.py
 
-# concate to bind strings
-
-# use singularity container for each task and run 
-srun --exclusive -n 1 -c 1 singularity exec --bind /home/data/NDClab/data/base-eeg/CMI container/run-container.simg python3 run.py
+# delete subjects.txt 
+rm -f subjects.txt
