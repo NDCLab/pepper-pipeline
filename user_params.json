@@ -5,7 +5,7 @@
     "tasks": ["*"],
     "exceptions": {
       "subjects": "",
-      "tasks": "", 
+      "tasks": "Video1", 
       "runs": ""
     },
     "channel-type": "eeg"
