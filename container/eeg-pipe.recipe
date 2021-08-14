@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: continuumio/miniconda3
+From: ubuntu:20.04
 
 %help
 
@@ -43,8 +43,8 @@ From: continuumio/miniconda3
        
 	# update package repository list
         apt-get -y update
-	
-	# download base software
+	export DEBIAN_FRONTEND=noninteractive
+
 	apt-get -y upgrade bash-completion \
 	 build-essential \
 	 curl \
