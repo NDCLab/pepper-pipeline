@@ -23,7 +23,7 @@ while IFS= read -r line; do
 done < subjects.txt
 
 # use singularity container for each available subject and run in parallel 
-singularity exec --bind /home/data/NDClab/data/base-eeg/CMI/,/home/data/NDClab/data/base-eeg/CMI/rawdata/${arr[${SLURM_ARRAY_TASK_ID}]} container/run-container.simg python3 run.py
+singularity exec --bind /home/data/NDClab/data/base-eeg/CMI/derivatives,/home/data/NDClab/data/base-eeg/CMI/rawdata/${arr[${SLURM_ARRAY_TASK_ID}]} container/run-container.simg python3 run.py
 
 # delete subjects.txt 
 rm -f subjects.txt
