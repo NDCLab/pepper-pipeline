@@ -17,16 +17,16 @@ From: ubuntu:20.04
 	
 	To start a shell instance with the container image, execute
 		
-		singularity shell container/run-env.simg
+		singularity shell container/run-container.simg
 
 	To execute a command within the container, execute:
 		
-		singularity exec container/run-env.simg [command]
+		singularity exec container/run-container.simg [command]
 
 	Lastly, to create an instance of the container that runs in the 
 	background, execute:
 
-		singularity instance start container/pipe-env.simg [name]
+		singularity instance start container/run-container.simg [name]
 
 	Commands can be passed to the instance using the following format
 
