@@ -4,12 +4,19 @@
 #SBATCH --partition 6g-per-core
 
 
-#SBATCH --nodes=1                # node count
-#SBATCH --ntasks=1               # total number of tasks across all nodes
-#SBATCH --time=00:24:00          # total run time limit (HH:MM:SS)
+#SBATCH --nodes=1                # use a single compute node
+#SBATCH --ntasks=5               # run 5 subjects in parallel
+#SBATCH --time=00:02:00          # quit if job hangs after two hours
 
 # load singularity module
 module load singularity-3.5.3
 
-# use singularity container to run pipeline
-singularity exec --bind /home/data/NDClab/data/base-eeg/CMI container/run-container.simg python3 run.py
+# get collection of all available subjects
+ls /home/data/NDClab/data/base-eeg/CMI/rawdata/ -F | grep / > subjects.txt
+
+# get all subjects that were created
+
+# concate to bind strings
+
+# use singularity container for each task and run 
+srun --exclusive -n 1 -c 1 singularity exec --bind /home/data/NDClab/data/base-eeg/CMI container/run-container.simg python3 run.py
