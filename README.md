@@ -5,8 +5,6 @@ A set of python-based tools for EEG processing geared towards developmental EEG 
 
 Currently, the development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
 
-Current readme and contributing files focus on the baseEEG-preprocessing pipeline.
-
 ## Outline
 
 * [Usage](#Usage)
