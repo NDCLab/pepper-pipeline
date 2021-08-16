@@ -8,7 +8,7 @@ ls /home/data/NDClab/data/base-eeg/CMI/rawdata/ -F | grep / > subjects.txt
 SUBJ_LINES=$(wc -l subjects.txt)
 COUNT=${SUBJ_LINES:0:1}
 
-#SBATCH --ntasks=$COUNT
+#SBATCH --ntasks=$COUNT            # set tasks equal to subject count
 #SBATCH --time=00:02:00            # quit if job hangs after two hours
 #SBATCH --job-name=pipeline_run
 
@@ -24,10 +24,14 @@ done < subjects.txt
 parallel_script=""
 for sub in "${arr[@]}"
 do
+   sub=${sub:4}
+   sub_num=${sub::-1}
+   echo "$sub_num"
+
    parallel_script+="srun --ntasks=1 "
    parallel_script+="singularity exec --bind /home/data/NDClab/data/base-eeg/CMI/derivatives,"
-   parallel_script+="/home/data/NDClab/data/base-eeg/CMI/rawdata/$sub"
-   parallel_script+=" container/run-container.simg python3 run.py & "
+   parallel_script+="/home/data/NDClab/data/base-eeg/CMI/rawdata"
+   parallel_script+=" container/run-container.simg python3 run.py $sub_num & "
 done
 
 parallel_script+="wait"

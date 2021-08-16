@@ -4,6 +4,7 @@ from scripts.preprocess import preprocess
 from collections import ChainMap
 
 import mne_bids
+import sys
 
 # load all parameters
 user_params = load.load_params("user_params.json")
@@ -16,6 +17,11 @@ write_params = user_params["output_data"]
 # get output root and channel type of data
 ch_type = data_params["channel-type"]
 output_path = write_params["root"]
+
+# overwrite data_params using sys.argv arguments
+if len(sys.argv) > 1:
+   print("overriding w/subject" + sys.argv[1])
+   data_params["subjects"] = [sys.argv[1]]
 
 # get set of subjects & tasks to run while omitting existing exceptions
 data = load.load_files(data_params)
