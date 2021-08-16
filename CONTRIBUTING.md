@@ -1,5 +1,5 @@
-# baseEEG contributing docs & standards
-Welcome to baseEEG! Note that the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows: 
+# PEPPER-Pipeline contributing docs & standards
+Welcome to the PEPPER-Pipeline project! Note that the development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows: 
 
 * [Roadmap](#Roadmap)  
     * [Overview](#Overview)
