@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "Jonhas",
+      "name": "Jonhas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45021859?v=4",
+      "profile": "https://github.com/Jonhas",
+      "contributions": [
+        "code",
+        "test",
+        "ideas",
+        "review"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pepper-pipeline",
+  "projectOwner": "NDCLab",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
