@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3
 
-MAINTAINER Steven W. Tolbert <stolb002@fiu.edu> 
+LABEL MAINTAINER="Steven W. Tolbert <stolb002@fiu.edu>" 
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get -y upgrade\

@@ -1,11 +1,11 @@
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
 
-# baseEEG
-A set of python-based tools for EEG processing geared towards developmental EEG researchers. baseEEG tools build off of MNE-python and the sciPy stack. Some tools are convenient wrappers for existing code, whereas others implement novel data processing steps. Note the purpose of baseEEG is not to reinvent/reimplement the algorithems already implemented by MNE-python. Instead, the "added value" of baseEEG is in providing a set of user-friendly pipelines for EEG pre (and post) processing geared towards developmental EEG researchers.
+# PEPPER-Pipeline: A Python-based, Easy, Pre-Processing EEG Reproducible Pipeline
+A set of python-based tools for EEG processing geared towards developmental EEG researchers. The PEPPER-Pipeline tools build off of MNE-python and the sciPy stack. Some tools are convenient wrappers for existing code, whereas others implement novel data processing steps. Note the purpose of the PEPPER-Pipeline is not to reinvent/reimplement the algorithems already implemented by MNE-python. Instead, the "added value" of PEPPER-Pipeline is in providing a user-friendly pipeline for EEG preprocessing, which is geared towards developmental EEG researchers and is compatible with BIDS, containerization (Docker and Singularity are both supported), and HPC usage. Three methods for working with the pipeline are provided: 1) A singularity image for running on HPCs, a docker image for running on local, and a conda environment for the dev toolkit.
 
-Currently, the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
+Currently, the development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
 
-Current readme and contributing files focus on the baseEEG-preprocessing pipeline.
+The PEPPER-Pipeline project is a fully-open, community-driven project. We welcome contributions by any/all researchers and data/computer scientists, at all levels. We strive to make all decisions "out in the open" and track all contributions rigorously via git, to faciliate proper recognition and authorship. We hold a weekly meeting that all are welcome to attend, and recordings of prior meetings are all availble for others to view. Please join us in moving this project forward, creating a fully-open, scalable, and reproducible EEG pipeline that all can use.
 
 ## Outline
 
@@ -138,11 +138,6 @@ Format:
 ### Raw-Derivatives
 For every pipeline step that executes, an intermediate dataset is written to the specified path. 
 
-### Log-Files
-
-These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output
-
-Each file name generated on a subject will follow the BIDS naming standard: `output_XXX_task_YYY_run_ZZZ.log`
 
 ## Pipeline-Steps
 
