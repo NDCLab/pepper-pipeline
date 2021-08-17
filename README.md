@@ -22,7 +22,6 @@ Current readme and contributing files focus on the baseEEG pre-processing pipeli
 * [Output](#output)
   * [Annotations](#annotations)
   * [Raw Derivatives](#raw-derivatives)
-  * [Log Files](#log-files)
 * [Pipeline Steps](#pipeline-steps)
   * [1-Filter](#1-filter)
   * [2-Reject Bad Channels](#2-reject-bad-channels)
