@@ -3,12 +3,8 @@
 ## Overview
 Welcome to baseEEG! Note that the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
 
-__________________FROM JESS
-In the above, it mentions a script for converting EEG to BIDS, but I don't see that referenced below?  How is someone supposed to use that?
-__________________FROM JESS
-
-* [Roadmap](#Roadmap)  
-    * [Overview](#Overview)
+* [Overview](#Roadmap)  
+    * [EEG to BIDS](#EEG-BIDS)
     * [Directory Structure](#Directory-Structure)
     * [Function Standards](#Function-Standards)
 * [Containers](#Containers)
@@ -18,26 +14,14 @@ __________________FROM JESS
 * [Output Data](#Output-Data)
 * [Reminders](#Reminders)  
 
-__________________FROM JESS
-Our template for contributing has a "Scripts" section.  Probably not needed here since the pipeline is, in effect, a collection of scripts?  So I'm just pointing it out in case that's helpful information!  For convenience, here is the default content for that section:
-The `scripts` directory is the local [package](https://docs.python.org/3/tutorial/modules.html#packages) where Python modules will be written. This ensures that modules are neatly divided according to responsibility, which helps with parallel development and debugging. 
-__________________FROM JESS
-
-
-## Roadmap
-
-### Overview
+## Overview
 Please see the roadmap available on the [README.md](README.md) file of this repository.
 
-__________________FROM JESS
-Wondering why these awesome graphics aren't maybe on the readme?  They seem very helpful in terms of explaining usage.  (But I continue to be confused about what should live on the readme and what should live on contributing, TBH...)
-__________________FROM JESS
-
-![UML-outer](https://user-images.githubusercontent.com/26397102/123485629-7820cd80-d5d8-11eb-916f-fa269a7ea05a.png)
+<img src="https://user-images.githubusercontent.com/26397102/123485629-7820cd80-d5d8-11eb-916f-fa269a7ea05a.png" alt="drawing" width="400"/>
 
 *UML diagram for run, which references to run:preprocess*
 
-![UML-inner](https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png)
+<img src="https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png" alt="drawing" width="800"/>
 
 *UML diagram for run:preprocess*
 
@@ -55,13 +39,15 @@ The UML diagrams above detail the discrete pipeline steps of the default `user_p
     
     Motivation behind each pipeline step is described in the [README.md](README.md). 
 
-3. `output_preproc`
+3. `write:output`
 
-   At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
+   At the very last step of the pipeline, each respective output is passed to a `write` module function which transforms the summed outputs into a comprehensive file. 
 
 Together, the contents of `user_params.json` and `output_preproc.json` define all details necessary to describe (such as in the methods and results section for a journal publication) the manipulations of the pre-processing pipeline and its outputs.
 
 The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the presence of any warning/errors, etc.
+
+### EEG-BIDS
 
 
 ### Directory-Structure
@@ -73,8 +59,8 @@ baseEEG
 |    ├──__init__.py
 |    ├──data
 |    |    ├──__init__.py
-|    |    ├──data_load.py
-|    |    ├──data_write.py
+|    |    ├──load.py
+|    |    ├──write.py
 |    ├──postprocess
 |    |    ├──__init__.py
 |    |    ├──postprocess.py
@@ -82,6 +68,8 @@ baseEEG
 |    |    ├──__init__.py
 |    |    ├──preprocess.py
 ```
+The `scripts` directory is the local [package](https://docs.python.org/3/tutorial/modules.html#packages) where sub-packages & modules will be written. This ensures that modules are neatly divided according to responsibility, which helps with parallel development and debugging. 
+
 All pipeline functions reside within their respective modules. For example, functions that are part of the pre-processing pipeline reside in `preprocess.py`, while functions that are part of post-processing reside in `postprocess.py`.
 
 ### Function Standards
@@ -93,6 +81,8 @@ __________________FROM JESS
 #### preprocess
 
 All functions for the pre-processing pipeline must contain the following parameter list and return values to satisfy `run.py` constraints.
+
+In addition, function documentation must include the following class comments as specified by the [NDClab programming standards](https://ndclab.github.io/wiki/docs/etiquette/programming-standards.html#python). 
 ```python
 def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
      """Function description
@@ -124,7 +114,7 @@ def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
 
 ## Containers
 
-Please use the docker image located at `base_eeg_docker_files/`. Directions on installation and usage are located in `base_eeg_docker_files/README.md`. 
+Please use the dockerfile & singularity recipe located at `container/`. Directions on installation and usage are located in `container/README.md`. 
 
 
 ## Issues
@@ -143,7 +133,7 @@ If you believe a new issue needs to be added to the [list of open issues](https:
 
 ![ndcworkflow](https://user-images.githubusercontent.com/26397102/116148813-00512800-a6a7-11eb-9624-cd81f11d3ada.png)
 
-Development is driven by the [feature branch workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow), wherein each new feature is encapsulated in its own branch. This ensures changes are properly tested and integrated before deploy, while still allowing for development to be done in parallel.
+Development is driven by the [feature branch workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow), wherein each new feature is encapsulated in its own branch. This ensures changes are properly tested and integrated before they deploy, while still allowing for development to be done in parallel.
 
 The baseEEG branches follow this convention:
 
@@ -166,16 +156,10 @@ The baseEEG branches follow this convention:
 
 
 ## Continuous Integration Testing
-[NDCLab CI test documentation](https://docs.google.com/document/d/1lTYCLn6XK4Ln-BjcNhMMqpQFhYWg6OHB/edit)
-
-__________________FROM JESS
-Why do we point to the Google Drive doc rather than this page:
-https://ndclab.github.io/wiki/docs/technical-docs/python-ci-workflow.html
-?
-Also, it would be nice to have some mini blurb, but I don't know enough about CI to try to craft one!
-__________________FROM JESS
+[NDCLab CI test documentation](https://ndclab.github.io/wiki/docs/technical-docs/python-ci-workflow.html)
 
 ## Example-Data
+
 - [BIDS.zip](https://drive.google.com/drive/u/0/folders/1aQY97T9EfkPEkuiCav2ei9cs0DFegO4-) is used as the test input file for all pipeline feature development.
 
 __________________FROM JESS
@@ -186,7 +170,7 @@ __________________FROM JESS
 ## Reminders
 1. Only push directly (without code review) to dev-feature-[featureName]-[yourName].
 2. You must initiate a pull request (and assign at least one person) for any higher-level branch.
-3. If there is no BIDS standard for a type of file that a feature outputs, the developer should set things up in a way that is in line with [general BIDS principles](https://www.nature.com/articles/s41597-019-0104-8).
+3. If there is no BIDS standard for a type of file that a feature outputs, the developer should set things up in a way that is in line with [general BIDS principles](https://bids.neuroimaging.io/).
 
 __________________FROM JESS
 Would this be a better link for general BIDS principles?
