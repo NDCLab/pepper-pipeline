@@ -1,0 +1,27 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "stevenwtolbert",
+      "name": "Steven William Tolbert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40587948?v=4",
+      "profile": "http://stevenwtolbert.com",
+      "contributions": [
+        "code",
+        "infra",
+        "ideas",
+        "review"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "pepper-pipeline",
+  "projectOwner": "NDCLab",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
