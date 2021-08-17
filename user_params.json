@@ -42,10 +42,6 @@
     "reref_raw": {
     }
   },
-  
-  "postprocess": {
-  },
-
   "output_data": {
     "root": "/home/data/NDClab/data/base-eeg/CMI"
   }
