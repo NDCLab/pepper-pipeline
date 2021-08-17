@@ -6,6 +6,17 @@
   "commit": false,
   "contributors": [
     {
+      "login": "F-said",
+      "name": "Farukh Saidmuratov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26397102?v=4",
+      "profile": "https://www.kaggle.com/fsaidmur",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+         "ideas",
+        "review"
       "login": "stevenwtolbert",
       "name": "Steven William Tolbert",
       "avatar_url": "https://avatars.githubusercontent.com/u/40587948?v=4",
