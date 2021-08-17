@@ -1,7 +1,7 @@
 # Contributing to baseEEG
 
 ## Overview
-Welcome to baseEEG! Note that the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
+Welcome to baseEEG! Note that the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
 
 * [Overview](#Roadmap)  
     * [Directory Structure](#Directory-Structure)
