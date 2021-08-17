@@ -138,11 +138,6 @@ Format:
 ### Raw-Derivatives
 For every pipeline step that executes, an intermediate dataset is written to the specified path. 
 
-### Log-Files
-
-These output log files will define the verbose outputs of mne functions including warnings and errors for each subject. Format will vary based on pipeline output
-
-Each file name generated on a subject will follow the BIDS naming standard: `output_XXX_task_YYY_run_ZZZ.log`
 
 ## Pipeline-Steps
 
