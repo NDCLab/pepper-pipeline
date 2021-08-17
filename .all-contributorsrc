@@ -6,6 +6,18 @@
   "commit": false,
   "contributors": [
     {
+      "login": "georgebuzzell",
+      "name": "George Buzzell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71228105?v=4",
+      "profile": "https://github.com/georgebuzzell",
+      "contributions": [
+        "doc",
+        "code",
+        "ideas",
+        "infra",
+        "review",
+        "projectManagement",
+        "mentoring"
       "login": "yanbin-niu",
       "name": "yanbin-niu",
       "avatar_url": "https://avatars.githubusercontent.com/u/79607547?v=4",
