@@ -10,6 +10,10 @@
       "name": "DMRoberts",
       "avatar_url": "https://avatars.githubusercontent.com/u/833695?v=4",
       "profile": "https://github.com/DMRoberts",
+      "login": "georgebuzzell",
+      "name": "George Buzzell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71228105?v=4",
+      "profile": "https://github.com/georgebuzzell",
       "contributions": [
         "doc",
         "code",
@@ -17,6 +21,8 @@
         "infra",
         "review",
         "projectManagement"
+        "projectManagement",
+        "data"
       "login": "yanbin-niu",
       "name": "yanbin-niu",
       "avatar_url": "https://avatars.githubusercontent.com/u/79607547?v=4",
@@ -25,7 +31,8 @@
         "code",
         "test",
         "ideas",
-        "review"
+        "review",
+        "data" 
       "login": "SDOsmany",
       "name": "Osmany",
       "avatar_url": "https://avatars.githubusercontent.com/u/58539319?v=4",
