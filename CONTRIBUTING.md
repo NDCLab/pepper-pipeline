@@ -10,7 +10,6 @@ Welcome to baseEEG! Note that the development of baseEEG is focused on optimizin
 * [Issues](#Issues)  
 * [Git Workflow](#Git-Workflow)  
 * [CI Testing](#Continuous-Integration-Testing)  
-* [Output Data](#Output-Data)
 * [Reminders](#Reminders)  
 
 ## Overview
@@ -47,9 +46,9 @@ Together, the contents of `user_params.json` and `output_preproc.json` define al
 The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the presence of any warning/errors, etc.
 
 
-### Directory-Structure
+### Directory Structure
 ```yml
-baseEEG
+PEPPER-Pipeline
 ├── run.py
 ├── user_params.json
 ├── scripts
@@ -75,7 +74,7 @@ Modules that are part of the pre-processing pipeline.
 #### data 
 Modules that are part of the creation and reading of data.
 
-### Function-Standards
+### Function Standards
 
 #### preprocess
 
@@ -162,4 +161,4 @@ NDCLab CI documentation is listed [here](https://ndclab.github.io/wiki/docs/tech
 2. You must initiate a pull request (and assign at least one person) for any higher-level branch.
 3. If there is no BIDS standard for a type of file that a feature outputs, the developer should set things up in a way that is in line with [general BIDS principles](https://bids.neuroimaging.io/).
 4. Preprocessing functions must follow the function standards listed [above](#Function-Standards).
-5. All Python code must follow the NDClab programming standards
+5. All Python code must follow the [NDClab programming standards](https://ndclab.github.io/wiki/docs/etiquette/programming-standards.html).
