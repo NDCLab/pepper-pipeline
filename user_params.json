@@ -1,0 +1,52 @@
+{
+  "load_data": {
+    "root": "/home/data/NDClab/data/base-eeg/CMI/rawdata",
+    "subjects": ["*"],
+    "tasks": ["*"],
+    "exceptions": {
+      "subjects": "",
+      "tasks": "", 
+      "runs": ""
+    },
+    "channel-type": "eeg"
+  }, 
+
+  "preprocess": {
+    "filter_data": {
+      "l_freq": 0.3, 
+      "h_freq": 40
+    },
+    "identify_badchans_raw": {
+    },
+    "ica_raw": {
+      "montage": "standard_1020"
+    },
+    "segment_data": {
+      "tmin": -0.2, 
+      "tmax": 0.5, 
+      "baseline": null, 
+      "picks": null, 
+      "reject_tmin": null, 
+      "reject_tmax": null, 
+      "decim": 1, 
+      "verbose": false, 
+      "preload": true
+    },
+    "final_reject_epoch": {
+    }, 
+    "interpolate_data": {
+      "mode": "accurate", 
+      "method": null,
+      "reset_bads": true
+    },
+    "reref_raw": {
+    }
+  },
+  
+  "postprocess": {
+  },
+
+  "output_data": {
+    "root": "/home/data/NDClab/data/base-eeg/CMI"
+  }
+}
