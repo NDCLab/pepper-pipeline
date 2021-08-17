@@ -1,5 +1,5 @@
-# baseEEG contributing docs & standards
-Welcome to baseEEG! The guidelines for development are as follows: 
+# PEPPER-Pipeline contributing docs & standards
+Welcome to the PEPPER-Pipeline project! Note that the development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows: 
 
 * [Roadmap](#Roadmap)  
     * [Overview](#Overview)
@@ -17,27 +17,31 @@ Welcome to baseEEG! The guidelines for development are as follows:
 
 ### Overview 
 
-![UMLrawread](https://user-images.githubusercontent.com/26397102/119166320-1642d600-ba24-11eb-8dd6-0d35430831b0.png)
+![UML-outer](https://user-images.githubusercontent.com/26397102/123485629-7820cd80-d5d8-11eb-916f-fa269a7ea05a.png)
 
-The UML diagram listed above details the pipeline steps that run for each subject:
+*UML diagram for run, which references to run:preprocess*
 
-1. Pipeline Input (load_data)
-- [raw EEG data](#Example-Data)  
-- [user_params.json](README.md)
+![UML-inner](https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png)
 
-2. Main Script
+*UML diagram for run:preprocess*
+
+The UML diagrams above detail the discrete pipeline steps of the default `user_params.json` file: 
+
+1. `load:data` (pipeline input)
+A subset of raw data described in `load_data` of `user_params.json` is extracted. The parameters and discrete pipeline steps are likewise extracted. Further details on the usage of these parameters are described in the [README](README.md)
+
+
+2. `run:preprocess`
 
     The main script calls a series of functions, each one executing a step of the pipeline. Some simply utilize an existing mne function, while others are more involved, but they all follow the same standard format: each feature always receives an EEG object and unpacked variables from the params dictionary from the main script. 
 
     Additionally, each pipeline step will likewise return an EEG object and a dictionary describing the changes that occured to that EEG object.
+    
+    Motivation behind each pipeline step listed in the [README.md](README.md). 
 
-    Motivation behind each pipeline step listed in the [readme.md](README.md). 
-
-3. Pipeline Output
+3. `output_preproc`
 
    At the very last step of the pipeline, each respective output is passed to the `output_preproc` function which transforms the summed outputs into a comprehensive file. 
-- [output_preproc.json](README.md)
-- [output.log](README.md)
 
 Together, the contents of [user_params.json](#user_params.json) and [output_preproc.json](#output_preproc.json) define all details neccesary to write relevant methods and results section for a journal publication to describe what the preprocessing pipeline did and what the outputs were.
 
@@ -121,12 +125,11 @@ Development is driven by the [feature branch workflow](https://www.atlassian.com
 Subsequently, branches follow this convention:
 
 `main`
-- No test features
-- 100% stable and usable by any lab members 
+- Represents a stable release with no features in development or testing
 - *No direct commits*
 
 `->dev`
-- Up to date development branch with properly tested/reviewed features 
+- Up to date development branch representing an unfinished release
 - *No direct commits*
 
 `-->dev-feature-[featureName]`

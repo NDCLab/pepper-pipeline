@@ -140,3 +140,6 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# batch script specific
+.out
