@@ -1,3 +1,7 @@
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
 
 # PEPPER-Pipeline: A Python-based, Easy, Pre-Processing EEG Reproducible Pipeline
@@ -8,11 +12,6 @@ The PEPPER-Pipeline tools build off of MNE-python and the sciPy stack. Some tool
 To facilitate community development and distributed contributions to the PEPPER-Pipeline, development leverages automatic linting of all code (enforcing the PEP8 standard). Moreover, a growing test suite is available for performing unit tests for all features, and the pipeline is structured in a modular way to allow independent modification of speicifc Pipeline steps/features without needing to modify the main run.py script or other functions.
 
 The PEPPER-Pipeline project is a fully-open, community-driven project. We welcome contributions by any/all researchers and data/computer scientists, at all levels. We strive to make all decisions "out in the open" and track all contributions rigorously via git, to faciliate proper recognition and authorship. We hold a weekly meeting that all are welcome to attend, and recordings of prior meetings are all availble for others to view. Please join us in moving this project forward, creating a fully-open, scalable, and reproducible EEG pipeline that all can use.
-
-## Roadmap
-Currently, the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use pipeline dedicated to EEG (as opposed to MEG) pre-processing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
-
-Current readme and contributing files focus on the baseEEG pre-processing pipeline.
 
 ## Outline
 
@@ -30,6 +29,7 @@ Current readme and contributing files focus on the baseEEG pre-processing pipeli
   * [5-Final Reject Epochs](#5-final-reject-epochs)
   * [6-Interpolate](#6-interpolate)
   * [7-Re-reference](#7-re-reference)
+* [Contributors](#Contributors)
 
 Development guidelines and details are listed in [CONTRIBUTING.md](CONTRIBUTING.md)
 
@@ -234,3 +234,29 @@ This `main` branch contains completed releases for this project. For all work-in
 ## Contributing
 If you are interested in contributing, please read our [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
+
+### Contributors 
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/georgebuzzell"><img src="https://avatars.githubusercontent.com/u/71228105?v=4?s=100" width="100px;" alt=""/><br /><sub><b>George Buzzell</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=georgebuzzell" title="Documentation">📖</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=georgebuzzell" title="Code">💻</a> <a href="#ideas-georgebuzzell" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-georgebuzzell" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3Ageorgebuzzell" title="Reviewed Pull Requests">👀</a> <a href="#projectManagement-georgebuzzell" title="Project Management">📆</a> <a href="#mentoring-georgebuzzell" title="Mentoring">🧑‍🏫</a></td>
+    <td align="center"><a href="https://github.com/DMRoberts"><img src="https://avatars.githubusercontent.com/u/833695?v=4?s=100" width="100px;" alt=""/><br /><sub><b>DMRoberts</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=DMRoberts" title="Documentation">📖</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=DMRoberts" title="Code">💻</a> <a href="#ideas-DMRoberts" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-DMRoberts" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3ADMRoberts" title="Reviewed Pull Requests">👀</a> <a href="#projectManagement-DMRoberts" title="Project Management">📆</a></td>
+    <td align="center"><a href="https://www.kaggle.com/fsaidmur"><img src="https://avatars.githubusercontent.com/u/26397102?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Farukh Saidmuratov</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=F-said" title="Code">💻</a> <a href="https://github.com/NDCLab/pepper-pipeline/issues?q=author%3AF-said" title="Bug reports">🐛</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=F-said" title="Documentation">📖</a> <a href="#infra-F-said" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-F-said" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3AF-said" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/yanbin-niu"><img src="https://avatars.githubusercontent.com/u/79607547?v=4?s=100" width="100px;" alt=""/><br /><sub><b>yanbin-niu</b></sub></a><br /><a href="#data-yanbin-niu" title="Data">🔣</a><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=yanbin-niu" title="Code">💻</a> <a href="#ideas-yanbin-niu" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3Ayanbin-niu" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/NDCLab/pepper-pipeline/issues?q=author%3AF-said" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://stevenwtolbert.com"><img src="https://avatars.githubusercontent.com/u/40587948?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Steven William Tolbert</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=stevenwtolbert" title="Code">💻</a> <a href="#infra-stevenwtolbert" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#ideas-stevenwtolbert" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3Astevenwtolbert" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/SDOsmany"><img src="https://avatars.githubusercontent.com/u/58539319?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Osmany</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=SDOsmany" title="Code">💻</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=SDOsmany" title="Tests">⚠️</a> <a href="#ideas-SDOsmany" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3ASDOsmany" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/Jonhas"><img src="https://avatars.githubusercontent.com/u/45021859?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonhas</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=Jonhas" title="Code">💻</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=Jonhas" title="Tests">⚠️</a> <a href="#ideas-Jonhas" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3AJonhas" title="Reviewed Pull Requests">👀</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

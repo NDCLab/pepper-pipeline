@@ -1,6 +1,6 @@
 {
   "load_data": {
-    "root": "CMI/rawdata",
+    "root": "/home/data/NDClab/data/base-eeg/CMI/rawdata",
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
@@ -19,7 +19,7 @@
     "identify_badchans_raw": {
     },
     "ica_raw": {
-      "montage": "GSN-HydroCel-129"
+      "montage": "standard_1020"
     },
     "segment_data": {
       "tmin": -0.2, 
@@ -43,6 +43,6 @@
     }
   },
   "output_data": {
-    "root": "CMI"
+    "root": "/home/data/NDClab/data/base-eeg/CMI"
   }
 }

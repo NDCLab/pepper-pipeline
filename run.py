@@ -4,9 +4,10 @@ from scripts.preprocess import preprocess
 from collections import ChainMap
 
 import mne_bids
+import sys
 
 # load all parameters
-user_params = load.load_params("user_params_except.json")
+user_params = load.load_params("user_params.json")
 
 # get data and metadata parameters
 preprocess_params = user_params["preprocess"]
@@ -16,6 +17,10 @@ write_params = user_params["output_data"]
 # get output root and channel type of data
 ch_type = data_params["channel-type"]
 output_path = write_params["root"]
+
+# overwrite data_params using sys.argv arguments
+if len(sys.argv) > 1:
+    data_params["subjects"] = [sys.argv[1]]
 
 # get set of subjects & tasks to run while omitting existing exceptions
 data = load.load_files(data_params)
@@ -29,7 +34,10 @@ for file in data:
     # for each pipeline step in user_params, execute with parameters
     for idx, (func, params) in enumerate(preprocess_params.items()):
         eeg_obj, outputs[idx] = getattr(preprocess, func)(eeg_obj, **params)
-        write.write_eeg_data(eeg_obj, func, file, ch_type, output_path)
+
+        # check if this is the fully preprocessed eeg object
+        final = idx == len(preprocess_params.items()) - 1
+        write.write_eeg_data(eeg_obj, func, file, ch_type, final, output_path)
 
     # collect annotations of each step
     outputs.reverse()
