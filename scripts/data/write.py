@@ -70,7 +70,7 @@ def write_eeg_data(obj, func, file, datatype, final, root):
 
     # puts together the path to be created
     dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
-        root.split("/")[0], PIPE_NAME, child_dir, subj, ses, datatype)
+        root, PIPE_NAME, child_dir, subj, ses, datatype)
 
     dir_section = dir_path.split("/")
 
