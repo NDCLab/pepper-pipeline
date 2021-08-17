@@ -1,7 +1,7 @@
-# Contributing to baseEEG
+# Contributing to PEPPER-Pipeline
 
 ## Overview
-Welcome to baseEEG! Note that the development of baseEEG is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
+Welcome to PEPPER! Note that the development of PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
 
 * [Overview](#Roadmap)  
     * [Directory Structure](#Directory-Structure)
@@ -116,13 +116,13 @@ Please use the dockerfile & singularity recipe located at `container/`. Directio
 
 ## Issues
 
-See the [list of open issues](https://github.com/NDCLab/baseEEG/issues) for current and future work to be performed.
+See the [list of open issues](https://github.com/NDCLab/PEPPER-Pipeline/issues) for current and future work to be performed.
 
 Always assign yourself to an issue before beginning work on it!
 
 If someone is already assigned to an issue that you intend to work on, post a comment to ask if you can help before assigning yourself. If you do not receive a response within 24 hours, then you are free to start work on the issue, but first post another comment to let them know what you will be doing on the issue.
 
-If you believe a new issue needs to be added to the [list of open issues](https://github.com/NDCLab/baseEEG/issues):
+If you believe a new issue needs to be added to the [list of open issues](https://github.com/NDCLab/PEPPER-Pipeline/issues):
 * Verify that the problem/suggestion does not already have an issue logged in GitHub.
 * Use the appropriate issue template to submit the problem/suggestion for review.
 
@@ -132,7 +132,7 @@ If you believe a new issue needs to be added to the [list of open issues](https:
 
 Development is driven by the [feature branch workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow), wherein each new feature is encapsulated in its own branch. This ensures changes are properly tested and integrated before they deploy, while still allowing for development to be done in parallel.
 
-The baseEEG branches follow this convention:
+The PEPPER branches follow this convention:
 
 `main`
 - Represents a stable release, merged from `dev` via a [Level 2 PR review](https://ndclab.github.io/wiki/docs/etiquette/github-etiquette.html#terminology)
