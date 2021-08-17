@@ -1,0 +1,77 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%help
+
+	.__   __.  _______   ______  __          ___      .______   
+	|  \ |  | |       \ /      ||  |        /   \     |   _  \  
+	|   \|  | |  .--.  |  ,----'|  |       /  ^  \    |  |_)  | 
+	|  . `  | |  |  |  |  |     |  |      /  /_\  \   |   _  <  
+	|  |\   | |  '--'  |  `----.|  `----./  _____  \  |  |_)  | 
+	|__| \__| |_______/ \______||_______/__/     \__\ |______/  
+                                                            
+	Start this container to reliably run the base-eeg pipeline with all
+	necessary packages, environments, and libraries. 
+
+	Usage:
+	
+	To start a shell instance with the container image, execute
+		
+		singularity shell container/run-container.simg
+
+	To execute a command within the container, execute:
+		
+		singularity exec container/run-container.simg [command]
+
+	Lastly, to create an instance of the container that runs in the 
+	background, execute:
+
+		singularity instance start container/run-container.simg [name]
+
+	Commands can be passed to the instance using the following format
+
+		singularity exec instance://[name] [command]
+
+	To submit an issue visit https://github.com/NDCLab/baseEEG. We 
+	encourage open-source collaboration!
+
+%files
+	
+	requirements.txt
+
+%post
+       
+	# update package repository list
+        apt-get -y update
+	export DEBIAN_FRONTEND=noninteractive
+
+	apt-get -y upgrade bash-completion \
+	 build-essential \
+	 curl \
+	 git git-core \
+	 golang \
+	 htop \
+	 locales \
+	 man \
+	 nmap \
+	 python3-pip \
+	 ruby-full \
+	 strace \
+	 sudo \
+	 tig \
+	 vim \
+	 wget
+
+	# set time
+	locale-gen en_US.UTF-8
+	
+	# install python packages
+	pip3 install -r requirements.txt
+
+	# create user and set as sudo
+	adduser --disabled-password --gecos '' ndc
+	adduser ndc sudo
+	echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+	su ndc
+
+
