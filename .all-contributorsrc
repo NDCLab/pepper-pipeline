@@ -6,6 +6,16 @@
   "commit": false,
   "contributors": [
     {
+      "login": "stevenwtolbert",
+      "name": "Steven William Tolbert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40587948?v=4",
+      "profile": "http://stevenwtolbert.com",
+      "contributions": [
+        "code",
+        "test",
+        "infra",
+        "ideas",
+        "review"
       "login": "Jonhas",
       "name": "Jonhas",
       "avatar_url": "https://avatars.githubusercontent.com/u/45021859?v=4",
@@ -14,7 +24,8 @@
         "code",
         "test",
         "ideas",
-        "review"
+        "review",
+        "infra"
       ]
       "login": "DMRoberts",
       "name": "DMRoberts",
