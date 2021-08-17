@@ -1,4 +1,7 @@
 # baseEEG
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 Lab-wide EEG scripts
 
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
@@ -106,3 +109,23 @@ One way around this is to first make a copy of the eeg data. For the copy, use a
 - Re-reference the data to the average of all electrodes (“average reference”) using the mne function
 - Write to output file that data were re-referenced to average
 
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Jonhas"><img src="https://avatars.githubusercontent.com/u/45021859?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonhas</b></sub></a><br /><a href="https://github.com/NDCLab/pepper-pipeline/commits?author=Jonhas" title="Code">💻</a> <a href="https://github.com/NDCLab/pepper-pipeline/commits?author=Jonhas" title="Tests">⚠️</a> <a href="#ideas-Jonhas" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/NDCLab/pepper-pipeline/pulls?q=is%3Apr+reviewed-by%3AJonhas" title="Reviewed Pull Requests">👀</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
