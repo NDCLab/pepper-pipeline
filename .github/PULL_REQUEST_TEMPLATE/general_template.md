@@ -1,3 +1,4 @@
+---
 name: "🧠 General Template"
 about: Create a general PR. 
 title: ''
