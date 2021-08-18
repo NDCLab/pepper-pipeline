@@ -6,7 +6,6 @@ import pytest
 from pathlib import Path
 
 import mne_bids
-from mne.io import Raw
 
 
 @pytest.fixture
