@@ -55,10 +55,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         filt_eeg, output_dict = pre.filter_data(eeg_obj, **filt_param)
 
         # assert that None does not exist in final reject
-        assert None not in output_dict.viewvalues()
-
-        # assert object returned is epoch object
-        assert isinstance(filt_eeg, Raw)
+        assert None not in output_dict.values()
 
 
 def test_except_value(error_obj):

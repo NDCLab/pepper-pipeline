@@ -50,10 +50,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         badchans_raw, output_dict = pre.identify_badchans_raw(eeg_obj)
 
         # assert that None does not exist in bad chans
-        assert None not in output_dict.viewvalues()
-
-        # assert object returned is raw object
-        assert isinstance(badchans_raw, Raw)
+        assert None not in output_dict.values()
 
 
 def test_except_value(error_obj):

@@ -2,11 +2,10 @@ from scripts.preprocess import preprocess as pre
 from scripts.data import load, write
 
 import pytest
+import mne_bids
 
 from pathlib import Path
-
-import mne_bids
-from mne import Epochs
+from mne.io import Raw
 
 
 @pytest.fixture
@@ -44,33 +43,30 @@ def test_return_values(default_param, select_subjects, select_tasks):
     # Load data using the selected subjects & tasks
     data = load.load_files(default_param["load_data"])
 
-    # get the pipeline steps and seg params
+    # get the pipeline steps
     feature_params = default_param["preprocess"]
-    seg_param = feature_params["segment_data"]
+    ica_param = feature_params["ica_raw"]
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
 
-        # segment data
-        seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
+        # reject epochs
+        ica_raw, output_dict = pre.ica_raw(eeg_obj, **ica_param)
 
-        # assert that None does not exist in final reject
+        # assert that None does not exist in bad chans
         assert None not in output_dict.values()
 
-        # assert object returned is epoch object
-        assert isinstance(seg_epo, Epochs)
 
-
-def test_except_value(default_param, error_obj):
+def test_except_value(error_obj):
     eeg_obj = error_obj
 
-    # get the pipeline steps and seg params
+    # get the pipeline steps
     feature_params = default_param["preprocess"]
-    seg_param = feature_params["segment_data"]
+    ica_param = feature_params["ica_raw"]
 
-    # attempt to segment epochs with invalid epoch object
+    # attempt to reject channels with data equal to None
     with pytest.raises(Exception):
-        _, output_dict = pre.segment_data(eeg_obj, **seg_param)
+        _, output_dict = pre.ica_raw(eeg_obj, **ica_param)
         assert True
 
         assert isinstance(output_dict, dict)
