@@ -15,7 +15,7 @@
         "bug",
         "doc",
         "infra",
-         "ideas",
+        "ideas",
         "review"
       "login": "stevenwtolbert",
       "name": "Steven William Tolbert",
@@ -79,6 +79,7 @@
     }
   ],
   "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": true,
   "projectName": "pepper-pipeline",
   "projectOwner": "NDCLab",
   "repoType": "github",
