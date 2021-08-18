@@ -58,7 +58,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         interp_eeg, output_dict = pre.interpolate_data(epo, **interp_param)
 
         # assert that None does not exist in final reject
-        assert None not in output_dict.viewvalues()
+        assert None not in output_dict.values()
 
         # assert object returned is epoch object
         assert isinstance(interp_eeg, Epochs)

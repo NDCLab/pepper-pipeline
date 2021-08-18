@@ -58,7 +58,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         rej_epo, output_dict = pre.final_reject_epoch(epo)
 
         # assert that None does not exist in final reject
-        assert None not in output_dict.viewvalues()
+        assert None not in output_dict.values()
 
         # assert object returned is epoch object
         assert isinstance(rej_epo, Epochs)

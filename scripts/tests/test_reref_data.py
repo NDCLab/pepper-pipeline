@@ -55,7 +55,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         reref_eeg, output_dict = pre.reref_raw(eeg_obj, **reref_param)
 
         # assert that None does not exist in final reject
-        assert None not in output_dict.viewvalues()
+        assert None not in output_dict.values()
 
         # assert object returned is epoch object
         assert isinstance(reref_eeg, Epochs)
