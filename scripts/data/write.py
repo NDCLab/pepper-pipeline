@@ -134,9 +134,10 @@ def write_template_params(root, subjects=None, tasks=None,
             "l_freq": 0.3,
             "h_freq": 40
         },
-        "bad_channels": {
+        "identify_badchans_raw": {
         },
-        "ica": {
+        "ica_raw": {
+            "montage": "standard_1020"
         },
         "segment_data": {
             "tmin": -0.2,
