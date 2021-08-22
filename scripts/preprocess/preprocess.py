@@ -444,8 +444,8 @@ def _em(arr):
     # Missed Alarm cost
     c_MA = 1
 
-    med = np.mean(arr)
-    std = np.std(arr)
+    # med = np.mean(arr)
+    # std = np.std(arr)
     mediana = (max(arr) + min(arr)) / 2
 
     # initialization parameter/ righthand side
