@@ -1,4 +1,4 @@
-name: mne
+name: pipe
 channels:
 - conda-forge
 dependencies:
@@ -20,7 +20,7 @@ dependencies:
 - psutil==5.8.0
 - numexpr==2.7.3
 - imageio==2.9.0
-- tqdm==4.60.0
+- tqdm==4.54.1
 - spyder-kernels==2.0.1
 - imageio-ffmpeg==0.4.3
 - vtk>=9.0.1
@@ -35,11 +35,13 @@ dependencies:
 - nilearn==0.7.1
 - python-picard==0.4
 - pyqt==5.12.3
+- pathlib==1.0.1
+- pytest==6.2.4
 - mne==0.23.0
 - mffpy==0.6.2
 - ipywidgets==7.6.3
 - pip:
   - ipyvtk-simple==0.1.4
-  - autoreject==0.2.1
-  - mne-bids==0.7
+  - autoreject==0.2.2
+  - mne-bids==0.8
   - pybv==0.5.0

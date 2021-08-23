@@ -1,0 +1,88 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "F-said",
+      "name": "Farukh Saidmuratov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26397102?v=4",
+      "profile": "https://www.kaggle.com/fsaidmur",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra",
+        "ideas",
+        "review"
+      "login": "stevenwtolbert",
+      "name": "Steven William Tolbert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40587948?v=4",
+      "profile": "http://stevenwtolbert.com",
+      "contributions": [
+        "code",
+        "test",
+        "infra",
+        "ideas",
+        "review"
+      "login": "Jonhas",
+      "name": "Jonhas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45021859?v=4",
+      "profile": "https://github.com/Jonhas",
+      "contributions": [
+        "code",
+        "test",
+        "ideas",
+        "review",
+        "infra"
+      ]
+      "login": "DMRoberts",
+      "name": "DMRoberts",
+      "avatar_url": "https://avatars.githubusercontent.com/u/833695?v=4",
+      "profile": "https://github.com/DMRoberts",
+      "login": "georgebuzzell",
+      "name": "George Buzzell",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71228105?v=4",
+      "profile": "https://github.com/georgebuzzell",
+      "contributions": [
+        "doc",
+        "code",
+        "ideas",
+        "infra",
+        "review",
+        "projectManagement"
+        "projectManagement",
+        "data"
+      "login": "yanbin-niu",
+      "name": "yanbin-niu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79607547?v=4",
+      "profile": "https://github.com/yanbin-niu",
+      "contributions": [
+        "data"
+        "code",
+        "test",
+        "ideas",
+        "review",
+        "data" 
+      "login": "SDOsmany",
+      "name": "Osmany",
+      "avatar_url": "https://avatars.githubusercontent.com/u/58539319?v=4",
+      "profile": "https://github.com/SDOsmany",
+      "contributions": [
+        "code",
+        "test",
+        "ideas",
+        "review"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": true,
+  "projectName": "pepper-pipeline",
+  "projectOwner": "NDCLab",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
