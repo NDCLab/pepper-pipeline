@@ -1,51 +1,74 @@
 # PEPPER-Pipeline contributing docs & standards
-Welcome to the PEPPER-Pipeline project! Note that the development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG (as opposed to MEG) preprocessing. Additionally, there is an unofficial script template for converting EEG data to BIDS format (heavily leveraging MNE-BIDS). Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows: 
+Welcome to the PEPPER-Pipeline project! To get started on collaborating view the contents below. We welcome contributors from **all** backgrounds! 
 
-## Overview
-Welcome to PEPPER! Note that the development of PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use pre-processing pipeline dedicated to EEG (as opposed to MEG) pre-processing. Following the optimization of import and pre-processing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. The guidelines for development are as follows:
+The development of the PEPPER-Pipeline is focused on optimizing an automated, flexible, and easy-to-use preprocessing pipeline dedicated to EEG preprocessing (as opposed to MEG).
 
-* [Overview](#Roadmap)  
+Following the optimization of import and preprocessing tools, development will focus on building out a common core of EEG processing tools to handle ERP, time-frequency, and source-based analyses. 
+
+## Contents
+
+* [Submit an issue](#Submit-an-Issue)  
+* [Create documentation](#Create-documentation)
+* [Contribute to the code](#Contribute-to-the-code)
     * [Directory Structure](#Directory-Structure)
     * [Function Standards](#Function-Standards)
+* [Pipeline overview](#Pipeline-overview)  
 * [Containers](#Containers)
-* [Issues](#Issues)  
 * [Git Workflow](#Git-Workflow)  
 * [CI Testing](#Continuous-Integration-Testing)  
 * [Reminders](#Reminders)  
 
-## Overview
-Please see the roadmap available on the [README.md](README.md) file of this repository.
+## Submit an Issue
 
-<img src="https://user-images.githubusercontent.com/26397102/123485629-7820cd80-d5d8-11eb-916f-fa269a7ea05a.png" alt="drawing" width="400"/>
+If you believe a new issue needs to be added to the [list of open issues](https://github.com/NDCLab/PEPPER-Pipeline/issues):
+* Verify that the suggestion does not already exist 
+* Use the appropriate issue template
 
-*UML diagram for run, which references to run:preprocess*
+## Create documentation
 
-<img src="https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png" alt="drawing" width="800"/>
+To be implemented! 
 
-*UML diagram for run:preprocess*
+## Contribute to the code
 
-The UML diagrams above detail the discrete pipeline steps of the default `user_params.json` file: 
+If someone is already assigned to an issue that you intend to work on, post a comment to ask if you can help before assigning yourself.
 
-1. `load:data` (pipeline input)
+If you do not receive a response within **24 hours**, then you are free to start work on the issue, but be sure to loop them in on your development plans. 
 
-    A subset of raw data described in `load_data` of `user_params.json` is extracted. The parameters and discrete pipeline steps are likewise extracted. Further details on the usage of these parameters are described in the [README](README.md).
+To get started on coding, follow the listed steps below. Note that you must have a GitHub account to collaborate to this project. All quoted commands are executed in your shell.
 
-2. `run:preprocess`
+1. Fork the repo (replace "user" with your GitHub username). 
 
-    The main script calls a series of functions, each one executing a step of the pipeline. Some functions simply utilize an existing MNE function while others are more involved. All, however, follow the same standard format: each feature always receives an EEG object and unpacked variables from the `params` dictionary in the main script. 
+> git clone https://github.com/user/pepper-pipeline.git
+> cd pepper-pipeline/
 
-    Additionally, each pipeline step returns an EEG object and a dictionary describing the changes that occurred to that EEG object.
-    
-    Motivation behind each pipeline step is described in the [README.md](README.md). 
+2. Build and activate a container using the OS relevant files (see `container/README.md`).
 
-3. `write:output`
+3. Switch to the branch that you plan to contribute to. 
 
-   At the very last step of the pipeline, each respective output is passed to a `write` module function which transforms the summed outputs into a comprehensive file. 
+  * If work on this issue has already begun, then fetch and checkout the active branch.
 
-Together, the contents of `user_params.json` and `output_preproc.json` define all details necessary to describe (such as in the methods and results section for a journal publication) the manipulations of the pre-processing pipeline and its outputs.
+  > git fetch
+  > git checkout dev-feature-issue
 
-The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the presence of any warning/errors, etc.
+ * If this issue has not begun development, then create a new branch.
 
+  > git checkout -b dev-feature-issue 
+  > git push origin dev-feature-issue
+
+4. Create a sub-branch using your name/identifier. 
+
+  > git checkout dev-feature-issue-name 
+
+5. Implement changes (commit often!).
+
+  > git add file1 file2
+  > git commit -m "Attached flux capacitor" 
+
+6. After you complete all your intended commits, push changes to branch.
+
+> git push origin dev-feature-issue-name
+
+7. Create a pull-request using the GitHub GUI. 
 
 ### Directory Structure
 ```yml
@@ -111,21 +134,42 @@ def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
     return EEG_object_modified, output_dict 
 ```
 
+## Overview
+Please see the roadmap available on the [README.md](README.md) file of this repository.
+
+<img src="https://user-images.githubusercontent.com/26397102/123485629-7820cd80-d5d8-11eb-916f-fa269a7ea05a.png" alt="drawing" width="400"/>
+
+*UML diagram for run, which references to run:preprocess*
+
+<img src="https://user-images.githubusercontent.com/26397102/120357498-22078580-c2cb-11eb-82b8-ab025f29e61a.png" alt="drawing" width="800"/>
+
+*UML diagram for run:preprocess*
+
+The UML diagrams above detail the discrete pipeline steps of the default `user_params.json` file: 
+
+1. `load:data` (pipeline input)
+
+    A subset of raw data described in `load_data` is extracted. Further details on the usage of these parameters are described in the [README](README.md).
+
+2. `run:preprocess`
+
+    The main script calls a series of functions, each one executing a step of the pipeline. Some functions simply utilize an existing MNE function while others are more involved. All, however, follow the same standard format: each feature always receives an EEG object and unpacked variables from the `params` dictionary in the main script. 
+
+    Additionally, each pipeline step returns an EEG object and a dictionary describing the changes that occurred to that EEG object.
+    
+    Motivation behind each pipeline step is described in the [README.md](README.md). 
+
+3. `write:output`
+
+   At the very last step of the pipeline, each respective output is passed to a `write` module which transforms the summed outputs into a comprehensive file. 
+
+Together, the contents of `user_params.json` and `output_preproc.json` define all details necessary to describe (such as in the methods and results section for a journal publication) the manipulations of the pre-processing pipeline and its outputs.
+
+The long term goal is to automate the writing of these journal article sections via a script that takes "user_params.json" and "output_preproc.json" as inputs. In contrast, the output.log file reflects a much more verbose record of what was run, what the outputs were, and the presence of any warning/errors, etc.
+
 ## Containers
 
 Please use the dockerfile & singularity recipe located at `container/`. Directions on installation and usage are located in `container/README.md`. 
-
-## Issues
-
-See the [list of open issues](https://github.com/NDCLab/PEPPER-Pipeline/issues) for current and future work to be performed.
-
-Always assign yourself to an issue before beginning work on it!
-
-If someone is already assigned to an issue that you intend to work on, post a comment to ask if you can help before assigning yourself. If you do not receive a response within 24 hours, then you are free to start work on the issue, but first post another comment to let them know what you will be doing on the issue.
-
-If you believe a new issue needs to be added to the [list of open issues](https://github.com/NDCLab/PEPPER-Pipeline/issues):
-* Verify that the problem/suggestion does not already have an issue logged in GitHub.
-* Use the appropriate issue template to submit the problem/suggestion for review.
 
 ## Git Workflow 
 
