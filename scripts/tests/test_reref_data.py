@@ -64,10 +64,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
 def test_except_value(error_obj):
     eeg_obj = error_obj
 
-    # attempt to reject epochs with data containing only one entire epoch
-    # across each channel
-    with pytest.raises(Exception):
-        _, output_dict = pre.reref_raw(eeg_obj)
-        assert True
+    # attempt to reref w/invalid data
+    _, output_dict = pre.reref_raw(eeg_obj)
+    assert True
 
-        assert isinstance(output_dict, dict)
+    assert isinstance(output_dict, dict)

@@ -34,30 +34,27 @@ def reref_raw(raw, ref_channels=None):
     """
     try:
         raw.load_data()
+    except (AttributeError, TypeError):
+        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
+        print(error)
 
-        # add back reference channel (all zero)
-        if ref_channels is None:
-            raw_new_ref = raw
-        else:
-            raw_new_ref = mne.add_reference_channels(raw,
-                                                     ref_channels=ref_channels)
+        reref_details = {"TypeError": error}
+        return raw, {"Reference": reref_details}
 
-        ref_type = "average"
-        raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
+    # add back reference channel (all zero)
+    if ref_channels is None:
+        raw_new_ref = raw
+    else:
+        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
 
-        ref_details = {
-            "Reference Type": ref_type
-        }
-        # return average reference
-        return raw_new_ref, {"Reference": ref_details}
+    ref_type = "average"
+    raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
 
-    except TypeError:
-        error = 'Type Error'
-    except Exception:
-        error = 'Unknown Error'
-    print(error)
-    reref_details = {"ERROR": error}
-    return raw, {"Reference": reref_details}
+    ref_details = {
+        "Reference Type": ref_type
+    }
+    # return average reference
+    return raw_new_ref, {"Reference": ref_details}
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
