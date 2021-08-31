@@ -85,22 +85,31 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
 
-        h_pass = raw_filtered.info["highpass"]
-        l_pass = raw_filtered.info["lowpass"]
-        samp_freq = raw_filtered.info["sfreq"]
+    except (AttributeError, TypeError):
+        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
+        print(error)
 
-        filter_details = {"Highpass corner frequency": h_pass,
-                          "Lowpass corner frequency": l_pass,
-                          "Sampling Rate": samp_freq}
+        filter_details = {"TypeError": error}
+        return raw, {"Filter": filter_details}
+    except (ValueError):
+        error = 'Error. Please use sufficiently seperated floats for \
+             l_freq & h_freq.'
+        print(error)
 
-        return raw_filtered, {"Filter": filter_details}
-    except TypeError:
-        error = 'Type Error'
-    except Exception:
-        error = 'Unknown Error'
-    print(error)
-    filter_details = {"ERROR": error}
-    return raw, {"Filter": filter_details}
+        filter_details = {"ValueError": error}
+        return raw, {"Filter": filter_details}
+
+    h_pass = raw_filtered.info["highpass"]
+    l_pass = raw_filtered.info["lowpass"]
+    samp_freq = raw_filtered.info["sfreq"]
+
+    filter_details = {
+        "Highpass corner frequency": h_pass,
+        "Lowpass corner frequency": l_pass,
+        "Sampling Rate": samp_freq
+    }
+
+    return raw_filtered, {"Filter": filter_details}
 
 
 def ica_raw(raw, montage):
@@ -125,15 +134,6 @@ def ica_raw(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        print("Invalid value for the 'montage' parameter. Allowed values are\
-        'EGI_256', 'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
-        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
-        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
-        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
-        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
-        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
-        'standard_primed', 'artinis-octamon', and 'artinis-brite23'.")
-
         montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
         'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
         'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
@@ -143,6 +143,7 @@ def ica_raw(raw, montage):
         'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
         'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
 
+        print(montage_error)
         ica_details = {"ERROR": montage_error}
         return raw, {"Ica": ica_details}
 

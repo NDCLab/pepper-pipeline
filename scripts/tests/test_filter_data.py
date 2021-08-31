@@ -21,12 +21,12 @@ def default_param(root):
 
 
 @pytest.fixture
-def select_subjects():
+def sel_subjects():
     return ["NDARAB793GL3"]
 
 
 @pytest.fixture
-def select_tasks():
+def sel_tasks():
     return ["ContrastChangeBlock1"]
 
 
@@ -35,10 +35,15 @@ def error_obj():
     return None
 
 
-def test_return_values(default_param, select_subjects, select_tasks):
+@pytest.fixture
+def error_val():
+    return 1.0
 
-    default_param["load_data"]["subjects"] = select_subjects
-    default_param["load_data"]["tasks"] = select_tasks
+
+def test_return_values(default_param, sel_subjects, sel_tasks):
+
+    default_param["load_data"]["subjects"] = sel_subjects
+    default_param["load_data"]["tasks"] = sel_tasks
 
     # Load data using the selected subjects & tasks
     data = load.load_files(default_param["load_data"])
@@ -51,18 +56,34 @@ def test_return_values(default_param, select_subjects, select_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # filter data
-        filt_eeg, output_dict = pre.filter_data(eeg_obj, **filt_param)
+        _, output_dict = pre.filter_data(eeg_obj, **filt_param)
 
         # assert that None does not exist in final reject
         assert None not in output_dict.values()
 
 
-def test_except_value(error_obj):
-    eeg_obj = error_obj
-
+def test_except_bad_object(error_obj):
     # attempt to reject epochs with data equal to None
-    with pytest.raises(Exception):
-        _, output_dict = pre.filter_data(eeg_obj)
+    _, output_dict = pre.filter_data(error_obj)
+    assert True
+
+    assert isinstance(output_dict, dict)
+
+
+def test_except_bad_params(default_param, sel_subjects, sel_tasks, error_val):
+
+    default_param["load_data"]["subjects"] = sel_subjects
+    default_param["load_data"]["tasks"] = sel_tasks
+
+    # Load data using the selected subjects & tasks
+    data = load.load_files(default_param["load_data"])
+
+    for file in data:
+        eeg_obj = mne_bids.read_raw_bids(file)
+
+        # filter data
+        _, output_dict = pre.filter_data(eeg_obj, error_val, error_val)
         assert True
 
+        # assert that None does not exist in final reject
         assert isinstance(output_dict, dict)
