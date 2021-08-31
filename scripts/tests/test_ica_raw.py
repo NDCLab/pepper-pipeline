@@ -20,13 +20,18 @@ def default_param(root):
 
 
 @pytest.fixture
-def select_subjects():
+def sel_subjects():
     return ["NDARAB793GL3"]
 
 
 @pytest.fixture
-def select_tasks():
+def sel_tasks():
     return ["ContrastChangeBlock1"]
+
+
+@pytest.fixture
+def error_mnt():
+    return "Fake_Montage"
 
 
 @pytest.fixture
@@ -34,10 +39,10 @@ def error_obj():
     return None
 
 
-def test_return_values(default_param, select_subjects, select_tasks):
+def test_return_values(default_param, sel_subjects, sel_tasks):
 
-    default_param["load_data"]["subjects"] = select_subjects
-    default_param["load_data"]["tasks"] = select_tasks
+    default_param["load_data"]["subjects"] = sel_subjects
+    default_param["load_data"]["tasks"] = sel_tasks
 
     # Load data using the selected subjects & tasks
     data = load.load_files(default_param["load_data"])
@@ -50,22 +55,35 @@ def test_return_values(default_param, select_subjects, select_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # reject epochs
-        ica_raw, output_dict = pre.ica_raw(eeg_obj, **ica_param)
+        _, output_dict = pre.ica_raw(eeg_obj, **ica_param)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
 
 
-def test_except_value(error_obj):
-    eeg_obj = error_obj
-
-    # get the pipeline steps
+def test_except_bad_object(default_param, error_obj):
     feature_params = default_param["preprocess"]
     ica_param = feature_params["ica_raw"]
 
-    # attempt to reject channels with data equal to None
-    with pytest.raises(Exception):
-        _, output_dict = pre.ica_raw(eeg_obj, **ica_param)
+    # attempt to process ica w/invalid data
+    _, output_dict = pre.ica_raw(error_obj, **ica_param)
+    assert True
+
+    assert isinstance(output_dict, dict)
+
+
+def test_except_bad_montage(default_param, sel_subjects, sel_tasks, error_mnt):
+    default_param["load_data"]["subjects"] = sel_subjects
+    default_param["load_data"]["tasks"] = sel_tasks
+
+    # Load data using the selected subjects & tasks
+    data = load.load_files(default_param["load_data"])
+
+    # attempt to run ica_raw w/invalid montage
+    for file in data:
+        eeg_obj = mne_bids.read_raw_bids(file)
+
+        _, output_dict = pre.ica_raw(eeg_obj, error_mnt)
         assert True
 
         assert isinstance(output_dict, dict)

@@ -91,7 +91,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
 
         filter_details = {"TypeError": error}
         return raw, {"Filter": filter_details}
-    except (ValueError):
+    except ValueError:
         error = 'Error. Please use sufficiently seperated floats for \
              l_freq & h_freq.'
         print(error)
@@ -129,11 +129,10 @@ def ica_raw(raw, montage):
                       dictionary with relevant ica information
     """
 
-    # set montage
-    # return if value is invalid
     try:
         raw.set_montage(montage)
     except ValueError:
+        # return if montage value is invalid
         montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
         'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
         'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
@@ -145,6 +144,12 @@ def ica_raw(raw, montage):
 
         print(montage_error)
         ica_details = {"ERROR": montage_error}
+        return raw, {"Ica": ica_details}
+    except (AttributeError, TypeError):
+        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
+        print(error)
+
+        ica_details = {"TypeError": error}
         return raw, {"Ica": ica_details}
 
     # prepica - step1 - filter
