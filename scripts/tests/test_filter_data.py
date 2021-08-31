@@ -63,7 +63,7 @@ def test_return_values(default_param, sel_subjects, sel_tasks):
 
 
 def test_except_bad_object(error_obj):
-    # attempt to reject epochs with data equal to None
+    # attempt to filter data w/invalid data
     _, output_dict = pre.filter_data(error_obj)
     assert True
 
