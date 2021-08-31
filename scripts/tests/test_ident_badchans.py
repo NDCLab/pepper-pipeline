@@ -30,8 +30,8 @@ def select_tasks():
 
 
 @pytest.fixture
-def error_tasks():
-    return ["Video1"]
+def error_obj():
+    return None
 
 
 def test_return_values(default_param, select_subjects, select_tasks):
