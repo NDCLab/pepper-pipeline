@@ -31,7 +31,7 @@ def _init_subjects(filter_sub, root, ch_type):
     if filter_sub == ["*"]:
         filter_sub = mne_bids.get_entity_vals(root, 'subject')
 
-    filered_subjects = []
+    filtered_subjects = []
     bids_root = pathlib.Path(root)
     type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
 
@@ -42,9 +42,9 @@ def _init_subjects(filter_sub, root, ch_type):
 
         files = bids_path.match()
         files_eeg = [f for f in files if f.extension.lower() in type_exten]
-        filered_subjects += files_eeg
+        filtered_subjects += files_eeg
 
-    return filered_subjects
+    return filtered_subjects
 
 
 def _filter_tasks(filter_tasks, files):
