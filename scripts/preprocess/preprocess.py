@@ -8,11 +8,12 @@ import sys
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from constants import \
+from scripts.preprocess.constants import \
     INVALID_DATA_MSG, \
     INVALID_FILTER_FREQ_MSG, \
     INVALID_FR_DATA_MSG, \
-    INVALID_MONTAGE_MSG
+    INVALID_MONTAGE_MSG, \
+    INVALID_UPARAM_MSG
 
 
 def reref_raw(raw, ref_channels=None):
@@ -274,19 +275,18 @@ def plot_sensor_locations(epochs, user_params):
     -----------
     Graph plotting of sensor locations
     """
+    try:
+        kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
+        ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
+    except TypeError:
+        print(INVALID_UPARAM_MSG)
+        return 1
 
-    if epochs is None:
-        print("Invalid epoch object")
-        sys.exit(1)
-
-    if user_params is None:
-        print("Invalid user_params dictionary")
-        sys.exit(1)
-
-    kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
-    ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
-
-    epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
+    try:
+        epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
+    except TypeError:
+        print(INVALID_DATA_MSG)
+        return 1
 
 
 def final_reject_epoch(epochs):
@@ -371,16 +371,15 @@ def interpolate_data(epochs, mode, method, reset_bads):
     ----------
     Modified in place epochs object and output dictionary
     """
-    if epochs is None:
-        error = "Null raw objects"
-        print(error)
-        return epochs, {"Interpolation": {"ERROR": error}}
-
-    epochs.interpolate_bads(mode=mode,
-                            method=method,
-                            reset_bads=reset_bads
-                            )
-    return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
+    try:
+        epochs.interpolate_bads(mode=mode,
+                                method=method,
+                                reset_bads=reset_bads
+                                )
+        return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
+    except (TypeError, AttributeError):
+        print(INVALID_DATA_MSG)
+        return epochs, {"Interpolation": {"ERROR": INVALID_DATA_MSG}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):

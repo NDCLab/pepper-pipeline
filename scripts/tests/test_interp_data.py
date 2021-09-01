@@ -71,6 +71,4 @@ def test_except_value(error_obj):
     # across each channel
     with pytest.raises(Exception):
         _, output_dict = pre.interpolate_data(eeg_obj)
-        assert True
-
         assert isinstance(output_dict, dict)
