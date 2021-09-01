@@ -1,127 +1,125 @@
+import datetime
+import glob
+import logging
 import mne
 import mne_bids
-import numpy as np
-import os
 import pathlib
 import pandas as pd
+import scipy
+import tarfile
 
-bids_root = pathlib.Path.cwd() / 'CMI/rawdata'
+# TODO: Check if multiple runs of a given task are present in the HBN dataset
+# TODO: Add progress bar
 
-# TODO: load and merge phenotype metadata files from all batches of data
-meta_data = pd.read_csv(pathlib.Path.cwd() / 'HBN_R2_1_Pheno.csv')
+# Format the Child Mind Institute (CMI) Healthy Brain Network (HBN) data in BIDS format
+# http://fcon_1000.projects.nitrc.org/indi/cmi_healthy_brain_network/sharing_neuro.html
 
-# mapping of event codes to block starts
-block_mapping = {'90': 'RestingState',
-                 '91': 'SequenceLearning',
-                 '92': 'SymbolSearch',
-                 '93': 'SurrSuppBlock1',
-                 '94': 'ContrastChangeBlock1',
-                 '95': 'ContrastChangeBlock2',
-                 '96': 'ContrastChangeBlock3',
-                 '97': 'SurrSuppBlock2',
-                 '81': 'Video1',
-                 '82': 'Video2',
-                 '83': 'Video3',
-                 '84': 'Video4'}
+# utility function:
+# from: https://stackoverflow.com/questions/952914/how-to-make-a-flat-list-out-of-a-list-of-lists
+def flatten(t):
+    return [item for sublist in t for item in sublist]
 
-# TODO: double check that the sex mapping is correct
-sex_mapping = {0: 'F',
-               1: 'M'}
+sourcedata_root = pathlib.Path.cwd() / '../CMI/sourcedata'
+bids_root = pathlib.Path.cwd() / '../CMI/rawdata'
 
-input_path = 'NDARAB793GL3.mff'
+launch_time = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+logging.basicConfig(filename=f'import_cmi_hbn_data_{launch_time}.log',
+                    format='%(asctime)s:%(levelname)s:%(message)s',
+                    level=logging.DEBUG)
 
-participant_code = pathlib.Path(input_path).stem
-meta_data_rows = (meta_data['EID'] == participant_code).sum()
-# fetch metadata
-if meta_data_rows < 1:
-    raise Exception('Participant not in metadata')
-elif meta_data_rows > 1:
-    raise Exception('Participant in metadata more than once')
-else:
-    participant_age = float(meta_data.loc[meta_data['EID'] == participant_code, 'Age'])
-    participant_sex = sex_mapping[int(meta_data.loc[meta_data['EID'] == participant_code, 'Sex'])]
+# whether to overwrite data that already exists
+overwrite = False
 
-# here, MNE was deciding to exclude channel 90 if not set to explicitly not exclude any channels
-raw = mne.io.read_raw_egi(input_path, preload=True, verbose=True, exclude=[])
+# assemble list of files to process
+releases = glob.glob(f'{sourcedata_root}/release-*')
+pheno_paths = flatten([glob.glob(f'{release}/HBN_*_Pheno.csv') for release in releases])
+pheno_data = pd.concat([pd.read_csv(path) for path in pheno_paths])
 
-# add metadata
-raw.info['line_freq'] = 60
+eeg_file_paths = flatten([glob.glob(f'{release}/eeg/*.tar.gz') for release in releases])
 
-# associate montage
-raw.rename_channels({'E129': 'Cz'})
-raw.set_montage('GSN-HydroCel-129')
+# the original task names are not BIDS compliant, as they contain dashes and underscores
+# map them to compliant names
+task_mapping = {'RestingState': 'restingState',
+                'vis_learn': 'visLearn',
+                'WISC_ProcSpeed': 'wiscProcSpeed',
+                'SurroundSupp_Block1': 'surroundSuppBlock1',
+                'SurroundSupp_Block2': 'surroundSuppBlock2',
+                'SAIIT_2AFC_Block1': 'saitt2afcBlock1',
+                'SAIIT_2AFC_Block2': 'saitt2afcBlock2',
+                'SAIIT_2AFC_Block3': 'saitt2afcBlock3',
+                'Video-FF': 'videoFF',
+                'Video-DM': 'videoDM',
+                'Video-WK': 'videoWK',
+                'Video-TP': 'videoTP'}
 
-# set the reference channel
-raw.set_eeg_reference(ref_channels=['Cz'], ch_type='eeg')
+sex_mapping = {0: 'M',
+               1: 'F'}
 
-# get the mapping from channel name to integer event ID
-event_keys = raw.event_id
-# extract the events from the 'STI 014' composite channel
-events = mne.find_events(raw, stim_channel='STI 014', shortest_event=1)
-# reverse the dict so that the keys are items and items are keys, stripping any trailing whitespace from the event strings
-event_map = dict((v, k.rstrip()) for k, v in event_keys.items())
-# use the event numpy array with integers, and the event_map going from integer to string names, to create annotations with the correct labels
-event_annotations = mne.annotations_from_events(events=events, sfreq=raw.info['sfreq'],
-                                                orig_time=raw.info['meas_date'], event_desc=event_map)
-# add the event annotations to the existing annotations
-raw.set_annotations(raw.annotations + event_annotations)
-# keep only the EEG channels, removing the stimulation channels
-raw.pick_types(eeg=True)
+channel_names = [f'E{c}' for c in range(1, 129)]
+channel_names.append('Cz')
 
-# get the time and code for each annotation
-annotation_codes = [(a['onset'], a['description']) for a in raw.annotations]
+for input_path in eeg_file_paths:
 
-# reduce to only the annotations that indicate block starts
-block_annotations = [a for a in annotation_codes if np.isin(a[1], list(block_mapping))]
-block_df = pd.DataFrame(data=block_annotations, columns=['start_time', 'code'])
+    print(f'Processing {input_path}')
 
-# each block end is the time of the next block start
-block_df['end_time'] = np.roll(block_df['start_time'], -1)
+    participant_code = pathlib.Path(input_path).stem.split('.')[0]
+    pheno_data_rows = (pheno_data['EID'] == participant_code).sum()
+    # fetch metadata
+    if pheno_data_rows < 1:
+        raise Exception('Participant not in metadata')
+    elif pheno_data_rows > 1:
+        raise Exception('Participant in metadata more than once')
+    else:
+        participant_age = float(pheno_data.loc[pheno_data['EID'] == participant_code, 'Age'])
+        participant_sex = sex_mapping[int(pheno_data.loc[pheno_data['EID'] == participant_code, 'Sex'])]
 
-# extend the length of the first and last block periods to the start / end of the recording
-block_df.loc[0, 'start_time'] = 0
-block_df.loc[block_df.index[-1], 'end_time'] = raw.times[-1]
 
-# subtract an amount of time equal to 1 sample from each end time
-# to avoid the next annotation from being included in cropped data
-block_df['end_time'] = block_df['end_time'] - (1 / raw.info['sfreq'])
+    # Get the .mat versions of needed tasks
+    with tarfile.open(input_path) as tar_data:
+        tar_contents = tar_data.getnames()
+        for task in task_mapping.keys():
+            task_filename = f'{participant_code}/EEG/raw/mat_format/{task}.mat'
 
-block_df['run'] = block_df.groupby('code').cumcount() + 1
+            bids_path = mne_bids.BIDSPath(subject=participant_code,
+                                          session='01',
+                                          task=task_mapping[task],
+                                          run=1,
+                                          datatype='eeg',
+                                          root=bids_root)
 
-# write out each block as a separate file
-for b in block_df.index:
-    task_name = block_mapping[block_df.loc[b, 'code']]
-    run_number = str(block_df.loc[b, 'run']).zfill(2)
+            if not overwrite and len(bids_path.match()) != 0:
+                # skip the file since we've already processsed it
+                logging.info('Participant %s Task %s already present, skipping', participant_code, task)
+            elif task_filename not in tar_contents:
+                logging.warning('Participant %s Task %s is missing', participant_code, task)
+            else:
+                task_file_obj = tar_data.extractfile(task_filename)
+                mat_data = scipy.io.loadmat(task_file_obj, simplify_cells = True)
+                EEG = mat_data['EEG']
+                info = mne.create_info(channel_names, ch_types='eeg', sfreq=EEG['srate'])
+                info['line_freq'] = 60
+                raw = mne.io.RawArray(EEG['data'], info)
+                raw.set_montage('GSN-HydroCel-129')
+                raw.set_eeg_reference(ref_channels=['Cz'], ch_type='eeg')
 
-    # crop & save as .fif
-    raw_cropped = raw.copy().crop(tmin=block_df.loc[b, 'start_time'],
-                                  tmax=block_df.loc[b, 'end_time'],
-                                  include_tmax=False)
-    temp_path = pathlib.Path.cwd() / f'{task_name}_{run_number}_raw.fif'
-    raw_cropped.save(temp_path, overwrite=True)
+                # create annotations from events
+                event_onset_seconds = [(event['sample'] - 1) / EEG['srate'] for event in EEG['event']]
+                event_duration_seconds = [event['duration'] / EEG['srate'] for event in EEG['event']]
+                event_descriptions = [event['type'].strip() for event in EEG['event']]
+                annotations = mne.Annotations(onset=event_onset_seconds,
+                                              duration=event_duration_seconds,
+                                              description=event_descriptions)
+                raw.set_annotations(annotations)
 
-    # read .fif back and write BIDS
-    raw_temp = mne.io.read_raw_fif(temp_path)
+                mne_bids.write_raw_bids(raw, bids_path, format='BrainVision', overwrite=overwrite, allow_preload=True)
 
-    bids_path = mne_bids.BIDSPath(subject=participant_code,
-                                  session='01',
-                                  task=task_name,
-                                  run=run_number,
-                                  datatype='eeg',
-                                  root=bids_root)
+                # update sidecar values
+                bids_path.update(suffix='eeg', extension='.json')
+                eeg_sidecar_values = {'EEGReference': 'Cz'}
+                mne_bids.update_sidecar_json(bids_path, eeg_sidecar_values)
 
-    mne_bids.write_raw_bids(raw_temp, bids_path, format='BrainVision', overwrite=True)
-
-    # update sidecar values
-    bids_path.update(suffix='eeg', extension='.json')
-    eeg_sidecar_values = {'EEGReference': 'Cz'}
-    mne_bids.update_sidecar_json(bids_path, eeg_sidecar_values)
-
-    # remove the temporary FIF
-    os.remove(temp_path)
-
-# update participants.tsv
-participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t', na_filter=False)
-participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
-participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
-participant_data.to_csv(bids_root / 'participants.tsv', sep='\t', index=False)
+    # update participants.tsv
+    participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t', na_filter=False)
+    participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
+    participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
+    participant_data.to_csv(bids_root / 'participants.tsv', sep='\t', index=False)
