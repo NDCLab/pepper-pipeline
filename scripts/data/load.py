@@ -4,15 +4,16 @@ import json
 from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
+import os 
 
 from scripts.constants import \
-    INVALID_DATA_MSG, \
-    INVALID_FILTER_FREQ_MSG, \
-    INVALID_FR_DATA_MSG, \
-    INVALID_MONTAGE_MSG, \
     INVALID_UPARAM_MSG, \
     INVALID_SUBJ_PARAM_MSG, \
-    INVALID_TASK_PARAM_MSG
+    INVALID_TASK_PARAM_MSG, \
+    MISSING_PATH_MSG, \
+    INVALID_E_SUBJ_MSG, \
+    INVALID_E_TASK_MSG, \
+    INVALID_E_RUN_MSG
 
 
 def load_params(user_param_path):
@@ -99,6 +100,13 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     files: list
            a list of fully filtered BIDS paths according to exceptions
     """
+    if not isinstance(subjects, list) and subjects != "":
+        raise TypeError(INVALID_E_SUBJ_MSG)
+    elif not isinstance(tasks, list) and tasks != "":
+        raise TypeError(INVALID_E_TASK_MSG)
+    elif not isinstance(runs, list) and runs != "":
+        raise TypeError(INVALID_E_RUN_MSG)
+
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
 
@@ -153,16 +161,18 @@ def load_files(data_params):
     except TypeError:
         raise TypeError(INVALID_UPARAM_MSG)
 
+    if not os.path.exists(root):
+        wd = os.getcwd()
+        raise FileNotFoundError(wd + root, MISSING_PATH_MSG)
+
     e_sub = exceptions["subjects"]
     e_tasks = exceptions["tasks"]
     e_runs = exceptions["runs"]
 
     # initialize files by loading selected subjects
     files = _init_subjects(subjects_sel, root, ch_type)
-
     # filter tasks
     files = _filter_tasks(tasks_sel, files)
-
     # filter exceptions
     files = _filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
 

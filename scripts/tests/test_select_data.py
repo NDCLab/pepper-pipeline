@@ -48,6 +48,16 @@ def subj_files(avail_subj, root):
     return subjects
 
 
+@pytest.fixture
+def error_select_param():
+    return ""
+
+
+@pytest.fixture
+def error_except_param():
+    return None
+
+
 def test_select_all(default_param, avail_subj, subj_files):
     # Load data using the default parameters
     data = load.load_files(default_param["load_data"])
@@ -410,9 +420,9 @@ def test_select_subj_task_except_subj_task_run(default_param, subj_files):
     assert len(data) == count
 
 
-def test_missing_subj(default_param):
+def test_missing_subj(default_param, error_select_param):
     # input invalid value for subjects
-    default_param["load_data"]["subjects"] = ""
+    default_param["load_data"]["subjects"] = error_select_param
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
@@ -420,9 +430,9 @@ def test_missing_subj(default_param):
         assert True
 
 
-def test_missing_task(default_param):
+def test_missing_task(default_param, error_select_param):
     # input invalid value for tasks
-    default_param["load_data"]["tasks"] = ""
+    default_param["load_data"]["tasks"] = error_select_param
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
@@ -430,9 +440,9 @@ def test_missing_task(default_param):
         assert True
 
 
-def test_missing_except_subj(default_param):
+def test_missing_except_subj(default_param, error_except_param):
     # input invalid value for tasks
-    default_param["load_data"]["exceptions"]["subjects"] = ""
+    default_param["load_data"]["exceptions"]["subjects"] = error_except_param
     default_param["load_data"]["exceptions"]["tasks"] = ["*"]
     default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
@@ -442,10 +452,10 @@ def test_missing_except_subj(default_param):
         assert True
 
 
-def test_missing_except_task(default_param):
+def test_missing_except_task(default_param, error_except_param):
     # input invalid value for tasks
     default_param["load_data"]["exceptions"]["subjects"] = ["*"]
-    default_param["load_data"]["exceptions"]["tasks"] = ""
+    default_param["load_data"]["exceptions"]["tasks"] = error_except_param
     default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the invalid field
@@ -454,27 +464,26 @@ def test_missing_except_task(default_param):
         assert True
 
 
-def test_missing_except_run(default_param):
+def test_missing_except_run(default_param, error_except_param):
     # input invalid value for tasks
     default_param["load_data"]["exceptions"]["subjects"] = ["*"]
     default_param["load_data"]["exceptions"]["tasks"] = ["*"]
-    default_param["load_data"]["exceptions"]["runs"] = ""
+    default_param["load_data"]["exceptions"]["runs"] = error_except_param
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         load.load_files(default_param["load_data"])
         assert True
 
 
-def test_missing_data(default_param, tmp_path):
+def test_bad_path(default_param, tmp_path):
     # create empty and temporary directory
-    empty_data = tmp_path / "empty"
-    empty_data.mkdir()
+    empty_data = str(tmp_path) + "empty"
 
     # input invalid value for tasks
     default_param["load_data"]["root"] = empty_data
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(FileNotFoundError):
         load.load_files(default_param["load_data"])
         assert True
