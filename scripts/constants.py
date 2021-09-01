@@ -1,3 +1,7 @@
+PIPE_NAME = "PEPPER"
+INTERM = "_intermediate"
+FINAL = "_preprocessed"
+
 INVALID_DATA_MSG = "Please use mne.io.Raw or mne.Epochs datatype \
      as raw."
 INVALID_UPARAM_MSG = "Please use a valid user_param file. A template can be \
