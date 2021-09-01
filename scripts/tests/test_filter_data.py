@@ -65,8 +65,6 @@ def test_return_values(default_param, sel_subjects, sel_tasks):
 def test_except_bad_object(error_obj):
     # attempt to filter data w/invalid data
     _, output_dict = pre.filter_data(error_obj)
-    assert True
-
     assert isinstance(output_dict, dict)
 
 
@@ -83,7 +81,4 @@ def test_except_bad_params(default_param, sel_subjects, sel_tasks, error_val):
 
         # filter data
         _, output_dict = pre.filter_data(eeg_obj, error_val, error_val)
-        assert True
-
-        # assert that None does not exist in final reject
         assert isinstance(output_dict, dict)

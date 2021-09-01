@@ -67,8 +67,6 @@ def test_except_bad_object(default_param, error_obj):
 
     # attempt to process ica w/invalid data
     _, output_dict = pre.ica_raw(error_obj, **ica_param)
-    assert True
-
     assert isinstance(output_dict, dict)
 
 
@@ -84,6 +82,4 @@ def test_except_bad_montage(default_param, sel_subjects, sel_tasks, error_mnt):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         _, output_dict = pre.ica_raw(eeg_obj, error_mnt)
-        assert True
-
         assert isinstance(output_dict, dict)

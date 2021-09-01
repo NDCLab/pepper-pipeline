@@ -66,6 +66,4 @@ def test_except_value(error_obj):
 
     # attempt to reref w/invalid data
     _, output_dict = pre.reref_raw(eeg_obj)
-    assert True
-
     assert isinstance(output_dict, dict)
