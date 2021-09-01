@@ -1,6 +1,8 @@
-INVALID_DATA_MSG = "Error. Please use mne.io.Raw or mne.Epochs datatype \
+INVALID_DATA_MSG = "Please use mne.io.Raw or mne.Epochs datatype \
      as raw."
-INVALID_FILTER_FREQ_MSG = "'Error. Please use sufficiently seperated floats for \
+INVALID_UPARAM_MSG = "Please use a valid user_param file. A template can be \
+     created using data:write.write_template_params()"
+INVALID_FILTER_FREQ_MSG = "'Please use sufficiently seperated floats for \
              l_freq & h_freq."
 INVALID_FR_DATA_MSG = "The least populated class in y has only 1 member, which is too\
              few. The minimum number of groups for any class cannot be\
