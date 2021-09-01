@@ -8,6 +8,12 @@ import sys
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
+from constants import \
+    INVALID_DATA_MSG, \
+    INVALID_FILTER_FREQ_MSG, \
+    INVALID_FR_DATA_MSG, \
+    INVALID_MONTAGE_MSG
+
 
 def reref_raw(raw, ref_channels=None):
     """Re-reference the data to the average of all electrodes
@@ -35,11 +41,8 @@ def reref_raw(raw, ref_channels=None):
     try:
         raw.load_data()
     except (AttributeError, TypeError):
-        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
-        print(error)
-
-        reref_details = {"TypeError": error}
-        return raw, {"Reference": reref_details}
+        print(INVALID_DATA_MSG)
+        return raw, {"Reference": {"ERROR": INVALID_DATA_MSG}}
 
     # add back reference channel (all zero)
     if ref_channels is None:
@@ -81,20 +84,12 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     try:
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
-
     except (AttributeError, TypeError):
-        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
-        print(error)
-
-        filter_details = {"TypeError": error}
-        return raw, {"Filter": filter_details}
+        print(INVALID_DATA_MSG)
+        return raw, {"Filter": {"ERROR": INVALID_DATA_MSG}}
     except ValueError:
-        error = 'Error. Please use sufficiently seperated floats for \
-             l_freq & h_freq.'
-        print(error)
-
-        filter_details = {"ValueError": error}
-        return raw, {"Filter": filter_details}
+        print(INVALID_FILTER_FREQ_MSG)
+        return raw, {"Filter": {"ERROR": INVALID_FILTER_FREQ_MSG}}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -129,25 +124,11 @@ def ica_raw(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        # return if montage value is invalid
-        montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
-        'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
-        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
-        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
-        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
-        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
-        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
-        'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
-
-        print(montage_error)
-        ica_details = {"ERROR": montage_error}
-        return raw, {"Ica": ica_details}
+        print(INVALID_MONTAGE_MSG)
+        return raw, {"Ica": {"ERROR": INVALID_MONTAGE_MSG}}
     except (AttributeError, TypeError):
-        error = 'Error. Please use mne.io.Raw or mne.Epochs datatype as raw.'
-        print(error)
-
-        ica_details = {"TypeError": error}
-        return raw, {"Ica": ica_details}
+        print(INVALID_DATA_MSG)
+        return raw, {"Ica": {"ERROR": INVALID_DATA_MSG}}
 
     # prepica - step1 - filter
     # High-pass with 1. Hz
@@ -245,12 +226,11 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     during segmentation stage
     """
 
-    if raw is None:
-        error = "Invalid raw object"
-        print(error)
-        return raw, {"Segment": {"ERROR": error}}
-
-    events, event_id = mne.events_from_annotations(raw)
+    try:
+        events, event_id = mne.events_from_annotations(raw)
+    except (TypeError, AttributeError):
+        print(INVALID_DATA_MSG)
+        return raw, {"Segment": {"ERROR": INVALID_DATA_MSG}}
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -335,14 +315,11 @@ def final_reject_epoch(epochs):
     try:
         autoRej.fit(epochs)
     except ValueError:
-        fr_error = "The least populated class in y has only 1 member, which is too\
-             few. The minimum number of groups for any class cannot be\
-             less than 2."
-
-        print(fr_error)
-
-        ica_details = {"ERROR": fr_error}
-        return epochs, {"Final Reject": ica_details}
+        print(INVALID_FR_DATA_MSG)
+        return epochs, {"Final Reject": {"ERROR": INVALID_FR_DATA_MSG}}
+    except (TypeError, AttributeError):
+        print(INVALID_DATA_MSG)
+        return epochs, {"Final Reject": {"ERROR": INVALID_DATA_MSG}}
 
     epochs_clean = autoRej.transform(epochs)
 
