@@ -415,7 +415,7 @@ def test_missing_subj(default_param):
     default_param["load_data"]["subjects"] = ""
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         load.load_files(default_param["load_data"])
         assert True
 
@@ -425,7 +425,7 @@ def test_missing_task(default_param):
     default_param["load_data"]["tasks"] = ""
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         load.load_files(default_param["load_data"])
         assert True
 
@@ -437,7 +437,7 @@ def test_missing_except_subj(default_param):
     default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         load.load_files(default_param["load_data"])
         assert True
 
@@ -449,7 +449,7 @@ def test_missing_except_task(default_param):
     default_param["load_data"]["exceptions"]["runs"] = ["*"]
 
     # Load data using the invalid field
-    with pytest.raises(Exception):
+    with pytest.raises(TypeError):
         load.load_files(default_param["load_data"])
         assert True
 

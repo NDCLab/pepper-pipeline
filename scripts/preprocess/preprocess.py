@@ -7,7 +7,7 @@ import pandas as pd
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.preprocess.constants import \
+from scripts.constants import \
     INVALID_DATA_MSG, \
     INVALID_FILTER_FREQ_MSG, \
     INVALID_FR_DATA_MSG, \

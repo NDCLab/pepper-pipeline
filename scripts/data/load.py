@@ -5,6 +5,15 @@ from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
 
+from scripts.constants import \
+    INVALID_DATA_MSG, \
+    INVALID_FILTER_FREQ_MSG, \
+    INVALID_FR_DATA_MSG, \
+    INVALID_MONTAGE_MSG, \
+    INVALID_UPARAM_MSG, \
+    INVALID_SUBJ_PARAM_MSG, \
+    INVALID_TASK_PARAM_MSG
+
 
 def load_params(user_param_path):
     with open(user_param_path) as fp:
@@ -30,6 +39,8 @@ def _init_subjects(filter_sub, root, ch_type):
     """
     if filter_sub == ["*"]:
         filter_sub = mne_bids.get_entity_vals(root, 'subject')
+    if not isinstance(filter_sub, list):
+        raise TypeError(INVALID_SUBJ_PARAM_MSG)
 
     filtered_subjects = []
     bids_root = pathlib.Path(root)
@@ -63,6 +74,8 @@ def _filter_tasks(filter_tasks, files):
     """
     if filter_tasks == ["*"]:
         return files
+    if not isinstance(filter_tasks, list):
+        raise TypeError(INVALID_TASK_PARAM_MSG)
 
     return [f for f in files if f.task in filter_tasks]
 
@@ -127,15 +140,19 @@ def load_files(data_params):
            a list of completely filtered BIDS paths
     """
     # get metadata
-    root = data_params["root"]
-    ch_type = data_params["channel-type"]
+    try:
+        root = data_params["root"]
+        ch_type = data_params["channel-type"]
 
-    # get selection of subjects & tasks
-    subjects_sel = data_params["subjects"]
-    tasks_sel = data_params["tasks"]
+        # get selection of subjects & tasks
+        subjects_sel = data_params["subjects"]
+        tasks_sel = data_params["tasks"]
 
-    # Get selection of exceptions
-    exceptions = data_params["exceptions"]
+        # Get selection of exceptions
+        exceptions = data_params["exceptions"]
+    except TypeError:
+        raise TypeError(INVALID_UPARAM_MSG)
+
     e_sub = exceptions["subjects"]
     e_tasks = exceptions["tasks"]
     e_runs = exceptions["runs"]
