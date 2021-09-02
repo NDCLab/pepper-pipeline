@@ -209,8 +209,9 @@ def ica_raw(raw, montage, ref_channels=None):
     # get channel positions from the raw data to compute the theta and radius
     cartesian_locations = raw_locs._get_channel_positions()
 
-    # convert the unit into cm rather m
-    cartesian_locations = cartesian_locations * 100
+    # if the max value is smaller than .2 (20cm), the unit should be 'm' and should be converted into 'cm'
+    if np.max(np.abs(cartesian_locations)) < .2:
+        cartesian_locations = cartesian_locations * 100
 
     # get spherical coordinates
     spherical_locations = mne.transforms._cart_to_sph(cartesian_locations)
