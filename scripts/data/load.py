@@ -4,7 +4,7 @@ import json
 from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
-import os 
+import os
 
 from scripts.constants import \
     INVALID_UPARAM_MSG, \
@@ -107,6 +107,13 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     elif not isinstance(runs, list) and runs != "":
         raise TypeError(INVALID_E_RUN_MSG)
 
+    if subjects == ["*"]:
+        subjects = mne_bids.get_entity_vals(root, 'subject')
+    if tasks == ["*"]:
+        tasks = mne_bids.get_entity_vals(root, 'task')
+    if runs == ["*"]:
+        runs = mne_bids.get_entity_vals(root, 'run')
+
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
 
@@ -128,7 +135,8 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
         e_files = bids_path.match()
         e_files_eeg = [f for f in e_files if f.extension.lower() in type_exten]
 
-        exceptions[i] = e_files_eeg[0]
+        if len(e_files_eeg):
+            exceptions[i] = e_files_eeg[0]
 
     # remove any file in files that shows up in exceptions and return
     return [f for f in files if f not in exceptions]
