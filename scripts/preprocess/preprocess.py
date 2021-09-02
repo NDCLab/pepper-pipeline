@@ -216,7 +216,7 @@ def ica_raw(raw, montage, ref_channels=None):
     spherical_locations = mne.transforms._cart_to_sph(cartesian_locations)
 
     # get polar coordinates
-    chn_locs = np.zeros([num_channels, 5])
+    chn_locs = np.zeros([cartesian_locations.shape[0], 5])
     chn_locs[:, 0:3] = cartesian_locations
     # get polar coordinates - theta - convert to angle [-180, 180]
     chn_locs[:, 3] = spherical_locations[:, 1] * 180 / np.pi
