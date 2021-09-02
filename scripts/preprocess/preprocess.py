@@ -206,15 +206,8 @@ def ica_raw(raw, montage, ref_channels=None):
     # remove bad channels
     raw_locs.drop_channels(bad_chans)
 
-    # channel locations in the montage will be used to compute the theta and radius.
-    # Note here that the raw.info['chs'] will not be used here, since it goes through further transformation.
-    montage_std = mne.channels.make_standard_montage(montage)
-    channel_names = raw_locs.ch_names
-    num_channels = len(channel_names)
-    cartesian_locations = np.empty([num_channels, 3])
-
-    for idx, ch_name in enumerate(channel_names):
-        cartesian_locations[idx, :] = montage_std.get_positions()['ch_pos'][ch_name]
+    # get channel positions from the raw data to compute the theta and radius
+    cartesian_locations = raw_locs._get_channel_positions()
 
     # convert the unit into cm rather m
     cartesian_locations = cartesian_locations * 100
