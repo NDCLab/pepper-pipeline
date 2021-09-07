@@ -348,7 +348,7 @@ def _adjust(icaact, icawinv, chanlocs):
 
     # find electrodes in Posterior Area (PA)
     # indexes of PA electrodes
-    indexp = np.where((chanlocs[:, 3] > -150) & (chanlocs[:, 3] < -30)
+    indexp = np.where((chanlocs[:, 3] > -160) & (chanlocs[:, 3] < -20)
                       & (chanlocs[:, 4] > 0))
     # number of PA electrodes
     dimback = len(indexp[0])
