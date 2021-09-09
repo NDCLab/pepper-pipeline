@@ -62,15 +62,11 @@ def test_return_values(default_param, select_subjects, select_tasks):
 
 
 def test_except_value(default_param, error_obj):
-    eeg_obj = error_obj
 
     # get the pipeline steps and seg params
     feature_params = default_param["preprocess"]
     seg_param = feature_params["segment_data"]
 
     # attempt to segment epochs with invalid epoch object
-    with pytest.raises(Exception):
-        _, output_dict = pre.segment_data(eeg_obj, **seg_param)
-        assert True
-
-        assert isinstance(output_dict, dict)
+    _, output_dict = pre.segment_data(error_obj, **seg_param)
+    assert isinstance(output_dict, dict)

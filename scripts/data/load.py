@@ -4,6 +4,16 @@ import json
 from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
+import os
+
+from scripts.constants import \
+    INVALID_UPARAM_MSG, \
+    INVALID_SUBJ_PARAM_MSG, \
+    INVALID_TASK_PARAM_MSG, \
+    MISSING_PATH_MSG, \
+    INVALID_E_SUBJ_MSG, \
+    INVALID_E_TASK_MSG, \
+    INVALID_E_RUN_MSG
 
 
 def load_params(user_param_path):
@@ -30,8 +40,10 @@ def _init_subjects(filter_sub, root, ch_type):
     """
     if filter_sub == ["*"]:
         filter_sub = mne_bids.get_entity_vals(root, 'subject')
+    if not isinstance(filter_sub, list):
+        raise TypeError(INVALID_SUBJ_PARAM_MSG)
 
-    filered_subjects = []
+    filtered_subjects = []
     bids_root = pathlib.Path(root)
     type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
 
@@ -42,9 +54,9 @@ def _init_subjects(filter_sub, root, ch_type):
 
         files = bids_path.match()
         files_eeg = [f for f in files if f.extension.lower() in type_exten]
-        filered_subjects += files_eeg
+        filtered_subjects += files_eeg
 
-    return filered_subjects
+    return filtered_subjects
 
 
 def _filter_tasks(filter_tasks, files):
@@ -63,6 +75,8 @@ def _filter_tasks(filter_tasks, files):
     """
     if filter_tasks == ["*"]:
         return files
+    if not isinstance(filter_tasks, list):
+        raise TypeError(INVALID_TASK_PARAM_MSG)
 
     return [f for f in files if f.task in filter_tasks]
 
@@ -86,6 +100,20 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     files: list
            a list of fully filtered BIDS paths according to exceptions
     """
+    if not isinstance(subjects, list) and subjects != "":
+        raise TypeError(INVALID_E_SUBJ_MSG)
+    elif not isinstance(tasks, list) and tasks != "":
+        raise TypeError(INVALID_E_TASK_MSG)
+    elif not isinstance(runs, list) and runs != "":
+        raise TypeError(INVALID_E_RUN_MSG)
+
+    if subjects == ["*"]:
+        subjects = mne_bids.get_entity_vals(root, 'subject')
+    if tasks == ["*"]:
+        tasks = mne_bids.get_entity_vals(root, 'task')
+    if runs == ["*"]:
+        runs = mne_bids.get_entity_vals(root, 'run')
+
     # get cartesian product of subjects, tasks, and runs
     exceptions = list(product(subjects, tasks, runs))
 
@@ -107,7 +135,8 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
         e_files = bids_path.match()
         e_files_eeg = [f for f in e_files if f.extension.lower() in type_exten]
 
-        exceptions[i] = e_files_eeg[0]
+        if len(e_files_eeg):
+            exceptions[i] = e_files_eeg[0]
 
     # remove any file in files that shows up in exceptions and return
     return [f for f in files if f not in exceptions]
@@ -127,25 +156,31 @@ def load_files(data_params):
            a list of completely filtered BIDS paths
     """
     # get metadata
-    root = data_params["root"]
-    ch_type = data_params["channel-type"]
+    try:
+        root = data_params["root"]
+        ch_type = data_params["channel-type"]
 
-    # get selection of subjects & tasks
-    subjects_sel = data_params["subjects"]
-    tasks_sel = data_params["tasks"]
+        # get selection of subjects & tasks
+        subjects_sel = data_params["subjects"]
+        tasks_sel = data_params["tasks"]
 
-    # Get selection of exceptions
-    exceptions = data_params["exceptions"]
+        # Get selection of exceptions
+        exceptions = data_params["exceptions"]
+    except TypeError:
+        raise TypeError(INVALID_UPARAM_MSG)
+
+    if not os.path.exists(root):
+        wd = os.getcwd()
+        raise FileNotFoundError(wd + root, MISSING_PATH_MSG)
+
     e_sub = exceptions["subjects"]
     e_tasks = exceptions["tasks"]
     e_runs = exceptions["runs"]
 
     # initialize files by loading selected subjects
     files = _init_subjects(subjects_sel, root, ch_type)
-
     # filter tasks
     files = _filter_tasks(tasks_sel, files)
-
     # filter exceptions
     files = _filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
 

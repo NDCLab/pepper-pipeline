@@ -85,6 +85,4 @@ def test_except_value(default_param, select_subjects, error_tasks):
         # across each channel
         with pytest.raises(ValueError):
             _, output_dict = pre.final_reject_epoch(epo)
-
-            assert True
             assert isinstance(output_dict, dict)

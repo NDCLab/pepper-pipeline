@@ -3,7 +3,10 @@ import sys
 import os
 import mne
 
-from scripts.data.constants import PIPE_NAME, INTERM, FINAL
+from scripts.constants import \
+    PIPE_NAME, \
+    INTERM, \
+    FINAL
 
 
 def read_dict_to_json(dict_array, file, datatype, root):
