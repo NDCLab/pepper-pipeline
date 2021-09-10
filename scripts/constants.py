@@ -1,10 +1,10 @@
 # Pipeline name constants
-PIPE_NAME = "PEPPER"
+PIPE_NAME = "PEPPER_pipeline"
 INTERM = "_intermediate"
 FINAL = "_preprocessed"
 
-# Load data error messages/exceptions
-MISSING_PATH_MSG = ": Missing Path. Please check if directory exists."
+# Load data error messages
+MISSING_PATH_MSG = "Missing Path. Please check if file or directory exists."
 INVALID_DATA_MSG = "Please use mne.io.Raw or mne.Epochs datatype \
     as raw."
 INVALID_UPARAM_MSG = "Please use a valid user_param file. A valid template can be \
@@ -34,3 +34,7 @@ INVALID_MONTAGE_MSG = "Invalid value for the 'montage' parameter. Allowed values
         'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
         'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
         'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
+
+# main driver code error messages
+CAUGHT_EXCEPTION_SKIP = ": Exception caught on function. Skipping to next \
+     subject."

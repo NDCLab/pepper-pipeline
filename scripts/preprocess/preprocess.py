@@ -41,8 +41,7 @@ def reref_raw(raw, ref_channels=None):
     try:
         raw.load_data()
     except (AttributeError, TypeError):
-        print(INVALID_DATA_MSG)
-        return raw, {"Reference": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
 
     # add back reference channel (all zero)
     if ref_channels is None:
@@ -85,11 +84,9 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
     except (AttributeError, TypeError):
-        print(INVALID_DATA_MSG)
-        return raw, {"Filter": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
     except ValueError:
-        print(INVALID_FILTER_FREQ_MSG)
-        return raw, {"Filter": {"ERROR": INVALID_FILTER_FREQ_MSG}}
+        raise ValueError(INVALID_FILTER_FREQ_MSG)
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -124,11 +121,9 @@ def ica_raw(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        print(INVALID_MONTAGE_MSG)
-        return raw, {"Ica": {"ERROR": INVALID_MONTAGE_MSG}}
+        raise ValueError(INVALID_MONTAGE_MSG)
     except (AttributeError, TypeError):
-        print(INVALID_DATA_MSG)
-        return raw, {"Ica": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
 
     # prepica - step1 - filter
     # High-pass with 1. Hz
@@ -229,8 +224,7 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     try:
         events, event_id = mne.events_from_annotations(raw)
     except (TypeError, AttributeError):
-        print(INVALID_DATA_MSG)
-        return raw, {"Segment": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -278,14 +272,12 @@ def plot_sensor_locations(epochs, user_params):
         kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
         ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
     except TypeError:
-        print(INVALID_UPARAM_MSG)
-        return 1
+        raise TypeError(INVALID_UPARAM_MSG)
 
     try:
         epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
     except TypeError:
-        print(INVALID_DATA_MSG)
-        return 1
+        raise TypeError(INVALID_DATA_MSG)
 
 
 def final_reject_epoch(epochs):
@@ -314,11 +306,9 @@ def final_reject_epoch(epochs):
     try:
         autoRej.fit(epochs)
     except ValueError:
-        print(INVALID_FR_DATA_MSG)
-        return epochs, {"Final Reject": {"ERROR": INVALID_FR_DATA_MSG}}
+        raise ValueError(INVALID_FR_DATA_MSG)
     except (TypeError, AttributeError):
-        print(INVALID_DATA_MSG)
-        return epochs, {"Final Reject": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -377,8 +367,7 @@ def interpolate_data(epochs, mode, method, reset_bads):
                                 )
         return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
     except (TypeError, AttributeError):
-        print(INVALID_DATA_MSG)
-        return epochs, {"Interpolation": {"ERROR": INVALID_DATA_MSG}}
+        raise TypeError(INVALID_DATA_MSG)
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
