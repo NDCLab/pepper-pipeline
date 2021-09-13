@@ -11,15 +11,19 @@ from scripts.constants import \
     INVALID_SUBJ_PARAM_MSG, \
     INVALID_TASK_PARAM_MSG, \
     MISSING_PATH_MSG, \
+    MISSING_DATA_MSG, \
     INVALID_E_SUBJ_MSG, \
     INVALID_E_TASK_MSG, \
     INVALID_E_RUN_MSG
 
 
 def load_params(user_param_path):
-    with open(user_param_path) as fp:
-        user_params = json.load(fp)
-        return user_params
+    try:
+        with open(user_param_path) as fp:
+            user_params = json.load(fp)
+            return user_params
+    except FileNotFoundError:
+        raise FileNotFoundError(user_param_path, ":", MISSING_PATH_MSG)
 
 
 def _init_subjects(filter_sub, root, ch_type):
@@ -169,9 +173,14 @@ def load_files(data_params):
     except TypeError:
         raise TypeError(INVALID_UPARAM_MSG)
 
+    # if the path does not exist, exit and throw exception
     if not os.path.exists(root):
-        wd = os.getcwd()
-        raise FileNotFoundError(wd + root, MISSING_PATH_MSG)
+        raise FileNotFoundError(root, ":", MISSING_PATH_MSG)
+    # if data does not exist at bottom-most path, exit and throw exception
+    for _, dirnames, filenames in os.walk(root):
+        if not dirnames:
+            if not len(filenames):
+                raise FileNotFoundError(root, ":", MISSING_DATA_MSG)
 
     e_sub = exceptions["subjects"]
     e_tasks = exceptions["tasks"]
