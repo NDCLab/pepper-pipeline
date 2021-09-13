@@ -30,8 +30,8 @@ def select_tasks():
 
 
 @pytest.fixture
-def error_tasks():
-    return ["Video1"]
+def error_obj():
+    return None
 
 
 def test_return_values(default_param, select_subjects, select_tasks):
@@ -46,7 +46,7 @@ def test_return_values(default_param, select_subjects, select_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # reject epochs
-        badchans_raw, output_dict = pre.identify_badchans_raw(eeg_obj)
+        _, output_dict = pre.identify_badchans_raw(eeg_obj)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
@@ -58,6 +58,5 @@ def test_except_value(error_obj):
     # attempt to reject channels with data equal to None
     with pytest.raises(Exception):
         _, output_dict = pre.identify_badchans_raw(eeg_obj)
-        assert True
 
         assert isinstance(output_dict, dict)

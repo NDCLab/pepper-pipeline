@@ -65,12 +65,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
 
 
 def test_except_value(error_obj):
-    eeg_obj = error_obj
-
     # attempt to interpolate an invalid object type
     # across each channel
     with pytest.raises(Exception):
-        _, output_dict = pre.interpolate_data(eeg_obj)
-        assert True
-
+        _, output_dict = pre.interpolate_data(error_obj)
         assert isinstance(output_dict, dict)

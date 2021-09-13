@@ -84,8 +84,13 @@ With a Dockerfile, we can construct a docker container with a volume attached to
    ```bash
     docker cp "datatset\path\name" mini:"/home/ubuntu/data"
    ```
-   
-7. Once a docker containerized enviroment is running, link ports by entering
+7. Run a container instance as a root by executing 
+
+   ```bash
+   docker exec -u root -it [containerName] bash
+   ```
+
+8. Once a docker containerized enviroment is running, link ports by entering
 
    ```bash 
    jupyter lab --ip 0.0.0.0 --no-browser --allow-root
