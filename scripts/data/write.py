@@ -89,8 +89,7 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
 
     if os.path.isfile(dir_path + raw_savePath) and not rewrite:
         print(SKIP_REWRITE_MSG)
-    else:
-        obj.save(dir_path + raw_savePath, overwrite=True)
+    obj.save(dir_path + raw_savePath, overwrite=rewrite)
 
 
 def write_template_params(root, subjects=None, tasks=None,
