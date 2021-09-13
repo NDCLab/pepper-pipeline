@@ -9,6 +9,13 @@ import warnings
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
+from scripts.constants import \
+    INVALID_DATA_MSG, \
+    INVALID_FILTER_FREQ_MSG, \
+    INVALID_FR_DATA_MSG, \
+    INVALID_MONTAGE_MSG, \
+    INVALID_UPARAM_MSG
+
 
 def reref_raw(raw, ref_channels=None):
     """Re-reference the data to the average of all electrodes
@@ -35,30 +42,23 @@ def reref_raw(raw, ref_channels=None):
     """
     try:
         raw.load_data()
+    except (AttributeError, TypeError):
+        raise TypeError(INVALID_DATA_MSG)
 
-        # add back reference channel (all zero)
-        if ref_channels is None:
-            raw_new_ref = raw
-        else:
-            raw_new_ref = mne.add_reference_channels(raw,
-                                                     ref_channels=ref_channels)
+    # add back reference channel (all zero)
+    if ref_channels is None:
+        raw_new_ref = raw
+    else:
+        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
 
-        ref_type = "average"
-        raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
+    ref_type = "average"
+    raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
 
-        ref_details = {
-            "Reference Type": ref_type
-        }
-        # return average reference
-        return raw_new_ref, {"Reference": ref_details}
-
-    except TypeError:
-        error = 'Type Error'
-    except Exception:
-        error = 'Unknown Error'
-    print(error)
-    reref_details = {"ERROR": error}
-    return raw, {"Reference": reref_details}
+    ref_details = {
+        "Reference Type": ref_type
+    }
+    # return average reference
+    return raw_new_ref, {"Reference": ref_details}
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
@@ -85,23 +85,22 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     try:
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
+    except (AttributeError, TypeError):
+        raise TypeError(INVALID_DATA_MSG)
+    except ValueError:
+        raise ValueError(INVALID_FILTER_FREQ_MSG)
 
-        h_pass = raw_filtered.info["highpass"]
-        l_pass = raw_filtered.info["lowpass"]
-        samp_freq = raw_filtered.info["sfreq"]
+    h_pass = raw_filtered.info["highpass"]
+    l_pass = raw_filtered.info["lowpass"]
+    samp_freq = raw_filtered.info["sfreq"]
 
-        filter_details = {"Highpass corner frequency": h_pass,
-                          "Lowpass corner frequency": l_pass,
-                          "Sampling Rate": samp_freq}
+    filter_details = {
+        "Highpass corner frequency": h_pass,
+        "Lowpass corner frequency": l_pass,
+        "Sampling Rate": samp_freq
+    }
 
-        return raw_filtered, {"Filter": filter_details}
-    except TypeError:
-        error = 'Type Error'
-    except Exception:
-        error = 'Unknown Error'
-    print(error)
-    filter_details = {"ERROR": error}
-    return raw, {"Filter": filter_details}
+    return raw_filtered, {"Filter": filter_details}
 
 
 def ica_raw(raw, montage):
@@ -121,31 +120,12 @@ def ica_raw(raw, montage):
                       dictionary with relevant ica information
     """
 
-    # set montage
-    # return if value is invalid
     try:
         raw.set_montage(montage)
     except ValueError:
-        print("Invalid value for the 'montage' parameter. Allowed values are\
-        'EGI_256', 'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
-        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
-        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
-        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
-        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
-        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
-        'standard_primed', 'artinis-octamon', and 'artinis-brite23'.")
-
-        montage_error = "Invalid value for the 'montage' parameter. Allowed values are 'EGI_256', \
-        'GSN-HydroCel-128', 'GSN-HydroCel-129', 'GSN-HydroCel-256',\
-        'GSN-HydroCel-257', 'GSN-HydroCel-32', 'GSN-HydroCel-64_1.0',\
-        'GSN-HydroCel-65_1.0', 'biosemi128', 'biosemi16', 'biosemi160',\
-        'biosemi256', 'biosemi32', 'biosemi64', 'easycap-M1', 'easycap-M10',\
-        'mgh60', 'mgh70', 'standard_1005', 'standard_1020',\
-        'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
-        'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
-
-        ica_details = {"ERROR": montage_error}
-        return raw, {"Ica": ica_details}
+        raise ValueError(INVALID_MONTAGE_MSG)
+    except (AttributeError, TypeError):
+        raise TypeError(INVALID_DATA_MSG)
 
     # prepica - step1 - filter
     # High-pass with 1. Hz
@@ -243,12 +223,10 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     during segmentation stage
     """
 
-    if raw is None:
-        error = "Invalid raw object"
-        print(error)
-        return raw, {"Segment": {"ERROR": error}}
-
-    events, event_id = mne.events_from_annotations(raw)
+    try:
+        events, event_id = mne.events_from_annotations(raw)
+    except (TypeError, AttributeError):
+        raise TypeError(INVALID_DATA_MSG)
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -292,19 +270,16 @@ def plot_sensor_locations(epochs, user_params):
     -----------
     Graph plotting of sensor locations
     """
+    try:
+        kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
+        ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
+    except TypeError:
+        raise TypeError(INVALID_UPARAM_MSG)
 
-    if epochs is None:
-        print("Invalid epoch object")
-        sys.exit(1)
-
-    if user_params is None:
-        print("Invalid user_params dictionary")
-        sys.exit(1)
-
-    kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
-    ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
-
-    epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
+    try:
+        epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
+    except TypeError:
+        raise TypeError(INVALID_DATA_MSG)
 
 
 def final_reject_epoch(epochs):
@@ -333,14 +308,9 @@ def final_reject_epoch(epochs):
     try:
         autoRej.fit(epochs)
     except ValueError:
-        fr_error = "The least populated class in y has only 1 member, which is too\
-             few. The minimum number of groups for any class cannot be\
-             less than 2."
-
-        print(fr_error)
-
-        ica_details = {"ERROR": fr_error}
-        return epochs, {"Final Reject": ica_details}
+        raise ValueError(INVALID_FR_DATA_MSG)
+    except (TypeError, AttributeError):
+        raise TypeError(INVALID_DATA_MSG)
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -392,16 +362,14 @@ def interpolate_data(epochs, mode, method, reset_bads):
     ----------
     Modified in place epochs object and output dictionary
     """
-    if epochs is None:
-        error = "Null raw objects"
-        print(error)
-        return epochs, {"Interpolation": {"ERROR": error}}
-
-    epochs.interpolate_bads(mode=mode,
-                            method=method,
-                            reset_bads=reset_bads
-                            )
-    return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
+    try:
+        epochs.interpolate_bads(mode=mode,
+                                method=method,
+                                reset_bads=reset_bads
+                                )
+        return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
+    except (TypeError, AttributeError):
+        raise TypeError(INVALID_DATA_MSG)
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -426,8 +394,8 @@ def plot_orig_and_interp(orig_raw, interp_raw):
 
     """
     if not orig_raw or not interp_raw:
-        print("Null raw objects")
-        sys.exit(1)
+        print(INVALID_DATA_MSG)
+        return 1
 
     for title_, data_ in zip(['orig.', 'interp.'], [orig_raw, interp_raw]):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
