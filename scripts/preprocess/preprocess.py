@@ -3,6 +3,7 @@ import collections
 import mne
 import numpy as np
 import pandas as pd
+import warnings
 
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
@@ -442,13 +443,13 @@ def hurst(data):
     xvals = xvals[0:index]
     yvals = yvals[0:index]
 
-    try:
+    if 0 in xvals or 0 in yvals:
+        print('Func hurst encountered zero in log. Nan value was returned.')
+        return np.nan
+    else:
         logx = np.log(xvals)
         logy = np.log(yvals)
         p2 = np.polyfit(logx, logy, 1)
-    except Exception:
-        print('Log Error!')
-        return np.nan
 
     # Hurst exponent is the slope of the linear fit of log-log plot
     return p2[0]
@@ -507,8 +508,11 @@ def identify_badchans_raw(raw):
                                                         tail=0)]
 
     # find bad channels based on correlations and correct for the distance
-    chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
-    chns_cor[128] = np.nanmean(chns_cor)
+    # ignore the warning when the data has nothing but nan values for the np.nanmean
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
+        chns_cor[128] = np.nanmean(chns_cor)
     reg_cor = np.polyfit(chanlocs['distance'], chns_cor, 2)
     fitcurve_cor = np.polyval(reg_cor, chanlocs['distance'])
     corrected_cor = chns_cor - fitcurve_cor
@@ -519,7 +523,10 @@ def identify_badchans_raw(raw):
 
     # find bad channels based on hurst exponent
     hurst_exp = np.array([hurst(i) for i in raw_data])
-    hurst_exp[np.isnan(hurst_exp)] = np.nanmean(hurst_exp)
+    # ignore the warning when the data has nothing but nan values for the np.nanmean
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        hurst_exp[np.isnan(hurst_exp)] = np.nanmean(hurst_exp)
     bads_loc = np.where(abs(zscore(hurst_exp)) > 3)[0]
     bads_hurst = [raw.ch_names[i] for i in bads_loc]
 
