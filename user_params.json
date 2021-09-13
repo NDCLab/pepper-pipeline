@@ -1,6 +1,6 @@
 {
   "load_data": {
-    "root": "/home/data/NDClab/data/base-eeg/CMI/rawdata",
+    "root": "CMI/rawdata",
     "subjects": ["*"],
     "tasks": ["*"],
     "exceptions": {
@@ -8,7 +8,10 @@
       "tasks": "", 
       "runs": ""
     },
-    "channel-type": "eeg"
+    "channel-type": "eeg",
+    "exit_on_error": false,
+    "overwrite": true,
+    "parallel_runs": false
   }, 
 
   "preprocess": {
@@ -43,6 +46,6 @@
     }
   },
   "output_data": {
-    "root": "/home/data/NDClab/data/base-eeg/CMI"
+    "root": "CMI"
   }
 }

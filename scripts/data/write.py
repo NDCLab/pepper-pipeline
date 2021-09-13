@@ -1,24 +1,20 @@
 import json
-import sys
 import os
 import mne
 
 from scripts.constants import \
     PIPE_NAME, \
     INTERM, \
-    FINAL
+    FINAL, \
+    SKIP_REWRITE_MSG
 
 
-def read_dict_to_json(dict_array, file, datatype, root):
-    if dict_array is None:
-        print("Invalid dictionary array", file=sys.stderr)
-        sys.exit(1)
-
+def write_output_param(dict_array, file, datatype, root, rewrite):
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
     # Creates the directory if it does not exist
-    dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
+    dir_path = '{}/derivatives/{}/{}/sub-{}/ses-{}/{}/'.format(
         root, PIPE_NAME, PIPE_NAME + FINAL, subj, ses, datatype)
 
     temp = ""
@@ -26,19 +22,21 @@ def read_dict_to_json(dict_array, file, datatype, root):
         temp += sec + "/"
         # checks that the directory path doesn't already exist
         if not os.path.isdir(temp):
-            os.chmod(temp, 0o644)  # set temp to be writable by user
             os.mkdir(temp)  # creates the directory path
 
     bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    with open(dir_path + bids_format, 'w') as file:
-        str = json.dumps(dict_array, indent=4)
-        file.seek(0)
-        file.write(str)
+    if os.path.isfile(dir_path + bids_format) and not rewrite:
+        print(SKIP_REWRITE_MSG)
+    else:
+        with open(dir_path + bids_format, 'w') as file:
+            str = json.dumps(dict_array, indent=4)
+            file.seek(0)
+            file.write(str)
 
 
-def write_eeg_data(obj, func, file, datatype, final, root):
+def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
     """Used to store the modified raw file after each processing step
     Parameters:
     -----------
@@ -72,7 +70,7 @@ def write_eeg_data(obj, func, file, datatype, final, root):
     func = PIPE_NAME if final else func.replace("_", "")
 
     # puts together the path to be created
-    dir_path = '{}/derivatives/pipeline_{}/{}/sub-{}/ses-{}/{}/'.format(
+    dir_path = '{}/derivatives/{}/{}/sub-{}/ses-{}/{}/'.format(
         root, PIPE_NAME, child_dir, subj, ses, datatype)
 
     dir_section = dir_path.split("/")
@@ -86,10 +84,12 @@ def write_eeg_data(obj, func, file, datatype, final, root):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = dir_path + 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
+    raw_savePath = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
-    obj.save(raw_savePath, overwrite=True)
+    if os.path.isfile(dir_path + raw_savePath) and not rewrite:
+        print(SKIP_REWRITE_MSG)
+    obj.save(dir_path + raw_savePath, overwrite=rewrite)
 
 
 def write_template_params(root, subjects=None, tasks=None,
