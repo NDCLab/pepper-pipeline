@@ -104,7 +104,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     return raw_filtered, {"Filter": filter_details}
 
 
-def ica_raw(raw, montage, ref_channels=None):
+def ica_raw(raw, montage):
     """Automatic artifacts identification - raw data is modified in place
     Parameters:
     ----------
@@ -113,8 +113,6 @@ def ica_raw(raw, montage, ref_channels=None):
             and bad channels removal)
     montage:    str
                 montage
-    ref_channels: str
-                  the name of the reference channel
 
     Returns:
     ----------
@@ -131,17 +129,8 @@ def ica_raw(raw, montage, ref_channels=None):
     except (AttributeError, TypeError):
         raise TypeError(INVALID_DATA_MSG)
 
-    # reference channel can not be None
-    if ref_channels is None:
-        ref_error = "ref_channels == None. You need to set a reference channel."
-        ica_details = {"ERROR": ref_error}
-        return raw, {"Ica": ica_details}
-
     # prep for ica - make a copy
     raw_filtered_1 = raw.copy()
-
-    # remove reference channel
-    raw_filtered_1.drop_channels(ref_channels)
 
     # High-pass with 1. Hz cut-off is recommended for ICA
     raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
@@ -161,9 +150,9 @@ def ica_raw(raw, montage, ref_channels=None):
     epochs_bads = epochs_original - epochs_bads_removal
 
     # ica
-    method = 'picard'
+    method = 'infomax'
     max_iter = 'auto'
-    fit_params = dict(ortho=False, extended=True)
+    fit_params = dict(extended=True)
     ica = mne.preprocessing.ICA(n_components=None,
                                 method=method,
                                 max_iter=max_iter,
