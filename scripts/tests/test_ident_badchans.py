@@ -2,9 +2,11 @@ from scripts.preprocess import preprocess as pre
 from scripts.data import load, write
 
 import pytest
-import mne_bids
 
 from pathlib import Path
+
+import mne_bids
+from mne.io import BaseRaw
 
 
 @pytest.fixture
@@ -46,17 +48,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # reject epochs
-        _, output_dict = pre.identify_badchans_raw(eeg_obj)
+        badchan_obj, output_dict = pre.identify_badchans_raw(eeg_obj)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
-
-
-def test_except_value(error_obj):
-    eeg_obj = error_obj
-
-    # attempt to reject channels with data equal to None
-    with pytest.raises(Exception):
-        _, output_dict = pre.identify_badchans_raw(eeg_obj)
-
-        assert isinstance(output_dict, dict)
+        assert isinstance(badchan_obj, BaseRaw)
