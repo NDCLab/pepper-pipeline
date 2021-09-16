@@ -6,6 +6,7 @@ import pytest
 from pathlib import Path
 
 import mne_bids
+from mne.io import BaseRaw
 
 
 @pytest.fixture
@@ -56,16 +57,17 @@ def test_return_values(default_param, sel_subjects, sel_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # filter data
-        _, output_dict = pre.filter_data(eeg_obj, **filt_param)
+        filt_obj, output_dict = pre.filter_data(eeg_obj, **filt_param)
 
-        # assert that None does not exist in final reject
+        # assert valid output objects
         assert None not in output_dict.values()
+        assert isinstance(filt_obj, BaseRaw)
 
 
 def test_except_bad_object(error_obj):
     # attempt to filter data w/invalid data
-    _, output_dict = pre.filter_data(error_obj)
-    assert isinstance(output_dict, dict)
+    with pytest.raises(TypeError):
+        _, _ = pre.filter_data(error_obj)
 
 
 def test_except_bad_params(default_param, sel_subjects, sel_tasks, error_val):
@@ -80,5 +82,5 @@ def test_except_bad_params(default_param, sel_subjects, sel_tasks, error_val):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # filter data
-        _, output_dict = pre.filter_data(eeg_obj, error_val, error_val)
-        assert isinstance(output_dict, dict)
+        with pytest.raises(ValueError):
+            _, _ = pre.filter_data(eeg_obj, error_val, error_val)
