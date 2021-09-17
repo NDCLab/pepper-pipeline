@@ -6,7 +6,7 @@ import pytest
 from pathlib import Path
 
 import mne_bids
-from mne import Epochs
+from mne.io import BaseRaw
 
 
 @pytest.fixture
@@ -54,16 +54,14 @@ def test_return_values(default_param, select_subjects, select_tasks):
         # reref the data
         reref_eeg, output_dict = pre.reref_raw(eeg_obj, **reref_param)
 
-        # assert that None does not exist in final reject
+        # assert that all data is valid
         assert None not in output_dict.values()
-
-        # assert object returned is epoch object
-        assert isinstance(reref_eeg, Epochs)
+        assert isinstance(reref_eeg, BaseRaw)
 
 
 def test_except_value(error_obj):
     eeg_obj = error_obj
 
     # attempt to reref w/invalid data
-    _, output_dict = pre.reref_raw(eeg_obj)
-    assert isinstance(output_dict, dict)
+    with pytest.raises(TypeError):
+        _, _ = pre.reref_raw(eeg_obj)
