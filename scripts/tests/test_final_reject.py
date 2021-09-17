@@ -38,6 +38,11 @@ def error_tasks():
     return ["Video1"]
 
 
+@pytest.fixture
+def error_obj():
+    return None
+
+
 def test_return_values(default_param, select_subjects, select_tasks):
 
     default_param["load_data"]["subjects"] = select_subjects
@@ -55,13 +60,18 @@ def test_return_values(default_param, select_subjects, select_tasks):
         # generate epoched object to be rejected
         epo, _ = pre.segment_data(eeg_obj, **feature_params["segment_data"])
         # reject epochs
+        epo.load_data()
         rej_epo, output_dict = pre.final_reject_epoch(epo)
 
-        # assert that None does not exist in final reject
+        # assert that data is valid
         assert None not in output_dict.values()
-
-        # assert object returned is epoch object
         assert isinstance(rej_epo, Epochs)
+
+
+def test_except_bad_object(error_obj):
+    # attempt to filter data w/invalid data
+    with pytest.raises(TypeError):
+        _, _ = pre.final_reject_epoch(error_obj)
 
 
 def test_except_value(default_param, select_subjects, error_tasks):
@@ -84,5 +94,4 @@ def test_except_value(default_param, select_subjects, error_tasks):
         # attempt to reject epochs with data containing only one entire epoch
         # across each channel
         with pytest.raises(ValueError):
-            _, output_dict = pre.final_reject_epoch(epo)
-            assert isinstance(output_dict, dict)
+            _, _ = pre.final_reject_epoch(epo)
