@@ -54,10 +54,8 @@ def test_return_values(default_param, select_subjects, select_tasks):
         # segment data
         seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
 
-        # assert that None does not exist in final reject
+        # assert that data is valid
         assert None not in output_dict.values()
-
-        # assert object returned is epoch object
         assert isinstance(seg_epo, Epochs)
 
 
@@ -68,5 +66,5 @@ def test_except_value(default_param, error_obj):
     seg_param = feature_params["segment_data"]
 
     # attempt to segment epochs with invalid epoch object
-    _, output_dict = pre.segment_data(error_obj, **seg_param)
-    assert isinstance(output_dict, dict)
+    with pytest.raises(TypeError):
+        _, _ = pre.segment_data(error_obj, **seg_param)
