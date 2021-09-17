@@ -2,10 +2,11 @@ from scripts.preprocess import preprocess as pre
 from scripts.data import load, write
 
 import pytest
-import mne_bids
 
 from pathlib import Path
 
+import mne_bids
+from mne.io import BaseRaw
 
 @pytest.fixture
 def root():
@@ -55,10 +56,11 @@ def test_return_values(default_param, sel_subjects, sel_tasks):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # reject epochs
-        _, output_dict = pre.ica_raw(eeg_obj, **ica_param)
+        ica_obj, output_dict = pre.ica_raw(eeg_obj, **ica_param)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
+        assert isinstance(ica_obj, BaseRaw)
 
 
 def test_except_bad_object(default_param, error_obj):
@@ -66,20 +68,5 @@ def test_except_bad_object(default_param, error_obj):
     ica_param = feature_params["ica_raw"]
 
     # attempt to process ica w/invalid data
-    _, output_dict = pre.ica_raw(error_obj, **ica_param)
-    assert isinstance(output_dict, dict)
-
-
-def test_except_bad_montage(default_param, sel_subjects, sel_tasks, error_mnt):
-    default_param["load_data"]["subjects"] = sel_subjects
-    default_param["load_data"]["tasks"] = sel_tasks
-
-    # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
-
-    # attempt to run ica_raw w/invalid montage
-    for file in data:
-        eeg_obj = mne_bids.read_raw_bids(file)
-
-        _, output_dict = pre.ica_raw(eeg_obj, error_mnt)
-        assert isinstance(output_dict, dict)
+    with pytest.raises(TypeError):
+        _, _ = pre.ica_raw(error_obj, **ica_param)
