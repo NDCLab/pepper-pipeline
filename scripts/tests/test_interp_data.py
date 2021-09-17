@@ -55,12 +55,11 @@ def test_return_values(default_param, select_subjects, select_tasks):
         epo, _ = pre.segment_data(eeg_obj, **feature_params["segment_data"])
 
         # interpolate data
+        epo.load_data()
         interp_eeg, output_dict = pre.interpolate_data(epo, **interp_param)
 
-        # assert that None does not exist in final reject
+        # assert that all data is valid
         assert None not in output_dict.values()
-
-        # assert object returned is epoch object
         assert isinstance(interp_eeg, Epochs)
 
 
@@ -68,5 +67,4 @@ def test_except_value(error_obj):
     # attempt to interpolate an invalid object type
     # across each channel
     with pytest.raises(Exception):
-        _, output_dict = pre.interpolate_data(error_obj)
-        assert isinstance(output_dict, dict)
+        _, _ = pre.interpolate_data(error_obj)
