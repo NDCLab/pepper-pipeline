@@ -21,7 +21,7 @@ write_params = user_params["output_data"]
 # get pipeline parameters
 ch_type = data_params["channel-type"]
 exit_on_error = data_params["exit_on_error"]
-rewrite = data_params["rewrite"]
+rewrite = data_params["overwrite"]
 path = write_params["root"]
 
 # get set of subjects & tasks to run while omitting existing exceptions

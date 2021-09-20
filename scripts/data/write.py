@@ -10,6 +10,26 @@ from scripts.constants import \
 
 
 def write_output_param(dict_array, file, datatype, root, rewrite):
+    """Write output parameters of completed pipeline
+    Parameters:
+    -----------
+    dict_array: dict
+                Dictionary object containing conjoined outputs
+    file:   String
+            Name of unprocessed EEG object
+    datatype:   String
+                Data-type of file
+    root:   String
+            Path to write to
+    rewrite:    Bool
+                Boolean value to indicate if file should be overwritten
+
+    Returns:
+    ----------
+    None | String
+        None is returned if file-write is skipped due to overwrite
+        String name of file is returned if file is successfully written
+    """
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
@@ -45,18 +65,20 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
             EEG Object generated from pipeline
     func:   String
             name of the function
-    subject:    String
-                name of the subject
-    session:    String
-                session number
-    task:   String
-            name of the task
+    file:   String
+            Name of unprocessed EEG object
     datatype:   String
                 type of data(e.g EEG, MEG, etc )
     final:  boolean
             boolean that determines if eeg object written is the final
     root:   String
             directory from where the data was loaded
+
+    Returns:
+    ----------
+    None | String
+        None is returned if file-write is skipped due to overwrite
+        String name of file is returned if file is successfully written
     """
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
