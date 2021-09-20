@@ -73,6 +73,8 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
             boolean that determines if eeg object written is the final
     root:   String
             directory from where the data was loaded
+    rewrite:    Bool
+                Boolean value to indicate if file should be overwritten
 
     Returns:
     ----------
@@ -117,7 +119,7 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
     return file_name
 
 
-def write_template_params(root, subjects=None, tasks=None,
+def write_template_params(root, write_root, subjects=None, tasks=None,
                           e_subj=None, e_task=None, e_run=None, to_file=None):
     """Function to write out default user_params.json file
     Parameters:
@@ -197,7 +199,7 @@ def write_template_params(root, subjects=None, tasks=None,
 
     # set up write_data params
     user_params["output_data"] = {
-        "root": "CMI"
+        "root": write_root
     }
 
     if to_file is not None:
