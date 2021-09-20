@@ -8,6 +8,7 @@ from pathlib import Path
 import mne_bids
 from mne.io import BaseRaw
 
+
 @pytest.fixture
 def root():
     root = Path("CMI/rawdata")
