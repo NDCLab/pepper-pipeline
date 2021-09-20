@@ -112,7 +112,9 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
     file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
+    # if the file has already been created, and it should not overwrite
     if os.path.isfile(dir_path + file_name) and not rewrite:
+        # skip this write by returning none
         print(SKIP_REWRITE_MSG)
         return None
     obj.save(dir_path + file_name, overwrite=rewrite)
