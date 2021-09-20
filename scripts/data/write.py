@@ -24,16 +24,17 @@ def write_output_param(dict_array, file, datatype, root, rewrite):
         if not os.path.isdir(temp):
             os.mkdir(temp)  # creates the directory path
 
-    bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
+    file_name = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    if os.path.isfile(dir_path + bids_format) and not rewrite:
+    if os.path.isfile(dir_path + file_name) and not rewrite:
         print(SKIP_REWRITE_MSG)
-    else:
-        with open(dir_path + bids_format, 'w') as file:
-            str = json.dumps(dict_array, indent=4)
-            file.seek(0)
-            file.write(str)
+        return None
+    with open(dir_path + file_name, 'w') as file:
+        str = json.dumps(dict_array, indent=4)
+        file.seek(0)
+        file.write(str)
+    return file_name
 
 
 def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
@@ -84,12 +85,14 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
+    file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
-    if os.path.isfile(dir_path + raw_savePath) and not rewrite:
+    if os.path.isfile(dir_path + file_name) and not rewrite:
         print(SKIP_REWRITE_MSG)
-    obj.save(dir_path + raw_savePath, overwrite=rewrite)
+        return None
+    obj.save(dir_path + file_name, overwrite=rewrite)
+    return file_name
 
 
 def write_template_params(root, subjects=None, tasks=None,
