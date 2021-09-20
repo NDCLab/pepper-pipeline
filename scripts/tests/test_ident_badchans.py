@@ -16,19 +16,26 @@ def root():
 
 
 @pytest.fixture
-def default_param(root):
+def default_params(root):
     default_param = write.write_template_params(root)
     return default_param
 
 
 @pytest.fixture
-def select_subjects():
+def sel_subjects():
     return ["NDARAB793GL3"]
 
 
 @pytest.fixture
-def select_tasks():
+def sel_tasks():
     return ["ContrastChangeBlock1"]
+
+
+@pytest.fixture
+def select_data_params(default_params, sel_subjects, sel_tasks):
+    default_params["load_data"]["subjects"] = sel_subjects
+    default_params["load_data"]["tasks"] = sel_tasks
+    return default_params
 
 
 @pytest.fixture
@@ -36,13 +43,10 @@ def error_obj():
     return None
 
 
-def test_return_values(default_param, select_subjects, select_tasks):
-
-    default_param["load_data"]["subjects"] = select_subjects
-    default_param["load_data"]["tasks"] = select_tasks
+def test_return_values(select_data_params):
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(select_data_params["load_data"])
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
