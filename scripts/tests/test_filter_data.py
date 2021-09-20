@@ -16,7 +16,7 @@ def root():
 
 
 @pytest.fixture
-def default_param(root):
+def default_params(root):
     default_param = write.write_template_params(root)
     return default_param
 
@@ -32,6 +32,13 @@ def sel_tasks():
 
 
 @pytest.fixture
+def select_data_params(default_params, sel_subjects, sel_tasks):
+    default_params["load_data"]["subjects"] = sel_subjects
+    default_params["load_data"]["tasks"] = sel_tasks
+    return default_params
+
+
+@pytest.fixture
 def error_obj():
     return None
 
@@ -41,16 +48,12 @@ def error_val():
     return 1.0
 
 
-def test_return_values(default_param, sel_subjects, sel_tasks):
-
-    default_param["load_data"]["subjects"] = sel_subjects
-    default_param["load_data"]["tasks"] = sel_tasks
-
+def test_return_values(select_data_params):
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(select_data_params["load_data"])
 
     # get the pipeline steps
-    feature_params = default_param["preprocess"]
+    feature_params = select_data_params["preprocess"]
     filt_param = feature_params["filter_data"]
 
     for file in data:
@@ -70,13 +73,9 @@ def test_except_bad_object(error_obj):
         _, _ = pre.filter_data(error_obj)
 
 
-def test_except_bad_params(default_param, sel_subjects, sel_tasks, error_val):
-
-    default_param["load_data"]["subjects"] = sel_subjects
-    default_param["load_data"]["tasks"] = sel_tasks
-
+def test_except_bad_params(select_data_params, error_val):
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(select_data_params["load_data"])
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
