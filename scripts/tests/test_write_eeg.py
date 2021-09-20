@@ -15,13 +15,15 @@ def root():
 
 
 @pytest.fixture
-def default_params(root):
-    default_param = write.write_template_params(root)
+def default_params(root, tmp_path):
+    default_param = write.write_template_params(root, tmp_path)
     return default_param
 
 
 @pytest.fixture
 def overwrite_params(default_params):
+    default_params["load_data"]["subjects"] = sel_subjects
+    default_params["load_data"]["tasks"] = sel_tasks
     default_params["load_data"]["rewrite"] = False
     return default_params
 
@@ -81,9 +83,13 @@ def test_overwrite(select_data_params, write_root, tmp_func):
     data = load.load_files(data_params)
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
-        write.write_eeg_data(eeg_obj, tmp_func, file, ch_type, 0, write_root,
-                             rewrite)
-        for _, dirnames, filenames in os.walk(write_root):
-            # if at bottom-most directory, assert one file has been written
-            if not dirnames:
-                assert len(filenames) == 1
+        # first write
+        first_write = write.write_eeg_data(eeg_obj, tmp_func, file,
+                                           ch_type, 0, write_root, rewrite)
+
+        # overwrite
+        overwrite = write.write_eeg_data(eeg_obj, tmp_func, file,
+                                         ch_type, 0, write_root, rewrite)
+
+        # assert first write produced string and second produced string again
+        assert isinstance(first_write, str) and isinstance(overwrite, str)

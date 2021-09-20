@@ -16,8 +16,8 @@ def root():
 
 
 @pytest.fixture
-def default_params(root):
-    default_param = write.write_template_params(root)
+def default_params(root, tmp_path):
+    default_param = write.write_template_params(root, tmp_path)
     return default_param
 
 
