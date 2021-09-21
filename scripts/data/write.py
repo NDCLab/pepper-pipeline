@@ -196,9 +196,6 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
         }
     }
 
-    # set up postprocess params Pipeline has not yet been implemented!
-    user_params["postprocess"] = {}
-
     # set up write_data params
     user_params["output_data"] = {
         "root": write_root
