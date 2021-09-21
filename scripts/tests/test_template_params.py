@@ -14,7 +14,9 @@ def root():
 
 @pytest.fixture
 def write_path():
-    return "test"
+    fn = "test"
+    os.mkdir(fn)
+    return fn
 
 
 @pytest.fixture
