@@ -1,6 +1,5 @@
 from scripts.data import write, load
 from scripts.preprocess import preprocess as pre
-from collections import ChainMap
 
 import pytest
 
