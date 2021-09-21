@@ -128,6 +128,8 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
     -----------
     root:   string
             string of path to data root
+    write_root: string
+                string of path to write root
     subjects:   list | None
                 a list of subjects for subject selection. None is default
     tasks:  list | None

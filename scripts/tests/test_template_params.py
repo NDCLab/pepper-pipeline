@@ -25,7 +25,8 @@ def default_params(root, tmp_path):
 
 @pytest.fixture
 def default_params_write(root, tmp_path, write_path):
-    default_param = write.write_template_params(root, tmp_path)
+    default_param = write.write_template_params(str(root), str(tmp_path),
+                                                to_file=write_path)
     return default_param
 
 
@@ -69,7 +70,7 @@ def ica_params():
 
 @pytest.fixture
 def segment_params():
-    return set(["tmin", "tmax", "baseline", "picks", "reject_tmin", 
+    return set(["tmin", "tmax", "baseline", "picks", "reject_tmin",
                 "reject_tmax", "decim", "verbose", "preload"])
 
 
@@ -127,12 +128,16 @@ def test_params(default_params, load_params, preprocess_params, write_params,
     assert reref_params == set(reref)
 
 
-def test_write(default_params_write, tmp_path, write_path):
+def test_write(default_params_write, write_path):
     # check if file has been written
     for _, dirnames, filenames in os.walk(write_path):
         if not dirnames:
             assert len(filenames) == 1
     # assert that the written file is the same as user_params
-    with open(tmp_path) as fp:
+    with open(write_path + "\\user_params.json") as fp:
         written_params = json.load(fp)
     assert default_params_write == written_params
+
+    # remove temp directory
+    os.remove(write_path + "\\user_params.json")
+    os.rmdir(write_path)
