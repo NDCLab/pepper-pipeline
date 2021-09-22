@@ -4,6 +4,8 @@
 
 ![baseeegheader](https://user-images.githubusercontent.com/26397102/117209976-b958e600-adbc-11eb-8f23-d6015a28935e.png)
 
+HELLO!!!
+
 # PEPPER-Pipeline: A Python-based, Easy, Pre-Processing EEG Reproducible Pipeline
 A BIDS compliant, scalable (i.e., HPC-ready), python-based pipeline for processing EEG data in a computationally reproducible framework (leveraging containerized computing using Docker or Singularity). 
 
