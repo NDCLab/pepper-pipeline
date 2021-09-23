@@ -11,7 +11,7 @@
     "channel-type": "eeg",
     "exit_on_error": false,
     "overwrite": true,
-    "parallel_runs": false
+    "parallel": false
   }, 
 
   "preprocess": {

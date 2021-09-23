@@ -16,8 +16,8 @@ def root():
 
 
 @pytest.fixture
-def default_param(root):
-    default_param = write.write_template_params(root)
+def default_param(root, tmp_path):
+    default_param = write.write_template_params(root, tmp_path)
     return default_param
 
 
@@ -149,8 +149,6 @@ def test_select_subj_task(default_param, subj_files, select_subj, select_task):
     count = 0
     for subject in select_subj:
         for file in subj_files[subject]:
-
-            # split and find task of file (TODO: need to BIDSIFY)
             task_id = [s for s in file.split("_") if "task" in s][0]
             task = [s for s in task_id.split("-") if s != "task"][0]
 
@@ -465,12 +463,26 @@ def test_missing_except_run(default_param, error_except_param, all):
         assert True
 
 
-def test_bad_path(default_param, tmp_path):
+def test_missing_data(default_param, tmp_path):
     # create empty and temporary directory
-    empty_data = str(tmp_path) + "empty"
+    empty_path = str(tmp_path) + "empty"
+    os.mkdir(empty_path)
 
     # input invalid value for tasks
-    default_param["load_data"]["root"] = empty_data
+    default_param["load_data"]["root"] = empty_path
+
+    # Load data using the invalid field
+    with pytest.raises(FileNotFoundError):
+        load.load_files(default_param["load_data"])
+        assert True
+
+
+def test_bad_path(default_param, tmp_path):
+    # create empty and temporary directory
+    invalid_path = str(tmp_path) + "empty"
+
+    # input invalid value for tasks
+    default_param["load_data"]["root"] = invalid_path
 
     # Load data using the invalid field
     with pytest.raises(FileNotFoundError):

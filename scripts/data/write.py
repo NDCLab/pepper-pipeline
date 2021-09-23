@@ -10,6 +10,26 @@ from scripts.constants import \
 
 
 def write_output_param(dict_array, file, datatype, root, rewrite):
+    """Write output parameters of completed pipeline
+    Parameters:
+    -----------
+    dict_array: dict
+                Dictionary object containing conjoined outputs
+    file:   String
+            Name of unprocessed EEG object
+    datatype:   String
+                Data-type of file
+    root:   String
+            Path to write to
+    rewrite:    Bool
+                Boolean value to indicate if file should be overwritten
+
+    Returns:
+    ----------
+    None | String
+        None is returned if file-write is skipped due to overwrite
+        String name of file is returned if file is successfully written
+    """
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
 
@@ -24,16 +44,17 @@ def write_output_param(dict_array, file, datatype, root, rewrite):
         if not os.path.isdir(temp):
             os.mkdir(temp)  # creates the directory path
 
-    bids_format = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
+    file_name = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    if os.path.isfile(dir_path + bids_format) and not rewrite:
+    if os.path.isfile(dir_path + file_name) and not rewrite:
         print(SKIP_REWRITE_MSG)
-    else:
-        with open(dir_path + bids_format, 'w') as file:
-            str = json.dumps(dict_array, indent=4)
-            file.seek(0)
-            file.write(str)
+        return None
+    with open(dir_path + file_name, 'w') as file:
+        str = json.dumps(dict_array, indent=4)
+        file.seek(0)
+        file.write(str)
+    return file_name
 
 
 def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
@@ -44,18 +65,22 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
             EEG Object generated from pipeline
     func:   String
             name of the function
-    subject:    String
-                name of the subject
-    session:    String
-                session number
-    task:   String
-            name of the task
+    file:   String
+            Name of unprocessed EEG object
     datatype:   String
                 type of data(e.g EEG, MEG, etc )
     final:  boolean
             boolean that determines if eeg object written is the final
     root:   String
             directory from where the data was loaded
+    rewrite:    Bool
+                Boolean value to indicate if file should be overwritten
+
+    Returns:
+    ----------
+    None | String
+        None is returned if file-write is skipped due to overwrite
+        String name of file is returned if file is successfully written
     """
     # get file metadata
     subj, ses, task, run = file.subject, file.session, file.task, file.run
@@ -84,21 +109,27 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
             os.mkdir(temp)  # creates the directory path
 
     # saves the raw file in the directory
-    raw_savePath = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
+    file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
-    if os.path.isfile(dir_path + raw_savePath) and not rewrite:
+    # if the file has already been created, and it should not overwrite
+    if os.path.isfile(dir_path + file_name) and not rewrite:
+        # skip this write by returning none
         print(SKIP_REWRITE_MSG)
-    obj.save(dir_path + raw_savePath, overwrite=rewrite)
+        return None
+    obj.save(dir_path + file_name, overwrite=rewrite)
+    return file_name
 
 
-def write_template_params(root, subjects=None, tasks=None,
+def write_template_params(root, write_root, subjects=None, tasks=None,
                           e_subj=None, e_task=None, e_run=None, to_file=None):
     """Function to write out default user_params.json file
     Parameters:
     -----------
     root:   string
             string of path to data root
+    write_root: string
+                string of path to write root
     subjects:   list | None
                 a list of subjects for subject selection. None is default
     tasks:  list | None
@@ -128,7 +159,10 @@ def write_template_params(root, subjects=None, tasks=None,
         "subjects": ["*"] if subjects is None else subjects,
         "tasks": ["*"] if tasks is None else tasks,
         "exceptions": exceptions,
-        "channel-type": "eeg"
+        "channel-type": "eeg",
+        "exit_on_error": False,
+        "overwrite": True,
+        "parallel": False
     }
 
     # set up default preprocess params
@@ -164,12 +198,9 @@ def write_template_params(root, subjects=None, tasks=None,
         }
     }
 
-    # set up postprocess params Pipeline has not yet been implemented!
-    user_params["postprocess"] = {}
-
     # set up write_data params
     user_params["output_data"] = {
-        "root": "CMI"
+        "root": write_root
     }
 
     if to_file is not None:

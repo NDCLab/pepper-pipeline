@@ -42,10 +42,10 @@ def _init_subjects(filter_sub, root, ch_type):
     files: list
            a list of partially filtered BIDS paths according to subjects
     """
-    if filter_sub == ["*"]:
-        filter_sub = mne_bids.get_entity_vals(root, 'subject')
     if not isinstance(filter_sub, list):
         raise TypeError(INVALID_SUBJ_PARAM_MSG)
+    if filter_sub == ["*"]:
+        filter_sub = mne_bids.get_entity_vals(root, 'subject')
 
     filtered_subjects = []
     bids_root = pathlib.Path(root)
@@ -77,10 +77,10 @@ def _filter_tasks(filter_tasks, files):
     files: list
            a list of partially filtered BIDS paths according to tasks
     """
-    if filter_tasks == ["*"]:
-        return files
     if not isinstance(filter_tasks, list):
         raise TypeError(INVALID_TASK_PARAM_MSG)
+    if filter_tasks == ["*"]:
+        return files
 
     return [f for f in files if f.task in filter_tasks]
 
