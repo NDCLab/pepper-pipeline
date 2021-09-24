@@ -36,6 +36,9 @@ INVALID_MONTAGE_MSG = "Invalid value for the 'montage' parameter. Allowed values
         'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
         'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
 
+MISSING_MONTAGE_MSG = "This operation requires a montage however the data does not have a montage applied. \
+Add a montage prior to this step via set_montage()."
+
 # write error messages
 SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
  parameter."

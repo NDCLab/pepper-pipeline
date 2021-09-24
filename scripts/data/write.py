@@ -133,6 +133,9 @@ def write_template_params(root, subjects=None, tasks=None,
 
     # set up default preprocess params
     user_params["preprocess"] = {
+        "set_montage": {
+            "montage": "standard_1020"
+        },
         "filter_data": {
             "l_freq": 0.3,
             "h_freq": 40
@@ -140,7 +143,6 @@ def write_template_params(root, subjects=None, tasks=None,
         "identify_badchans_raw": {
         },
         "ica_raw": {
-            "montage": "standard_1020"
         },
         "segment_data": {
             "tmin": -0.2,
