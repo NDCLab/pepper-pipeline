@@ -1,24 +1,12 @@
-# Containerization 
-Containerization is an alternative or companion to virtualization. It involves encapsulating or packaging up software and all its dependencies so that it can run uniformly and consistently on any infrastructure. This allows for developers to create and deploy applications faster and more securely. Moreover, this allows researchers to replicate each others analyses deterministically (computational replicability). The image built using the dockerfile has all the base functionality required for analysis, such as Python, MNE, Nipype, TensorFlow, Pandas, and more.  
+# Singularity and Docker
+The images described below are container files that all have the base functionality required for reliably running, testing, and developing the PEPPER pipeline. This includes Python, MNE, Pandas, and more.
+
+# Docker
+
+## Pulling Existing Container
 
 
-## What is Docker?
-
-Docker is a set of platform as a service products that use OS-level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries, and configuration files. 
-
-## What is a Docker Volume? 
-Docker volumes are the preferred mechanism for persisting data generated 
-by and used by Docker containers. While bind mounts are dependent on the 
-directory structure and OS of the host machine, volumes are completely 
-managed by Docker. Volumes have several advantages over bind mounts: 
-* Volumes are easier to back up or migrate than bind mounts.
-* Volumes on Docker Desktop have much higher performance than bind mounts from Mac and Windows hosts.
-* Volumes can be more safely shared among multiple containers.
-
-Volumes are often a better choice than persisting data in a container’s writable layer, because a volume does not increase the size of the containers using it, and the volume’s contents exist outside the lifecycle of a given container. 
-
-As a default, you should use volume mounts instead of bind mounts.
-
+## Building New Container
 
 ## How to Use Docker? 
 With a Dockerfile, we can construct a docker container with a volume attached to it. To begin using docker: 
@@ -90,14 +78,37 @@ With a Dockerfile, we can construct a docker container with a volume attached to
    docker exec -u root -it [containerName] bash
    ```
 
-8. Once a docker containerized enviroment is running, link ports by entering
+# Singularity
 
-   ```bash 
-   jupyter lab --ip 0.0.0.0 --no-browser --allow-root
-   ```
+As there is currently no central repository of Singularity container images, the image must be built from the `eeg-pipe.recipe` file. 
 
-The jupyter notebook then can be accessed through: 
- 
-* Following link listed in terminal 
+The image must be built in a Linux environment with root access, as Singularity is only compatible for Linux environments and permissions outside of the container will be mirrored to inside of the container. This means that unless you are an administrator on your HPC, you must build this container in a local environment before moving it to your cluster.
 
-* Copying and pasting localhost:5000/lab in browser  
+To install Singularity to a Linux OS, follow [these instructions](https://sylabs.io/guides/3.0/user-guide/installation.html).
+
+Once singularity is installed, confirm the installation by running:
+```
+singularity --version
+```
+
+Once that is confirmed, proceed with the following steps to build the image:
+
+1. Navigate to the container folder and build the container image using the `build` command. The build time will depend on the container size, with large containers taking more time to build. 
+```
+cd container
+sudo singularity build pepper-container.simg eeg-pipe.recipe
+```
+
+2. If you are planning to use this container image on a cluster, export the container file to your cluster using your preferred means of data-transfer. Once that is complete, navigate to your cluster's login node. 
+
+3. To interact with a shell instance of the container image, execute the `shell` command:
+```
+singularity shell container/pepper-container.simg.simg
+```
+
+Additionally, if you would like to bind specific data paths to the container, execute the above `shell` command with the `--bind` tag:
+```
+singularity shell --bind [path]/[to]/[data],[path]/[to]/[data2] container/pepper-container.simg.simg
+```
+
+4. To find out more about the functionality of Singularity, view the following [documentation](https://sylabs.io/guides/3.0/user-guide/quick_start.html).
