@@ -15,7 +15,40 @@ from scripts.constants import \
     INVALID_FILTER_FREQ_MSG, \
     INVALID_FR_DATA_MSG, \
     INVALID_MONTAGE_MSG, \
-    INVALID_UPARAM_MSG
+    INVALID_UPARAM_MSG, \
+    MISSING_MONTAGE_MSG
+
+
+def set_montage(raw, montage):
+    """Associate a montage with the dataset
+    Parameters
+    ----------
+    raw:    mne.io.Raw
+            raw EEG object
+
+    montage: string
+            name of montage to use
+
+    Returns
+    ----------
+    raw:   mne.io.Raw
+           raw EEG object with montage applied
+
+    output_dict_montage:  dictionary
+                          dictionary with montage informationrw
+    """
+    try:
+        raw.set_montage(montage)
+    except ValueError:
+        raise ValueError(INVALID_MONTAGE_MSG)
+    except (AttributeError, TypeError):
+        raise TypeError(INVALID_DATA_MSG)
+
+    montage_details = {
+        "Montage": montage
+    }
+    # return average reference
+    return raw, {"Montage": montage_details}
 
 
 def reref_raw(raw, ref_channels=None):
@@ -104,15 +137,13 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     return raw_filtered, {"Filter": filter_details}
 
 
-def ica_raw(raw, montage):
+def ica_raw(raw):
     """Automatic artifacts identification - raw data is modified in place
     Parameters:
     ----------
     raw:    mne.io.Raw
             raw object of EEG data after processing by previous steps (filter
             and bad channels removal)
-    montage:    str
-                montage
 
     Returns:
     ----------
@@ -122,12 +153,8 @@ def ica_raw(raw, montage):
                       dictionary with relevant ica information
     """
 
-    try:
-        raw.set_montage(montage)
-    except ValueError:
-        raise ValueError(INVALID_MONTAGE_MSG)
-    except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
+    if raw.get_montage() is None:
+        raise ValueError(MISSING_MONTAGE_MSG)
 
     # prep for ica - make a copy
     raw_filtered_1 = raw.copy()
