@@ -3,15 +3,30 @@ The images described below are container files that all have the base functional
 
 # Docker
 
+The docker container image used for this project can be simply pulled from [Docker Hub](https://hub.docker.com/) as described in the section *Pulling Existing Container*. However, if you are planning on expanding the project to include additional Python packages, then you must rebuild the container image with your additional configurations as described in the section *Building a New Container*.
+
+Both approaches will require [Docker Desktop](https://www.docker.com/products/docker-desktop). To install, follow the [these directions](https://docs.docker.com/get-docker/). 
+
+Once Docker is installed to your computer, verify the installation by opening the "Docker Desktop" application. 
+
 ## Pulling Existing Container
 
+1. To work with the existing PEPPER container simply use the `pull` command:
+```
+docker pull fsaid22/pepper_container:latest
+```
 
-## Building New Container
+2. Next, once the container image has been copied over to your local machine, run an instance of the container by using the `run` command:
+```
+docker run --name=[containerName] fsaid22/pepper_container:latest
+```
+
+## Building a New Container
 
 ## How to Use Docker? 
-With a Dockerfile, we can construct a docker container with a volume attached to it. To begin using docker: 
-1. Download and install Docker on your local PC (https://docs.docker.com/get-docker/). If using Windows 10 Home, downloading WSL2 is necessary. 
-2. Pull the latest Dockerfile and environment.yml from the github repository.
+
+1. 
+
 3. Begin building the docker file with a specific tag, expressed as
    `
    docker build -t [tag] .  

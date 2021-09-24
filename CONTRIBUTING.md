@@ -38,35 +38,46 @@ To get started on coding, follow the listed steps below. Note that you must have
 
 1. Fork the repo (replace "user" with your GitHub username). 
 
-> git clone https://github.com/user/pepper-pipeline.git
-> cd pepper-pipeline/
+```
+git clone https://github.com/user/pepper-pipeline.git
+cd pepper-pipeline/
+```
 
 2. Build and activate a container using the OS relevant files (see `container/README.md`).
 
 3. Switch to the branch that you plan to contribute to. 
 
   * If work on this issue has already begun, then fetch and checkout the active branch.
-
-  > git fetch
-  > git checkout dev-feature-issue
+  ```
+  git fetch
+  git checkout dev-feature-issue
+  ```
 
  * If this issue has not begun development, then create a new branch.
 
-  > git checkout -b dev-feature-issue 
-  > git push origin dev-feature-issue
+  ```
+  git checkout -b dev-feature-issue 
+  git push origin dev-feature-issue
+  ```
 
 4. Create a sub-branch using your name/identifier. 
 
-  > git checkout dev-feature-issue-name 
+  ```
+  git checkout dev-feature-issue-name 
+  ```
 
 5. Implement changes (commit often!).
 
-  > git add file1 file2
-  > git commit -m "Attached flux capacitor" 
+  ```
+  git add file1 file2
+  git commit -m "Attached flux capacitor" 
+  ```
 
 6. After you complete all your intended commits, push changes to branch.
 
-> git push origin dev-feature-issue-name
+  ```
+  git push origin dev-feature-issue-name
+  ```
 
 7. Create a pull-request using the GitHub GUI. 
 
