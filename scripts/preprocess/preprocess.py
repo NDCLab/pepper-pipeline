@@ -804,13 +804,16 @@ def hurst(data):
     return p2[0]
 
 
-def identify_badchans_raw(raw):
+def identify_badchans_raw(raw, ref_elec_name):
     """Automatic bad channel identification - raw data is modified in place
 
     Parameters:
     ----------:
     raw:    mne.io.Raw
             initially loaded raw object of EEG data
+
+    ref_elec_name:    str
+                      reference electrode name
 
     Returns:
     ----------
@@ -824,32 +827,26 @@ def identify_badchans_raw(raw):
     # get raw data matrix
     raw_data = raw.get_data()
 
-    # get spherical and polar coordinates
-    chs_x = np.array([loc['loc'][1] for loc in raw.info['chs']])
-    chs_y = np.array([loc['loc'][0] * (-1) for loc in raw.info['chs']])
-    chs_z = np.array([loc['loc'][2] for loc in raw.info['chs']])
-    sph_phi = (np.arctan2(chs_z, np.sqrt(chs_x**2 + chs_y**2))) / np.pi * 180
-    sph_theta = (np.arctan2(chs_y, chs_x)) / np.pi * 180
-    theta = sph_theta * (-1)
-    radius = 0.5 - sph_phi / 180
-    chanlocs = pd.DataFrame({'x': chs_x,
-                             'y': chs_y,
-                             'z': chs_z,
-                             'theta': theta,
-                             'radius': radius})
+    # get the index of reference electrode
+    try:
+        ref_index = raw.ch_names.index(ref_elec_name)
+    except ValueError:
+        raise ValueError(INVALID_REF_MSG)
 
-    # compute the distance between each channel and reference
-    # -- should be edited later to take reference from user_params
-    # -- need to confirm the naming of channels across systems
-    ref_theta = chanlocs.iloc[128]['theta']
-    ref_radius = chanlocs.iloc[128]['radius']
+    # get reference electrode location
+    channel_positions = raw._get_channel_positions() * 100
+    ref_x = channel_positions[ref_index][0]
+    ref_y = channel_positions[ref_index][1]
+    ref_z = channel_positions[ref_index][2]
 
-    chanlocs['distance'] = chanlocs.apply(lambda x: np.sqrt(x['radius']**2 + ref_radius**2 - 2 * x['radius'] * ref_radius * np.cos(x['theta'] / 180 * np.pi - ref_theta / 180 * np.pi)), axis=1)
+    # get distances between electrodes and the reference electrode
+    chan_ref_dist = [np.sqrt((x[0] - ref_x)**2 + (x[1] - ref_y)**2 + (x[2] - ref_z)**2)
+                     for x in channel_positions]
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
-    reg_var = np.polyfit(chanlocs['distance'], chns_var, 2)
-    fitcurve_var = np.polyval(reg_var, chanlocs['distance'])
+    reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
+    fitcurve_var = np.polyval(reg_var, chan_ref_dist)
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
                                                         threshold=3.0,
@@ -861,9 +858,9 @@ def identify_badchans_raw(raw):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
-        chns_cor[128] = np.nanmean(chns_cor)
-    reg_cor = np.polyfit(chanlocs['distance'], chns_cor, 2)
-    fitcurve_cor = np.polyval(reg_cor, chanlocs['distance'])
+        chns_cor[ref_index] = np.nanmean(chns_cor)
+    reg_cor = np.polyfit(chan_ref_dist, chns_cor, 2)
+    fitcurve_cor = np.polyval(reg_cor, chan_ref_dist)
     corrected_cor = chns_cor - fitcurve_cor
     bads_cor = [raw.ch_names[i] for i in _find_outliers(corrected_cor,
                                                         threshold=3.0,

@@ -36,6 +36,9 @@ INVALID_MONTAGE_MSG = "Invalid value for the 'montage' parameter. Allowed values
         'standard_alphabetic', 'standard_postfixed', 'standard_prefixed',\
         'standard_primed', 'artinis-octamon', and 'artinis-brite23'."
 
+# reference channel error
+INVALID_REF_MSG = "The reference electrode name is NOT provided or in the list."
+
 # write error messages
 SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
  parameter."
