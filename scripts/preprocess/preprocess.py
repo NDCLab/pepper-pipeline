@@ -870,7 +870,7 @@ def identify_badchans_raw(raw, ref_elec_name):
     # get distances between electrodes and the reference electrode
     chan_ref_dist = [np.sqrt((x[0] - ref_x) ** 2 + (x[1] - ref_y) ** 2 + (x[2] - ref_z) ** 2)
                      for x in channel_positions]
-    
+
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
     reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
