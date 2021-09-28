@@ -1,5 +1,5 @@
 # Singularity and Docker
-The images described below are container files that all have the base functionality required for reliably running, testing, and developing the PEPPER pipeline. This includes Python, MNE, Pandas, and more.
+The images described below are container files that all have the base functionality required for reliably running, testing, and developing the PEPPER pipeline. These include Python, MNE, Pandas, and more.
 
 # Docker
 
@@ -12,30 +12,23 @@ Once Docker is installed to your computer, verify the installation by opening th
 ## Pulling Existing Container
 
 1. To work with the existing PEPPER container simply use the `pull` command:
-```
-docker pull fsaid22/pepper_container:latest
-```
+   ```
+   docker pull fsaid22/pepper_container:latest
+   ```
 
-2. Next, once the container image has been copied over to your local machine, run an instance of the container by using the `run` command:
-```
-docker run --name=[containerName] fsaid22/pepper_container:latest
-```
+2. Once the container image has been pulled over to your local machine, run an instance of the container by using the `run` command:
+   ```
+   docker run --name=[containerName] fsaid22/pepper_container:latest
+   ```
 
 ## Building a New Container
 
-## How to Use Docker? 
+1. Build the new docker file with a specific tag, by execut
+   ```
+   docker build -t [tag] container/Dockerfile
+   ```
 
-1. 
-
-3. Begin building the docker file with a specific tag, expressed as
-   `
-   docker build -t [tag] .  
-   `
-   where: 
-    * The docker build builds docker images from a Dockerfile
-    * The -t flag tags our image. This is simply a human-readable name for the final image.
-    * . tells docker should look for the Dockerfile in the current directory. 
-4. We can now create a docker volume called data. To create the volume, we run `docker volume create data`, resulting in a volume called data. When we run `docker volume ls`, we should get the following output
+2. We can now create a docker volume called data. To create the volume, we run `docker volume create data`, resulting in a volume called data. When we run `docker volume ls`, we should get the following output
    ```bash
     DRIVER    VOLUME NAME
     local     data
@@ -54,7 +47,7 @@ docker run --name=[containerName] fsaid22/pepper_container:latest
         }
     ]
    ```
-5. To mount a data volume to a container, we add the --mount flag to the docker run command. This will allow us to add the volume to the specified container, storing the data produced inside the virtual environment. To run a container and mount a data volume to it, while routing it to some port, such as port 5000, we use the following syntax:
+3. To mount a data volume to a container, we add the --mount flag to the docker run command. This will allow us to add the volume to the specified container, storing the data produced inside the virtual environment. To run a container and mount a data volume to it, while routing it to some port, such as port 5000, we use the following syntax:
    ```bash 
     docker run --name=[containerName] -it -w /projects -p 5000:8888 --mount source=[volume_name], destination=[docker_image_path] [tag]
    ```
@@ -74,7 +67,7 @@ docker run --name=[containerName] fsaid22/pepper_container:latest
 
     which will now construct a new container mapped to port 5000 with a volume attached to it. This volume, data, is now mounted on /home/ubuntu/data.
 
-6. Once the volume is attached to the container, we can use the docker cp command to copy data from the host to the container. This also works interchangeably. To copy a file from the local file system to a container, the syntax is as follows: 
+4. Once the volume is attached to the container, we can use the docker cp command to copy data from the host to the container. This also works interchangeably. To copy a file from the local file system to a container, the syntax is as follows: 
    ```bash 
     docker cp <src-path> <container>:<dest-path>
    ```
@@ -87,12 +80,17 @@ docker run --name=[containerName] fsaid22/pepper_container:latest
    ```bash
     docker cp "datatset\path\name" mini:"/home/ubuntu/data"
    ```
-7. Run a container instance as a root by executing 
+5. Run a container instance as a root by executing 
 
    ```bash
    docker exec -u root -it [containerName] bash
    ```
+## Binding Data to the Container
 
+3. Once this container has been started, the container instance as a root can be executed by running:
+   ```bash
+   docker exec -u root -it [containerName] bash
+   ```
 # Singularity
 
 As there is currently no central repository of Singularity container images, the image must be built from the `eeg-pipe.recipe` file. 
