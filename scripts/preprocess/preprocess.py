@@ -40,9 +40,9 @@ def set_montage(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        raise ValueError(INVALID_MONTAGE_MSG)
+        return raw, {"Montage": INVALID_MONTAGE_MSG}
     except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
+        return raw, {"Montage": INVALID_DATA_MSG}
 
     montage_details = {
         "Montage": montage
