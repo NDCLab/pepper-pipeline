@@ -44,7 +44,6 @@ for file in data:
             # if pipeline should exit on error, do so
             if exit_on_error:
                 sys.exit(EXIT_MESSAGE)
-            break
 
         # check if this is the final preprocessed eeg object
         final = idx == len(preprocess_params.items()) - 1
