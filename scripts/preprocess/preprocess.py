@@ -39,9 +39,9 @@ def set_montage(raw, montage):
     try:
         raw.set_montage(montage)
     except ValueError:
-        return 1, raw, {"Montage": INVALID_MONTAGE_MSG}
+        return raw, {"ERROR": INVALID_MONTAGE_MSG}
     except (AttributeError, TypeError):
-        return 1, raw, {"Montage": INVALID_DATA_MSG}
+        return raw, {"ERROR": INVALID_DATA_MSG}
 
     montage_details = {
         "Montage": montage
@@ -76,7 +76,7 @@ def reref_raw(raw, ref_channels=None):
     try:
         raw.load_data()
     except (AttributeError, TypeError):
-        return 1, raw, {"Reference": INVALID_DATA_MSG}
+        return raw, {"ERROR": INVALID_DATA_MSG}
 
     # add back reference channel (all zero)
     if ref_channels is None:
@@ -119,9 +119,9 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
     except (AttributeError, TypeError):
-        return 1, raw, {"Filter": INVALID_DATA_MSG}
+        return raw, {"ERROR": INVALID_DATA_MSG}
     except ValueError:
-        return 1, raw, {"Filter": INVALID_FILTER_FREQ_MSG}
+        return raw, {"ERROR": INVALID_FILTER_FREQ_MSG}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -600,7 +600,7 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     try:
         events, event_id = mne.events_from_annotations(raw)
     except (TypeError, AttributeError):
-        return 1, raw, {"Segment": INVALID_DATA_MSG}
+        return raw, {"ERROR": INVALID_DATA_MSG}
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -675,9 +675,9 @@ def final_reject_epoch(epochs):
     try:
         autoRej.fit(epochs)
     except ValueError:
-        return 1, epochs, {"Final Reject": INVALID_FR_DATA_MSG}
+        return epochs, {"ERROR": INVALID_FR_DATA_MSG}
     except (TypeError, AttributeError):
-        return 1, epochs, {"Final Reject": INVALID_DATA_MSG}
+        return epochs, {"ERROR": INVALID_DATA_MSG}
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -736,7 +736,7 @@ def interpolate_data(epochs, mode, method, reset_bads):
                                 )
         return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
     except (TypeError, AttributeError):
-        return 1, epochs, {"Interpolation": INVALID_DATA_MSG}
+        return epochs, {"ERROR": INVALID_DATA_MSG}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
