@@ -66,5 +66,5 @@ def test_except_value(error_obj):
     eeg_obj = error_obj
 
     # attempt to reref w/invalid data
-    error, _, _ = pre.reref_raw(eeg_obj)
-    assert error
+    _, output = pre.reref_raw(eeg_obj)
+    assert "ERROR" in output.keys()

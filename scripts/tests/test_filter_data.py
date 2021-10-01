@@ -69,8 +69,8 @@ def test_return_values(select_data_params):
 
 def test_except_bad_object(error_obj):
     # attempt to filter data w/invalid data
-    error, _, _ = pre.filter_data(error_obj)
-    assert error
+    _, output = pre.filter_data(error_obj)
+    assert "ERROR" in output.keys()
 
 
 def test_except_bad_params(select_data_params, error_val):
@@ -81,5 +81,5 @@ def test_except_bad_params(select_data_params, error_val):
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # filter data
-        error, _, _ = pre.filter_data(eeg_obj, error_val, error_val)
-        assert error
+        _, output = pre.filter_data(eeg_obj, error_val, error_val)
+        assert "ERROR" in output.keys()

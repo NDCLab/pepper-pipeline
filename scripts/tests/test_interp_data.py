@@ -69,5 +69,5 @@ def test_return_values(select_data_params):
 def test_except_value(error_obj):
     # attempt to interpolate an invalid object type
     # across each channel
-    error, _, _ = pre.interpolate_data(error_obj)
-    assert error
+    _, output = pre.interpolate_data(error_obj)
+    assert "ERROR" in output.keys()
