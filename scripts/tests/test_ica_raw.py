@@ -72,5 +72,5 @@ def test_except_bad_object(select_data_params, error_obj):
     ica_param = feature_params["ica_raw"]
 
     # attempt to process ica w/invalid data
-    with pytest.raises(TypeError):
-        _, _ = pre.ica_raw(error_obj, **ica_param)
+    error, _, _ = pre.ica_raw(error_obj, **ica_param)
+    assert error

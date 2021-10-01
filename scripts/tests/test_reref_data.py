@@ -66,5 +66,5 @@ def test_except_value(error_obj):
     eeg_obj = error_obj
 
     # attempt to reref w/invalid data
-    with pytest.raises(TypeError):
-        _, _ = pre.reref_raw(eeg_obj)
+    error, _, _ = pre.reref_raw(eeg_obj)
+    assert error
