@@ -21,14 +21,7 @@ The PEPPER-Pipeline project is a fully-open, community-driven project. We welcom
 * [Output](#output)
   * [Annotations](#annotations)
   * [Raw Derivatives](#raw-derivatives)
-* [Pipeline Steps](#pipeline-steps)
-  * [1-Filter](#1-filter)
-  * [2-Reject Bad Channels](#2-reject-bad-channels)
-  * [3-ICA](#3-ica)
-  * [4-Segment](#4-segment)
-  * [5-Final Reject Epochs](#5-final-reject-epochs)
-  * [6-Interpolate](#6-interpolate)
-  * [7-Re-reference](#7-re-reference)
+* [Work in Development](#Work-in-Development)
 * [Contributors](#Contributors)
 
 Development guidelines and details are listed in [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -179,54 +172,6 @@ Here is an example of file contents:
 For every pipeline step that executes, an intermediate dataset is written to the specified output path under the intermediate folder 'PEPPER_intermediate'. 
 
 The final preprocessed datafile is written to a final 'PEPPER_preprocessed'. 
-
-### Pipeline Steps
-
-#### 1-Filter
-
-- High-pass filter the data using MNE functions
-- Read in the "high pass" "low pass" fields from the `user_params.json` file to define filter parameters
-
-#### 2-Reject Bad Channels
-
-- Auto-detect and remove bad channels (those that are “noisy” for a majority of the recording)
-- Write to output file (field "globalBad_chans") to indicate which channels were detected as bad
-
-#### 3-Independent Component Analysis
-
-  Overview: ICA requires a decent amount of [stationarity](https://towardsdatascience.com/stationarity-in-time-series-analysis-90c94f27322#:~:text=In%20t%20he%20most%20intuitive,not%20itself%20change%20over%20time.) in the data. This is often violated by raw EEG. One way around this is to first make a copy of the EEG data using automated methods to detect noisy portions of data and removing these sections. ICA is then run on the copied data after cleaning. The ICA weights produced by the copied dataset are copied back into original recording. In this way, we do not have to “throw out” sections of noisy data, while, at the same time, we are able to derive an improved ICA decomposition.
-
-1. Prepica
-    - Make a copy of the EED recording
-    - For the copied data: high-pass filter at 1 Hz
-    - For the copied data: segment by epoch  to “cut” the continuous EEG recording into arbitrary 1-second epochs
-    - For the copied data: use automated methods (voltage outlier detection and spectral outlier detection) to detect epochs that are excessively “noisy” for any channel
-    - For the copied data: reject (remove) the noisy periods of data
-    - Write to the output file which segments were rejected and based on what metrics
-2. ICA
-    - Run ICA on the copied data
-    - Copy the ICA weights from the copied data back to the pre-copy data
-3. Rejica
-    - Use automated methods (TBD) to identify ICA components that reflect artifacts
-    - Remove the data corresponding to the identified artifacts
-    - Write to the output file (field "icArtifacts") which ICA components were identified as artifacts
-
-#### 4-Segment
-- Segment by epoch to "cut" the continuous data into epochs of data such that the zero point for each epoch is a given marker of interest
-- Write to output file (field "XXX") which markers were used for epoching purposes, how many of each epoch were created, and how many milliseconds were retained before/after the markers of interest
-
-#### 5-Final Reject Epochs
-- Loop through each channel. For a given channel, loop over all epochs for that channel and identify epochs for which that channel, for a given epoch, exceeds either the voltage threshold or spectral threshold. If it exceeds the threshold, reject the channel data for this channel/epoch.
-- Write to the output file ("field XXX") which channel/epoch intersections were rejected
-
-#### 6-Interpolate
-- Interpolate missing channels, at the channel/epoch level, using a spherical spline interpolation, as implemented in MNE
-- Interpolate missing channels, at the global level, using a spherical spline interpolation, as implemented in MNE
-- Write to output file (field "XXX") which channels were interpolated and using what method
-
-#### 7-Re-reference
-- Re-reference the data to the average of all electrodes (“average reference”) using the MNE function
-- Write to output file (field "XXX") which data were re-referenced to average
 
 ## Work in Development
 This `main` branch contains completed releases for this project. For all work-in-progress, please switch over to the `dev` branches.
