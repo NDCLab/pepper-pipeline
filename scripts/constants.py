@@ -39,6 +39,9 @@ MISSING_MONTAGE_MSG = "This operation requires a montage however the data does \
  not have a montage applied. Add a montage prior to this step via \
  set_montage()."
 
+# reference channel error
+INVALID_REF_MSG = "The reference electrode name is NOT provided or in the list."
+
 # write error messages
 SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
  parameter."
