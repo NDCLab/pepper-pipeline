@@ -154,7 +154,7 @@ def ica_raw(raw):
     """
 
     if raw.get_montage() is None:
-        return 1, raw, {"Ica": MISSING_MONTAGE_MSG}
+        return raw, {"ERROR": MISSING_MONTAGE_MSG}
 
     # prep for ica - make a copy
     raw_filtered_1 = raw.copy()

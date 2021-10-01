@@ -55,9 +55,13 @@ def test_return_values(select_data_params):
     # get the pipeline steps
     feature_params = select_data_params["preprocess"]
     ica_param = feature_params["ica_raw"]
+    montage_file = feature_params["set_montage"]
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
+
+        # set montage
+        pre.set_montage(eeg_obj, **montage_file)
 
         # reject epochs
         ica_obj, output_dict = pre.ica_raw(eeg_obj, **ica_param)
@@ -72,5 +76,6 @@ def test_except_bad_object(select_data_params, error_obj):
     ica_param = feature_params["ica_raw"]
 
     # attempt to process ica w/invalid data
-    _, output = pre.ica_raw(error_obj, **ica_param)
-    assert "ERROR" in output.keys()
+    with pytest.raises(AttributeError):
+        _, output = pre.ica_raw(error_obj, **ica_param)
+        assert "ERROR" in output.keys()

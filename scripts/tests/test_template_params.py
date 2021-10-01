@@ -40,9 +40,9 @@ def load_params():
 
 @pytest.fixture
 def preprocess_params():
-    return set(["filter_data", "identify_badchans_raw", "ica_raw",
-                "segment_data", "final_reject_epoch", "interpolate_data",
-                "reref_raw"])
+    return set(["set_montage", "filter_data", "identify_badchans_raw",
+                "ica_raw", "segment_data", "final_reject_epoch",
+                "interpolate_data", "reref_raw"])
 
 
 @pytest.fixture
