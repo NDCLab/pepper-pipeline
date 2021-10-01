@@ -36,50 +36,51 @@ If you do not receive a response within **24 hours**, then you are free to start
 
 To get started on coding, follow the listed steps below. Note that you must have a GitHub account to collaborate to this project. All quoted commands are executed in your shell.
 
-1. Fork the repo (replace "user" with your GitHub username). 
+1. Fork the repo to your GitHub account by clicking on the "Fork" button on the top right corner of the [PEPPER repository](https://github.com/NDCLab/pepper-pipeline):
+<img width="950" alt="Untitled" src="https://user-images.githubusercontent.com/26397102/135622318-46cd9a5a-06e6-47eb-9afc-0f0a56655b3e.png">
 
-```
-git clone https://github.com/user/pepper-pipeline.git
-cd pepper-pipeline/
-```
+2. Clone the repository to your local machine, with `git clone` in your terminal. Be sure to replace `user` below with your own GitHub username.
+  ```
+  git clone https://github.com/[user]/pepper-pipeline.git
+  cd pepper-pipeline/
+  ```
 
-2. Build and activate a container using the OS relevant files (see `container/README.md`).
+3. Build and activate a container using the OS relevant files (see `container/README.md`).
 
-3. Switch to the branch that you plan to contribute to. 
+4. Switch to the branch that you plan to contribute to. 
 
   * If work on this issue has already begun, then fetch and checkout the active branch.
-  ```
-  git fetch
-  git checkout dev-feature-issue
-  ```
+    ```
+    git fetch
+    git checkout dev-feature-issue
+    ```
 
- * If this issue has not begun development, then create a new branch.
+  * If this issue has not begun development, then create a new branch.
 
-  ```
-  git checkout -b dev-feature-issue 
-  git push origin dev-feature-issue
-  ```
+    ```
+    git checkout -b dev-feature-issue 
+    ```
 
-4. Create a sub-branch using your name/identifier. 
+5. Create a sub-branch using your name/identifier. 
 
-  ```
-  git checkout dev-feature-issue-name 
-  ```
+    ```
+    git checkout dev-feature-issue-name 
+    ```
 
-5. Implement changes (commit often!).
+6. Implement changes (commit often!).
 
-  ```
-  git add file1 file2
-  git commit -m "Attached flux capacitor" 
-  ```
+    ```
+    git add file1 file2
+    git commit -m "Attached flux capacitor" 
+    ```
 
-6. After you complete all your intended commits, push changes to branch.
+7. After you complete all your intended commits, push changes to branch.
 
-  ```
-  git push origin dev-feature-issue-name
-  ```
+    ```
+    git push 
+    ```
 
-7. Create a pull-request using the GitHub GUI. 
+8. Create a pull-request using the GitHub GUI. 
 
 ### Directory Structure
 ```yml
