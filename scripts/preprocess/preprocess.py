@@ -15,7 +15,6 @@ from scripts.constants import \
     INVALID_FILTER_FREQ_MSG, \
     INVALID_FR_DATA_MSG, \
     INVALID_MONTAGE_MSG, \
-    INVALID_UPARAM_MSG, \
     MISSING_MONTAGE_MSG, \
     INVALID_REF_MSG
 
