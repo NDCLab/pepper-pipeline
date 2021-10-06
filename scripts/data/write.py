@@ -175,6 +175,7 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
             "h_freq": 40
         },
         "identify_badchans_raw": {
+            "ref_elec_name": "Cz"
         },
         "ica_raw": {
         },
