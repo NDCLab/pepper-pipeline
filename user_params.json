@@ -25,7 +25,9 @@
             "l_freq": 0.3,
             "h_freq": 40
         },
-        "identify_badchans_raw": {},
+        "identify_badchans_raw": {
+            "ref_elec_name": "Cz"
+        },
         "ica_raw": {},
         "segment_data": {
             "tmin": -0.2,
