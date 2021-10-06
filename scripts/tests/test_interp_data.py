@@ -66,8 +66,11 @@ def test_return_values(select_data_params):
         assert isinstance(interp_eeg, Epochs)
 
 
-def test_except_value(error_obj):
+def test_except_value(error_obj, select_data_params):
+    feature_params = select_data_params["preprocess"]
+    interp_param = feature_params["interpolate_data"]
+
     # attempt to interpolate an invalid object type
     # across each channel
-    _, output = pre.interpolate_data(error_obj)
+    _, output = pre.interpolate_data(error_obj, **interp_param)
     assert "ERROR" in output.keys()
