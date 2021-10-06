@@ -62,12 +62,12 @@ def filter_params():
 
 @pytest.fixture
 def badchans_params():
-    return set()
+    return set(["ref_elec_name"])
 
 
 @pytest.fixture
 def ica_params():
-    return set(["montage"])
+    return set()
 
 
 @pytest.fixture
