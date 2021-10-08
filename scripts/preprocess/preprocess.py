@@ -1,5 +1,4 @@
 import autoreject as ar
-import collections
 import mne
 import numpy as np
 import pandas as pd
