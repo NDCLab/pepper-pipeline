@@ -28,7 +28,7 @@ def sel_subjects():
 
 @pytest.fixture
 def sel_tasks():
-    return ["ContrastChangeBlock1"]
+    return ["SurrSuppBlock2"]
 
 
 @pytest.fixture
@@ -55,6 +55,7 @@ def test_return_values(select_data_params):
     # get the pipeline steps
     feature_params = select_data_params["preprocess"]
     ica_param = feature_params["ica_raw"]
+    filt_param = feature_params["filter_data"]
     montage_file = feature_params["set_montage"]
 
     for file in data:
@@ -63,8 +64,11 @@ def test_return_values(select_data_params):
         # set montage
         pre.set_montage(eeg_obj, **montage_file)
 
+        # filter
+        filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
+
         # reject epochs
-        ica_obj, output_dict = pre.ica_raw(eeg_obj, **ica_param)
+        ica_obj, output_dict = pre.ica_raw(filt_obj, **ica_param)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
