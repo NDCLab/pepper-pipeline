@@ -35,13 +35,13 @@ INVALID_MONTAGE_MSG = f"Invalid value for the 'montage' parameter.\
  Allowed values are: {', '.join(mne.channels.get_builtin_montages())}."
 
 # reference channel error
-INVALID_REF_MSG = "The reference electrode name is NOT provided or in the list."
+INVALID_REF_MSG = "The reference electrode is NOT provided or in the list."
 
 # write error messages
 SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
  parameter."
 
 # main driver code error messages
-CAUGHT_EXCEPTION_SKIP = ": Exception caught on function. Skipping to next\
+CAUGHT_EXCEPTION_SKIP = ": Exception caught in function. Skipping to next\
  subject."
 EXIT_MESSAGE = "Pipeline exited according to 'exit_on_error' parameter."
