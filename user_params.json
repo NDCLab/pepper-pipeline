@@ -19,7 +19,7 @@
     },
     "preprocess": {
         "set_montage": {
-            "montage": "standard_1020"
+            "montage": "GSN-HydroCel-129"
         },
         "filter_data": {
             "l_freq": 0.3,
