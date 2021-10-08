@@ -10,13 +10,7 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import \
-    INVALID_DATA_MSG, \
-    INVALID_FILTER_FREQ_MSG, \
-    INVALID_FR_DATA_MSG, \
-    INVALID_MONTAGE_MSG, \
-    MISSING_MONTAGE_MSG, \
-    INVALID_REF_MSG
+from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG
 
 
 def set_montage(raw, montage):
@@ -231,11 +225,11 @@ def ica_raw(raw):
     ica_details = {"original epochs": epochs_original,
                    "bad epochs": epochs_bads,
                    "bad epochs rate": epochs_bads / epochs_original,
-                   "Horizontal Eye Movement": arti_hem,
-                   "Vertical Eye Movement": arti_vem,
-                   "Eye Blink": arti_eb,
-                   "Generic Discontinuity": arti_gd,
-                   "Total artifact components": arti_adj}
+                   "Horizontal Eye Movement": list(arti_hem.astype(str)),
+                   "Vertical Eye Movement": list(arti_vem.astype(str)),
+                   "Eye Blink": list(arti_eb.astype(str)),
+                   "Generic Discontinuity": list(arti_gd.astype(str)),
+                   "Total artifact components": list(arti_adj.astype(str))}
 
     return raw_icaed, {"Ica": ica_details}
 
@@ -690,10 +684,8 @@ def final_reject_epoch(epochs):
                             dictionary with epochs droped per channel and
                             channels interpolated
     """
-
-    # creates the output dictionary to store the function output
-    output_dict_finalRej = collections.defaultdict(dict)
-    output_dict_finalRej['interpolatedChannels'] = []
+    # Quick-fix, re-load epochs
+    epochs.load_data()
 
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
@@ -701,6 +693,11 @@ def final_reject_epoch(epochs):
         autoRej.fit(epochs)
     except (ValueError, TypeError, AttributeError) as error_msg:
         return epochs, {"ERROR": str(error_msg)}
+
+    # creates the output dictionary to store the function output
+    output_dict_finalRej = {}
+    interpolatedChannels = []
+    epochsDropped = {}
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -714,14 +711,18 @@ def final_reject_epoch(epochs):
     df = pd.DataFrame(data=reject_log.labels, columns=ch_names)
     for ch in ch_names:
         if df[df[ch] == 2][ch].count() > 0:
-            output_dict_finalRej['interpolatedChannels'].append(ch)
+            interpolatedChannels.append(ch)
 
     for ch in ch_names:
         # store amount of epochs dropped for each channel
-        output_dict_finalRej['epochsDropped'][ch] = str(
-            epochs_clean.drop_log.count((ch,)))
+        epochsDropped[ch] = str(epochs_clean.drop_log.count((ch,)))
 
-    return epochs_clean, output_dict_finalRej
+    output_dict_finalRej = {
+        "Interpolated channels": interpolatedChannels,
+        "Epochs dropped": epochsDropped
+    }
+
+    return epochs_clean, {"Final Reject": output_dict_finalRej}
 
 
 def interpolate_data(epochs, mode, method, reset_bads):
