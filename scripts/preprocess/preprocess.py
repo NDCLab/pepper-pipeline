@@ -39,10 +39,8 @@ def set_montage(raw, montage):
     """
     try:
         raw.set_montage(montage)
-    except ValueError:
-        return raw, {"ERROR": INVALID_MONTAGE_MSG}
-    except (AttributeError, TypeError):
-        return raw, {"ERROR": INVALID_DATA_MSG}
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     montage_details = {
         "Montage": montage
@@ -76,8 +74,8 @@ def reref_raw(raw, ref_channels=None):
     """
     try:
         raw.load_data()
-    except (AttributeError, TypeError):
-        return raw, {"ERROR": INVALID_DATA_MSG}
+    except (AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     # add back reference channel (all zero)
     if ref_channels is None:
@@ -119,10 +117,8 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     try:
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
-    except (AttributeError, TypeError):
-        return raw, {"ERROR": INVALID_DATA_MSG}
-    except ValueError:
-        return raw, {"ERROR": INVALID_FILTER_FREQ_MSG}
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -628,8 +624,8 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
 
     try:
         events, event_id = mne.events_from_annotations(raw)
-    except (TypeError, AttributeError):
-        return raw, {"ERROR": INVALID_DATA_MSG}
+    except (TypeError, AttributeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -703,10 +699,8 @@ def final_reject_epoch(epochs):
     autoRej = ar.AutoReject()
     try:
         autoRej.fit(epochs)
-    except ValueError:
-        return epochs, {"ERROR": INVALID_FR_DATA_MSG}
-    except (TypeError, AttributeError):
-        return epochs, {"ERROR": INVALID_DATA_MSG}
+    except (ValueError, TypeError, AttributeError) as error_msg:
+        return epochs, {"ERROR": str(error_msg)}
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -764,8 +758,8 @@ def interpolate_data(epochs, mode, method, reset_bads):
                                 reset_bads=reset_bads
                                 )
         return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
-    except (TypeError, AttributeError):
-        return epochs, {"ERROR": INVALID_DATA_MSG}
+    except (TypeError, AttributeError) as error_msg:
+        return epochs, {"ERROR": str(error_msg)}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -878,8 +872,8 @@ def identify_badchans_raw(raw, ref_elec_name):
     # get the index of reference electrode
     try:
         ref_index = raw.ch_names.index(ref_elec_name)
-    except ValueError:
-        raise ValueError(INVALID_REF_MSG)
+    except ValueError as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100

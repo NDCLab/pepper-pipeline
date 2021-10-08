@@ -28,16 +28,11 @@ INVALID_E_RUN_MSG = "Invalid parameter. Please populate the exception run \
  data:write.write_template_params()"
 
 # Preprocess feature error messages/exceptions
-INVALID_FILTER_FREQ_MSG = "'Please use sufficiently seperated floats for \
- l_freq & h_freq."
-INVALID_FR_DATA_MSG = "The least populated class in y has only 1 member, which is too\
- few. The minimum number of groups for any class cannot be less than 2."
-INVALID_MONTAGE_MSG = f"Invalid value for the 'montage' parameter.\
- Allowed values are: {', '.join(mne.channels.get_builtin_montages())}."
-
 MISSING_MONTAGE_MSG = "This operation requires a montage however the data does \
  not have a montage applied. Add a montage prior to this step via \
  set_montage()."
+INVALID_MONTAGE_MSG = f"Invalid value for the 'montage' parameter.\
+ Allowed values are: {', '.join(mne.channels.get_builtin_montages())}."
 
 # reference channel error
 INVALID_REF_MSG = "The reference electrode name is NOT provided or in the list."
