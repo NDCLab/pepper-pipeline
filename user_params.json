@@ -38,9 +38,7 @@
     "final_reject_epoch": {
     }, 
     "interpolate_data": {
-      "mode": "accurate", 
-      "method": null,
-      "reset_bads": true
+      "mode": "accurate"
     },
     "reref_raw": {
     }

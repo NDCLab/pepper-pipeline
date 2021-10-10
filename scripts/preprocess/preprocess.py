@@ -710,7 +710,7 @@ def final_reject_epoch(epochs):
     return epochs_clean, output_dict_finalRej
 
 
-def interpolate_data(epochs, mode, method, reset_bads):
+def interpolate_data(epochs, mode='accurate'):
     """Used to return an epoch object that has been interpolated
 
     Parameters:
@@ -720,12 +720,6 @@ def interpolate_data(epochs, mode, method, reset_bads):
 
     mode:   str
             Either 'accurate' or 'fast'
-
-    method: dict
-            Method to use for each channel type.
-
-    reset_bads: bool
-                If True, remove the bads from info.
 
     Throws:
     ----------
@@ -738,14 +732,17 @@ def interpolate_data(epochs, mode, method, reset_bads):
     ----------
     Modified in place epochs object and output dictionary
     """
-    try:
-        epochs.interpolate_bads(mode=mode,
-                                method=method,
-                                reset_bads=reset_bads
-                                )
-        return epochs, {"Interpolation": {"Affected": epochs.info['bads']}}
-    except (TypeError, AttributeError):
-        raise TypeError(INVALID_DATA_MSG)
+
+    bads_before = epochs.info['bads']
+
+    if len(bads_before) == 0:
+        return epochs, {"Interpolation": {"Affected": bads_before}}
+    else:
+        try:
+            epochs_interp = epochs.interpolate_bads(mode=mode)
+            return epochs_interp, {"Interpolation": {"Affected": bads_before}}
+        except (TypeError, AttributeError):
+            raise TypeError(INVALID_DATA_MSG)
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
