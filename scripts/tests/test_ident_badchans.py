@@ -48,11 +48,15 @@ def test_return_values(select_data_params):
     # Load data using the selected subjects & tasks
     data = load.load_files(select_data_params["load_data"])
 
+    # get badchans param
+    feature_params = select_data_params["preprocess"]
+    bparam = feature_params["identify_badchans_raw"]
+
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
 
         # reject epochs
-        badchan_obj, output_dict = pre.identify_badchans_raw(eeg_obj)
+        badchan_obj, output_dict = pre.identify_badchans_raw(eeg_obj, **bparam)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()

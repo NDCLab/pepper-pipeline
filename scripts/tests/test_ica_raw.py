@@ -28,7 +28,7 @@ def sel_subjects():
 
 @pytest.fixture
 def sel_tasks():
-    return ["ContrastChangeBlock1"]
+    return ["SurrSuppBlock2"]
 
 
 @pytest.fixture
@@ -55,12 +55,20 @@ def test_return_values(select_data_params):
     # get the pipeline steps
     feature_params = select_data_params["preprocess"]
     ica_param = feature_params["ica_raw"]
+    filt_param = feature_params["filter_data"]
+    montage_file = feature_params["set_montage"]
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)
 
+        # set montage
+        pre.set_montage(eeg_obj, **montage_file)
+
+        # filter
+        filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
+
         # reject epochs
-        ica_obj, output_dict = pre.ica_raw(eeg_obj, **ica_param)
+        ica_obj, output_dict = pre.ica_raw(filt_obj, **ica_param)
 
         # assert that None does not exist in bad chans
         assert None not in output_dict.values()
@@ -72,5 +80,6 @@ def test_except_bad_object(select_data_params, error_obj):
     ica_param = feature_params["ica_raw"]
 
     # attempt to process ica w/invalid data
-    with pytest.raises(TypeError):
-        _, _ = pre.ica_raw(error_obj, **ica_param)
+    with pytest.raises(AttributeError):
+        _, output = pre.ica_raw(error_obj, **ica_param)
+        assert "ERROR" in output.keys()

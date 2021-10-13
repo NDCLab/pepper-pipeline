@@ -36,22 +36,21 @@ for file in data:
 
     # for each pipeline step in user_params, execute with parameters
     for idx, (func, params) in enumerate(preprocess_params.items()):
-        try:
-            eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
+        eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
 
-            # check if this is the final preprocessed eeg object
-            final = idx == len(preprocess_params.items()) - 1
-            # write object out to file
-            write.write_eeg_data(eeg_obj, func, file, ch_type, final, path,
-                                 rewrite)
-        except (AttributeError, TypeError, ValueError):
-            # if an exception was caught, clean up outputs and skip subject
+        if "ERROR" in outputs[idx].keys():
             print(func, CAUGHT_EXCEPTION_SKIP)
             outputs = [result for result in outputs if result is not None]
             # if pipeline should exit on error, do so
             if exit_on_error:
                 sys.exit(EXIT_MESSAGE)
             break
+
+        # check if this is the final preprocessed eeg object
+        final = idx == len(preprocess_params.items()) - 1
+        # write object out to file
+        write.write_eeg_data(eeg_obj, func, file, ch_type, final, path,
+                             rewrite)
 
     # collect annotations of each step
     outputs.reverse()

@@ -1,5 +1,4 @@
 import autoreject as ar
-import collections
 import mne
 import numpy as np
 import pandas as pd
@@ -10,14 +9,7 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import \
-    INVALID_DATA_MSG, \
-    INVALID_FILTER_FREQ_MSG, \
-    INVALID_FR_DATA_MSG, \
-    INVALID_MONTAGE_MSG, \
-    INVALID_UPARAM_MSG, \
-    MISSING_MONTAGE_MSG, \
-    INVALID_REF_MSG
+from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG
 
 
 def set_montage(raw, montage):
@@ -40,10 +32,8 @@ def set_montage(raw, montage):
     """
     try:
         raw.set_montage(montage)
-    except ValueError:
-        raise ValueError(INVALID_MONTAGE_MSG)
-    except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     montage_details = {
         "Montage": montage
@@ -77,8 +67,8 @@ def reref_raw(raw, ref_channels=None):
     """
     try:
         raw.load_data()
-    except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
+    except (AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     # add back reference channel (all zero)
     if ref_channels is None:
@@ -120,10 +110,8 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     try:
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
-    except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
-    except ValueError:
-        raise ValueError(INVALID_FILTER_FREQ_MSG)
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -155,7 +143,7 @@ def ica_raw(raw):
     """
 
     if raw.get_montage() is None:
-        raise ValueError(MISSING_MONTAGE_MSG)
+        return raw, {"ERROR": MISSING_MONTAGE_MSG}
 
     # prep for ica - make a copy
     raw_filtered_1 = raw.copy()
@@ -164,7 +152,10 @@ def ica_raw(raw):
     raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
 
     # epoch with arbitrary 1s
-    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1, duration=1.0, preload=True, overlap=0.0)
+    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
+                                               duration=1.0,
+                                               preload=True,
+                                               overlap=0.0)
 
     # number of epeochs pre-rejection
     epochs_original = epochs_prep.__len__()
@@ -196,7 +187,8 @@ def ica_raw(raw):
     icawinv = ica.get_components()
 
     # compute channel locations
-    # first get a list of channel names after removing bad channels and the reference channel
+    # first get a list of channel names after removing bad channels and the
+    # reference channel
     raw_locs = raw_filtered_1.copy()
     bad_chans = raw_locs.info['bads']
 
@@ -210,19 +202,21 @@ def ica_raw(raw):
     cartesian_locations = cartesian_locations * 100
 
     # get spherical coordinates
-    spherical_locations = mne.transforms._cart_to_sph(cartesian_locations)
+    spher_locations = mne.transforms._cart_to_sph(cartesian_locations)
 
     # get polar coordinates
     chn_locs = np.zeros([cartesian_locations.shape[0], 5])
     chn_locs[:, 0:3] = cartesian_locations
     # get polar coordinates - theta - convert to angle [-180, 180]
-    chn_locs[:, 3] = spherical_locations[:, 1] * 180 / np.pi
+    chn_locs[:, 3] = spher_locations[:, 1] * 180 / np.pi
     # get polar coordinates - radius
-    chn_locs[:, 4] = spherical_locations[:, 0] * np.sin(spherical_locations[:, 2])
+    chn_locs[:, 4] = spher_locations[:, 0] * np.sin(spher_locations[:, 2])
 
     # identify artifacts by using adjust
-    artifacts_hem, artifacts_vem, artifacts_eb, artifacts_gd, artifacts_adj = _adjust(icaact, icawinv, chn_locs)
-    ica.exclude = artifacts_adj
+    arti_hem, arti_vem, arti_eb, arti_gd, arti_adj = _adjust(icaact,
+                                                             icawinv,
+                                                             chn_locs)
+    ica.exclude = arti_adj
 
     # reapplying the matrix back to raw data -- modify in place
     raw_icaed = ica.apply(raw.load_data())
@@ -230,21 +224,23 @@ def ica_raw(raw):
     ica_details = {"original epochs": epochs_original,
                    "bad epochs": epochs_bads,
                    "bad epochs rate": epochs_bads / epochs_original,
-                   "Horizontal Eye Movement": artifacts_hem,
-                   "Vertical Eye Movement": artifacts_vem,
-                   "Eye Blink": artifacts_eb,
-                   "Generic Discontinuity": artifacts_gd,
-                   "Total artifact components": artifacts_adj}
+                   "Horizontal Eye Movement": list(arti_hem.astype(str)),
+                   "Vertical Eye Movement": list(arti_vem.astype(str)),
+                   "Eye Blink": list(arti_eb.astype(str)),
+                   "Generic Discontinuity": list(arti_gd.astype(str)),
+                   "Total artifact components": list(arti_adj.astype(str))}
 
     return raw_icaed, {"Ica": ica_details}
 
 
 def _adjust(icaact, icawinv, chanlocs):
-    """Automatic EEG artifact Detector based on the Joint Use of Spatial and Temporal features
-    this is the python version of the eeglab plugin ADJUST which is developed by Andrea Mognon (1) and Marco Buiatti (2)
+    """Automatic EEG artifact Detector based on the Joint Use of Spatial and
+    Temporal features this is the python version of the eeglab plugin ADJUST
+    which is developed by Andrea Mognon (1) and Marco Buiatti (2)
     Reference paper: Mognon A, Jovicich J, Bruzzone L, Buiatti M,
-    ADJUST: An Automatic EEG artifact Detector based on the Joint Use of Spatial and Temporal features.
-    Psychophysiology 48 (2), 229-240 (2011).
+    ADJUST: An Automatic EEG artifact Detector based on the Joint Use of
+    Spatial and Temporal features. Psychophysiology 48 (2), 229-240 (2011).
+
     Parameters:
     ----------
     icaact:    3D numpy array
@@ -252,7 +248,9 @@ def _adjust(icaact, icawinv, chanlocs):
     icawinv:   2D numpy array
                the mixing matrix - channels * ics
     chanlocs:  2D numpy array
-               1-3 columns: x, y and z; 4th column: theta (in polar coordinates); 5th column: radius (in polar coordinates)
+               1-3 columns: x, y and z;
+               4th column: theta (in polar coordinates);
+               5th column: radius (in polar coordinates)
 
     Returns:
     ----------
@@ -304,16 +302,19 @@ def _adjust(icaact, icawinv, chanlocs):
 
             # difference between el and the average of 10 neighbors
             # weighted according to weightchas
-            aux.append(abs(topografie_normed[ic, el] - np.mean(weightchas * topografie_normed[ic, repchas])))
+            aux.append(abs(topografie_normed[ic, el] -
+                       np.mean(weightchas * topografie_normed[ic, repchas])))
 
         res[ic] = max(aux)
 
     # get GD values
     gd_value = res
 
-    # compute SED - Computes Spatial Eye Difference feature without normalization
+    # compute SED - Computes Spatial Eye Difference feature without
+    # normalization
     # find electrodes in Left Eye area (LE)
-    # indexes of LE electrodes - disagreement between the matlab ADJUST and the paper
+    # indexes of LE electrodes - disagreement between
+    # the matlab ADJUST and the paper
     indexl = np.where((chanlocs[:, 3] > 119) & (chanlocs[:, 3] < 151)
                       & (chanlocs[:, 4] > .3 * 9.5))
     # number of LE electrodes
@@ -328,7 +329,8 @@ def _adjust(icaact, icawinv, chanlocs):
 
     if dimleft * dimright == 0:
         # should return warning message as well
-        print('ERROR: no channels included in some scalp areas (dimleft & dimright).')
+        print('ERROR: no channels included in some\
+               scalp areas (dimleft & dimright).')
 
     # SED value
     medie_left = topografie_normed[:, indexl[0]].mean(1)
@@ -352,7 +354,8 @@ def _adjust(icaact, icawinv, chanlocs):
 
     if dimfront * dimback == 0:
         # should return warning message as well
-        print('ERROR: no channels included in some scalp areas (dimfront & dimback).')
+        print('ERROR: no channels included in some scalp areas \
+              (dimfront & dimback).')
 
     # SAD value
     mean_front = topografie_normed[:, indexf[0]].mean(1)
@@ -365,16 +368,24 @@ def _adjust(icaact, icawinv, chanlocs):
     diff_var = var_front - var_back
 
     # epoch dynamic range, variance and kurtosis
-    # kurtosis is not exactly same (matlab ADJUST uses the kurt method from eeglab), but fairly close
-    kurt = np.apply_along_axis(lambda x: sp_stats.kurtosis(x, axis=None), 1, icaact_normed).transpose()
-    varmat = np.apply_along_axis(lambda x: np.var(x, ddof=1), 1, icaact_normed).transpose()
+    # kurtosis is not exactly same
+    # (matlab ADJUST uses the kurt method from eeglab), but fairly close
+    kurt = np.apply_along_axis(lambda x: sp_stats.kurtosis(x, axis=None), 1,
+                               icaact_normed).transpose()
+    varmat = np.apply_along_axis(lambda x: np.var(x, ddof=1), 1,
+                                 icaact_normed).transpose()
 
     # compute average value removing the top 1% of the values
     dim_remove = int(np.floor(.01 * num_epoch))
 
-    mean_kurt = np.apply_along_axis(lambda x: np.mean(x[np.argsort(x)[0:(len(x) - dim_remove)]]), 0, kurt)
-    mean_varmat = np.apply_along_axis(lambda x: np.mean(x[np.argsort(x)[0:(len(x) - dim_remove)]]), 0, varmat)
-    max_varmat = np.apply_along_axis(lambda x: x[np.argsort(x)[-(dim_remove + 1)]], 0, varmat)
+    mean_kurt = np.apply_along_axis(lambda x: np.mean(
+        x[np.argsort(x)[0:(len(x) - dim_remove)]]), 0, kurt)
+
+    mean_varmat = np.apply_along_axis(lambda x: np.mean(
+        x[np.argsort(x)[0:(len(x) - dim_remove)]]), 0, varmat)
+
+    max_varmat = np.apply_along_axis(
+        lambda x: x[np.argsort(x)[-(dim_remove + 1)]], 0, varmat)
 
     # MEV in reviewed formulation
     nuovav = max_varmat / mean_varmat
@@ -509,8 +520,10 @@ def _em(arr):
                 prob2 = ((1 / (np.sqrt(2 * np.pi * var2_old))) * np.exp(
                     (-1) * ((arr[i] - med2_old) ** 2) / (2 * var2_old)))
 
-            prior1_i.append(prior1_old * prob1 / (prior1_old * prob1 + prior2_old * prob2))
-            prior2_i.append(prior2_old * prob2 / (prior1_old * prob1 + prior2_old * prob2))
+            prior1_i.append(prior1_old * prob1 /
+                            (prior1_old * prob1 + prior2_old * prob2))
+            prior2_i.append(prior2_old * prob2 /
+                            (prior1_old * prob1 + prior2_old * prob2))
 
         prior1 = sum(prior1_i) / len_arr
         prior2 = sum(prior2_i) / len_arr
@@ -530,8 +543,11 @@ def _em(arr):
     k = c_MA / c_FA
     a = (var1 - var2) / 2
     b = ((var2 * med1) - (var1 * med2))
+
     c = (np.log((k * prior1 * np.sqrt(var2)) / (prior2 * np.sqrt(var1)))
-         * (var2 * var1)) + (((((med2) ** 2) * var1) - (((med1) ** 2) * var2)) / 2)
+         * (var2 * var1)) + (((((med2) ** 2) * var1) -
+                             (((med1) ** 2) * var2)) / 2)
+
     rad = (b ** 2) - (4 * a * c)
     if rad < 0:
         print('ERROR: Negative Discriminant!')
@@ -601,8 +617,8 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
 
     try:
         events, event_id = mne.events_from_annotations(raw)
-    except (TypeError, AttributeError):
-        raise TypeError(INVALID_DATA_MSG)
+    except (TypeError, AttributeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     epochs = mne.Epochs(raw, events, event_id=event_id,
                         tmin=tmin,
@@ -646,16 +662,9 @@ def plot_sensor_locations(epochs, user_params):
     -----------
     Graph plotting of sensor locations
     """
-    try:
-        kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
-        ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
-    except TypeError:
-        raise TypeError(INVALID_UPARAM_MSG)
-
-    try:
-        epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
-    except TypeError:
-        raise TypeError(INVALID_DATA_MSG)
+    kind_selected = user_params["Segment"]["Plotting Information"]["Kinds"]
+    ch_types = user_params["Segment"]["Plotting Information"]["Ch_type"]
+    epochs.plot_sensors(kind=kind_selected, ch_type=ch_types)
 
 
 def final_reject_epoch(epochs):
@@ -674,19 +683,20 @@ def final_reject_epoch(epochs):
                             dictionary with epochs droped per channel and
                             channels interpolated
     """
-
-    # creates the output dictionary to store the function output
-    output_dict_finalRej = collections.defaultdict(dict)
-    output_dict_finalRej['interpolatedChannels'] = []
+    # Quick-fix, re-load epochs
+    epochs.load_data()
 
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
     try:
         autoRej.fit(epochs)
-    except ValueError:
-        raise ValueError(INVALID_FR_DATA_MSG)
-    except (TypeError, AttributeError):
-        raise TypeError(INVALID_DATA_MSG)
+    except (ValueError, TypeError, AttributeError) as error_msg:
+        return epochs, {"ERROR": str(error_msg)}
+
+    # creates the output dictionary to store the function output
+    output_dict_finalRej = {}
+    interpolatedChannels = []
+    epochsDropped = {}
 
     epochs_clean = autoRej.transform(epochs)
 
@@ -700,14 +710,18 @@ def final_reject_epoch(epochs):
     df = pd.DataFrame(data=reject_log.labels, columns=ch_names)
     for ch in ch_names:
         if df[df[ch] == 2][ch].count() > 0:
-            output_dict_finalRej['interpolatedChannels'].append(ch)
+            interpolatedChannels.append(ch)
 
     for ch in ch_names:
         # store amount of epochs dropped for each channel
-        output_dict_finalRej['epochsDropped'][ch] = str(
-            epochs_clean.drop_log.count((ch,)))
+        epochsDropped[ch] = str(epochs_clean.drop_log.count((ch,)))
 
-    return epochs_clean, output_dict_finalRej
+    output_dict_finalRej = {
+        "Interpolated channels": interpolatedChannels,
+        "Epochs dropped": epochsDropped
+    }
+
+    return epochs_clean, {"Final Reject": output_dict_finalRej}
 
 
 def interpolate_data(epochs, mode='accurate'):
@@ -732,7 +746,6 @@ def interpolate_data(epochs, mode='accurate'):
     ----------
     Modified in place epochs object and output dictionary
     """
-
     bads_before = epochs.info['bads']
 
     if len(bads_before) == 0:
@@ -741,8 +754,8 @@ def interpolate_data(epochs, mode='accurate'):
         try:
             epochs_interp = epochs.interpolate_bads(mode=mode)
             return epochs_interp, {"Interpolation": {"Affected": bads_before}}
-        except (TypeError, AttributeError):
-            raise TypeError(INVALID_DATA_MSG)
+        except (TypeError, AttributeError) as error_msg:
+            return epochs, {"ERROR": str(error_msg)}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -855,8 +868,8 @@ def identify_badchans_raw(raw, ref_elec_name):
     # get the index of reference electrode
     try:
         ref_index = raw.ch_names.index(ref_elec_name)
-    except ValueError:
-        raise ValueError(INVALID_REF_MSG)
+    except ValueError as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100
@@ -865,8 +878,8 @@ def identify_badchans_raw(raw, ref_elec_name):
     ref_z = channel_positions[ref_index][2]
 
     # get distances between electrodes and the reference electrode
-    chan_ref_dist = [np.sqrt((x[0] - ref_x) ** 2 + (x[1] - ref_y) ** 2 + (x[2] - ref_z) ** 2)
-                     for x in channel_positions]
+    chan_ref_dist = [np.sqrt((x[0] - ref_x) ** 2 + (x[1] - ref_y) ** 2 +
+                     (x[2] - ref_z) ** 2) for x in channel_positions]
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
@@ -879,11 +892,14 @@ def identify_badchans_raw(raw, ref_elec_name):
                                                         tail=0)]
 
     # find bad channels based on correlations and correct for the distance
-    # ignore the warning when the data has nothing but nan values for the np.nanmean
+    # ignore the warning when the data has nothing but nan values for the
+    # np.nanmean
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         chns_cor = np.nanmean(abs(np.corrcoef(raw_data)), axis=0)
         chns_cor[ref_index] = np.nanmean(chns_cor)
+
     reg_cor = np.polyfit(chan_ref_dist, chns_cor, 2)
     fitcurve_cor = np.polyval(reg_cor, chan_ref_dist)
     corrected_cor = chns_cor - fitcurve_cor
@@ -894,7 +910,9 @@ def identify_badchans_raw(raw, ref_elec_name):
 
     # find bad channels based on hurst exponent
     hurst_exp = np.array([hurst(i) for i in raw_data])
-    # ignore the warning when the data has nothing but nan values for the np.nanmean
+
+    # ignore the warning when the data has nothing but nan values for the
+    # np.nanmean
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         hurst_exp[np.isnan(hurst_exp)] = np.nanmean(hurst_exp)
