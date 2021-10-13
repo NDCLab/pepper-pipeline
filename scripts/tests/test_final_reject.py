@@ -72,8 +72,8 @@ def test_return_values(select_data_params):
 
 def test_except_bad_object(error_obj):
     # attempt to filter data w/invalid data
-    with pytest.raises(TypeError):
-        _, _ = pre.final_reject_epoch(error_obj)
+    _, output = pre.final_reject_epoch(error_obj)
+    assert "ERROR" in output.keys()
 
 
 def test_except_value(select_data_params):
@@ -92,5 +92,5 @@ def test_except_value(select_data_params):
 
         # attempt to reject epochs with data containing only one entire epoch
         # across each channel
-        with pytest.raises(ValueError):
-            _, _ = pre.final_reject_epoch(epo)
+        _, output = pre.final_reject_epoch(epo)
+        assert "ERROR" in output.keys()

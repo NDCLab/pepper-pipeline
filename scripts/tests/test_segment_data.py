@@ -68,5 +68,5 @@ def test_except_value(select_data_params, error_obj):
     seg_param = feature_params["segment_data"]
 
     # attempt to segment epochs with invalid epoch object
-    with pytest.raises(TypeError):
-        _, _ = pre.segment_data(error_obj, **seg_param)
+    _, output = pre.segment_data(error_obj, **seg_param)
+    assert "ERROR" in output.keys()
