@@ -20,6 +20,8 @@ while IFS= read -r line; do
   arr+=("$line")
 done < subjects.txt
 
+cd ..
+
 parallel_script=""
 for sub in "${arr[@]}"
 do
