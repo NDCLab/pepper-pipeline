@@ -193,9 +193,7 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
         "final_reject_epoch": {
         },
         "interpolate_data": {
-            "mode": "accurate",
-            "method": None,
-            "reset_bads": None
+            "mode": "accurate"
         },
         "reref_raw": {
         }
