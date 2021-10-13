@@ -29,7 +29,7 @@ do
    parallel_script+="srun --ntasks=1 "
    parallel_script+="singularity exec --bind /home/data/NDClab/datasets/pepper-pipeline-dataset/CMI/derivatives,"
    parallel_script+="/home/data/NDClab/data/pepper-pipeline/CMI/rawdata"
-   parallel_script+=" /container/singularity/run-container.simg python3 run.py & "
+   parallel_script+=" /containers/singularity/run-container.simg python3 run.py & "
 done
 
 parallel_script+="wait"
