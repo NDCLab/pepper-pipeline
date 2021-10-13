@@ -12,5 +12,5 @@
 module load singularity-3.5.3
 
 # use singularity image to run all tests
-cd ..
+cd /home/data/NDClab/tools/pepper-pipeline
 singularity exec --bind /home/data/NDClab/datasets/pepper-pipeline-dataset/CMI /container/run-container.simg pytest
