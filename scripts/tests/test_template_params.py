@@ -14,9 +14,11 @@ def root():
 
 @pytest.fixture
 def write_path():
-    fn = "test"
-    os.mkdir(fn)
-    return fn
+    dn = "test"
+    if os.path.isdir(dn):
+        os.rmdir(dn)
+    os.mkdir(dn)
+    return dn
 
 
 @pytest.fixture
@@ -136,10 +138,11 @@ def test_write(default_params_write, write_path):
         if not dirnames:
             assert len(filenames) == 1
     # assert that the written file is the same as user_params
-    with open(write_path + "\\user_params.json") as fp:
+    full_path = os.path.join(write_path, "user_params.json")
+    with open(full_path) as fp:
         written_params = json.load(fp)
     assert default_params_write == written_params
 
     # remove temp directory
-    os.remove(write_path + "\\user_params.json")
+    os.remove(full_path)
     os.rmdir(write_path)
