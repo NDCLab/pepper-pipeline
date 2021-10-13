@@ -746,7 +746,10 @@ def interpolate_data(epochs, mode='accurate'):
     ----------
     Modified in place epochs object and output dictionary
     """
-    bads_before = epochs.info['bads']
+    try:
+        bads_before = epochs.info['bads']
+    except (TypeError, AttributeError) as error_msg:
+        return epochs, {"ERROR": str(error_msg)}
 
     if len(bads_before) == 0:
         return epochs, {"Interpolation": {"Affected": bads_before}}

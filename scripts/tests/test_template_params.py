@@ -83,7 +83,7 @@ def finalReject_params():
 
 @pytest.fixture
 def interp_params():
-    return set(["mode", "method", "reset_bads"])
+    return set(["mode"])
 
 
 @pytest.fixture
