@@ -46,6 +46,13 @@ def error_tasks():
 
 
 @pytest.fixture
+def error_data_params(default_params, sel_subjects, error_tasks):
+    default_params["load_data"]["subjects"] = sel_subjects
+    default_params["load_data"]["tasks"] = error_tasks
+    return default_params
+
+
+@pytest.fixture
 def error_obj():
     return None
 
@@ -76,13 +83,13 @@ def test_except_bad_object(error_obj):
     assert "ERROR" in output.keys()
 
 
-def test_except_value(select_data_params):
+def test_except_value(error_data_params):
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(select_data_params["load_data"])
+    data = load.load_files(error_data_params["load_data"])
 
     # get the pipeline steps
-    feature_params = select_data_params["preprocess"]
+    feature_params = error_data_params["preprocess"]
 
     for file in data:
         eeg_obj = mne_bids.read_raw_bids(file)

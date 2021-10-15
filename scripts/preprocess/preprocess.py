@@ -683,12 +683,11 @@ def final_reject_epoch(epochs):
                             dictionary with epochs droped per channel and
                             channels interpolated
     """
-    # Quick-fix, re-load epochs
-    epochs.load_data()
-
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
     try:
+        # Quick-fix, re-load epochs
+        epochs.load_data()
         autoRej.fit(epochs)
     except (ValueError, TypeError, AttributeError) as error_msg:
         return epochs, {"ERROR": str(error_msg)}
