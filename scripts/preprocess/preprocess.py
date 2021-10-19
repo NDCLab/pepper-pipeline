@@ -102,8 +102,8 @@ def reref_raw(raw, reref_channels='average'):
     """
     try:
         raw.load_data()
-    except (AttributeError, TypeError):
-        raise TypeError(INVALID_DATA_MSG)
+    except (AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     raw_new_ref = raw.set_eeg_reference(reref_channels)
 
