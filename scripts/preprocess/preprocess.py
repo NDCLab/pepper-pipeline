@@ -42,14 +42,49 @@ def set_montage(raw, montage):
     return raw, {"Montage": montage_details}
 
 
-def reref_raw(raw, ref_channels=None):
-    """Re-reference the data to the average of all electrodes
+def set_reference(raw, ref_channels):
+    """Add reference channel into the dataset
     Parameters
     ----------
     raw:    mne.io.Raw
-            raw object of EEG data
-    ref_channels: list
-            list of reference channels
+            raw EEG object
+
+    ref_channels: string
+                  name of online reference channel
+
+    Returns
+    ----------
+    raw:   mne.io.Raw
+           raw EEG object with reference channel added
+
+    output_dict_reference:  dictionary
+                            dictionary with reference information
+    """
+    try:
+        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
+        reference_details = {
+            "Reference": ref_channels
+        }
+        return raw_new_ref, {"Reference": reference_details}
+    except ValueError:
+        reference_details = {
+            "Reference": "Reference is already specified. Or invalid reference channel name."
+        }
+        return raw, {"Reference": reference_details}
+
+
+def reref_raw(raw, reref_channels='average'):
+    """Re-reference the data
+    Parameters
+    ----------
+    raw: instance of Raw | Epochs
+         EEG data
+    reref_channels: list of str | str
+                    Can be:
+                    The name(s) of the channel(s) used to construct the reference.
+                    'average' to apply an average reference (default)
+                    'REST' to use the Reference Electrode Standardization Technique infinity reference 4.
+                    An empty list, in which case MNE will not attempt any re-referencing of the data
 
     Throws
     ----------
@@ -60,30 +95,24 @@ def reref_raw(raw, ref_channels=None):
 
     Returns
     ----------
-    raw_filtered:   mne.io.Raw
-                    instance of rereferenced data
+    raw_rerefed: instance of Raw | Epochs
+                 data after re-referenced
     output_dict_reference:  dictionary
                             dictionary with relevant information on re-ref
     """
     try:
         raw.load_data()
-    except (AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+    except (AttributeError, TypeError):
+        raise TypeError(INVALID_DATA_MSG)
 
-    # add back reference channel (all zero)
-    if ref_channels is None:
-        raw_new_ref = raw
-    else:
-        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
+    raw_new_ref = raw.set_eeg_reference(reref_channels)
 
-    ref_type = "average"
-    raw_new_ref = raw_new_ref.set_eeg_reference(ref_channels=ref_type)
-
-    ref_details = {
-        "Reference Type": ref_type
+    reref_details = {
+        "Rereference": reref_channels
     }
-    # return average reference
-    return raw_new_ref, {"Reference": ref_details}
+
+    # return rereferenced data
+    return raw_new_ref, {"Rereference": reref_details}
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
