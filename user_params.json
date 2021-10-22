@@ -18,6 +18,9 @@
         "parallel": false
     },
     "preprocess": {
+        "set_reference": {
+            "ref_channels": "E129"
+        },
         "set_montage": {
             "montage": "GSN-HydroCel-129"
         },
