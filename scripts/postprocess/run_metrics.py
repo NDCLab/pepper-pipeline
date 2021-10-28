@@ -1,8 +1,6 @@
 import os
 import erp
 
-# def get_erp -- need input: 1) data path; 2) event of interest (string)
-
 data_path = "/Users/yanbinniu/Documents/Projects/tf-pca/OSF/tfpca-tutorial/ptb_data/"
 
 fileList = []
