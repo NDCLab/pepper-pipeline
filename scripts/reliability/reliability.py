@@ -54,8 +54,8 @@ def split_half(data_group_one, data_group_two=None, number_permutations=5000):
 
     for n in range(number_permutations):
         data_random_split = [np.array_split(rng.permutation(d), 2) for d in data_group_one]  # permute each array, split
-        mean_by_split = np.array([[np.mean(split) for split in group] for group in data_random_split]) # mean of each split
-        if compute_difference: # do the same for the second group of data if computing differenc
+        mean_by_split = np.array([[np.mean(split) for split in group] for group in data_random_split])  # mean of each split
+        if compute_difference:  # do the same for the second group of data if computing difference
             data_random_split_two = [np.array_split(rng.permutation(d), 2) for d in data_group_two]
             mean_by_split_two = np.array([[np.mean(split) for split in group] for group in data_random_split_two])
             mean_by_split = mean_by_split - mean_by_split_two
