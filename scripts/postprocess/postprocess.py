@@ -36,7 +36,7 @@ def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
         epoch_con1_arr = epoch_con1.get_data()
         # return a array of shape (n_epochs, n_channels, n_times)
         # cut the data to the time of interest
-        epoch_con1_arr_int = epoch_con1_arr[:,:,start_point:end_point]
+        epoch_con1_arr_int = epoch_con1_arr[:, :, start_point:end_point]
 
         # compute trial level erp
         datalist1.append(np.mean(epoch_con1_arr_int, axis=(1, 2)))
