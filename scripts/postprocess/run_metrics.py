@@ -10,6 +10,6 @@ for root, dirs, files in os.walk(data_path):
             fileList.append(os.path.join(root, file))
 
 # get trial level erp for all participants
-dataList = erp.get_trial_erp(fileList, 'auditory')
+datalist1, datalist2 = erp.get_trial_erp(fileList, 0, 0.1, 'auditory', 'visual')
 
 # cal Dan's splithalf
