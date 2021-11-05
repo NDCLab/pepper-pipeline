@@ -25,7 +25,7 @@ def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
     datalist2 = []
 
     for dt in filelist:
-        raw = mne.io.read_raw_fif(dt)
+        raw = mne.read_epochs(dt)
 
         # find the start and end time points of interest
         start_point = bisect.bisect_left(raw.times, start_t)
