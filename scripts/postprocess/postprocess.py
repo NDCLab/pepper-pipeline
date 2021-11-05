@@ -91,7 +91,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
     smelist = []
 
     for dt in filelist:
-        raw = mne.read_epoch(dt)
+        raw = mne.read_epochs(dt)
 
         # find the start and end time points of interest
         start_point = bisect.bisect_left(raw.times, start_t)
