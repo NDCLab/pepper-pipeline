@@ -951,7 +951,7 @@ def identify_badchans_raw(raw, ref_elec_name):
     bads_hurst = [raw.ch_names[i] for i in bads_loc]
 
     # mark bad channels
-    raw.info['bads'].extend(bads_var + bads_cor + bads_hurst)
+    raw.info['bads'].extend(np.unique(bads_var + bads_cor + bads_hurst))
 
     badchans_details = {"badchans based on variances": bads_var,
                         "badchans based on correlations": bads_cor,
