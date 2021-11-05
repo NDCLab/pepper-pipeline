@@ -110,10 +110,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
 
             # average across electrodes and time points of interest
             epoch_con_dat_int = epoch_con_dat[:, elec, start_point:end_point]
-            if len(elec) == 1:
-                epoch_con_dat_int_mean = np.mean(epoch_con_dat_int, axis=1)
-            else:
-                epoch_con_dat_int_mean = np.mean(epoch_con_dat_int, axis=(1, 2))
+            epoch_con_dat_int_mean = np.mean(epoch_con_dat_int, axis=(1, 2))
 
             # compute standard error of the sample mean
             sem_arr[i] = sd_sample_mean(epoch_con_dat_int_mean)
