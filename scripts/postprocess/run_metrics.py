@@ -11,8 +11,8 @@ for root, dirs, files in os.walk(data_path):
 
 # compute splithalf reliability
 # get trial level erp for all participants
-datalist1, datalist2 = postprocess.get_trial_erp(fileList, 0, 0.1, 'auditory', 'visual')
+datalist1, datalist2 = postprocess.get_trial_erp(fileList, 0, 0.1, '12', '5')
 # call Dan's splithalf
 
 # compute SME
-sme = postprocess.sme(fileList, 0, 0.1, ['auditory', 'visual'], ['E1', 'E2'])
+sme = postprocess.sme(fileList, 0, 0.1, ['12', '5'], ['E1', 'E2'])
