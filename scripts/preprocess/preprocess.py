@@ -28,7 +28,7 @@ def set_montage(raw, montage):
            raw EEG object with montage applied
 
     output_dict_montage:  dictionary
-                          dictionary with montage informationrw
+                          dictionary with montage information
     """
     try:
         raw.set_montage(montage)
@@ -38,7 +38,6 @@ def set_montage(raw, montage):
     montage_details = {
         "Montage": montage
     }
-    # return average reference
     return raw, {"Montage": montage_details}
 
 
