@@ -67,7 +67,8 @@ def set_reference(raw, ref_channels):
         return raw_new_ref, {"Reference": reference_details}
     except ValueError:
         reference_details = {
-            "Reference": "Reference is already specified. Or invalid reference channel name."
+            "Reference": "Reference is already specified. Or invalid reference \
+            channel name."
         }
         return raw, {"Reference": reference_details}
 
@@ -80,10 +81,13 @@ def reref_raw(raw, reref_channels='average'):
          EEG data
     reref_channels: list of str | str
                     Can be:
-                    The name(s) of the channel(s) used to construct the reference.
+                    The name(s) of the channel(s) used to construct the
+                    reference.
                     'average' to apply an average reference (default)
-                    'REST' to use the Reference Electrode Standardization Technique infinity reference 4.
-                    An empty list, in which case MNE will not attempt any re-referencing of the data
+                    'REST' to use the Reference Electrode Standardization
+                    Technique infinity reference 4.
+                    An empty list, in which case MNE will not attempt any
+                    re-referencing of the data
 
     Throws
     ----------
@@ -331,7 +335,8 @@ def _adjust(icaact, icawinv, chanlocs):
             # difference between el and the average of 10 neighbors
             # weighted according to weightchas
             aux.append(abs(topografie_normed[ic, el] -
-                       np.mean(weightchas * topografie_normed[ic, repchas])))
+                           np.mean(weightchas * topografie_normed[ic, repchas])
+                           ))
 
         res[ic] = max(aux)
 
@@ -574,7 +579,7 @@ def _em(arr):
 
     c = (np.log((k * prior1 * np.sqrt(var2)) / (prior2 * np.sqrt(var1)))
          * (var2 * var1)) + (((((med2) ** 2) * var1) -
-                             (((med1) ** 2) * var2)) / 2)
+                              (((med1) ** 2) * var2)) / 2)
 
     rad = (b ** 2) - (4 * a * c)
     if rad < 0:
@@ -645,20 +650,19 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
 
     try:
         events, event_id = mne.events_from_annotations(raw)
-    except (TypeError, AttributeError) as error_msg:
+        epochs = mne.Epochs(raw, events, event_id=event_id,
+                            tmin=tmin,
+                            tmax=tmax,
+                            baseline=baseline,
+                            picks=picks,
+                            reject_tmin=reject_tmin,
+                            reject_tmax=reject_tmax,
+                            decim=decim,
+                            verbose=verbose,
+                            preload=preload
+                            )
+    except (TypeError, AttributeError, ValueError) as error_msg:
         return raw, {"ERROR": str(error_msg)}
-
-    epochs = mne.Epochs(raw, events, event_id=event_id,
-                        tmin=tmin,
-                        tmax=tmax,
-                        baseline=baseline,
-                        picks=picks,
-                        reject_tmin=reject_tmin,
-                        reject_tmax=reject_tmax,
-                        decim=decim,
-                        verbose=verbose,
-                        preload=preload
-                        )
 
     # get count of all epochs to output dictionary
     ch_names = epochs.info.ch_names
@@ -714,7 +718,7 @@ def final_reject_epoch(epochs):
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
     try:
-        # Quick-fix, re-load epochs
+        # load in epochs and fit on autoRej model
         epochs.load_data()
         autoRej.fit(epochs)
     except (ValueError, TypeError, AttributeError) as error_msg:
@@ -909,7 +913,7 @@ def identify_badchans_raw(raw, ref_elec_name):
 
     # get distances between electrodes and the reference electrode
     chan_ref_dist = [np.sqrt((x[0] - ref_x) ** 2 + (x[1] - ref_y) ** 2 +
-                     (x[2] - ref_z) ** 2) for x in channel_positions]
+                             (x[2] - ref_z) ** 2) for x in channel_positions]
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
