@@ -177,14 +177,18 @@ def ica_raw(raw):
     if raw.get_montage() is None:
         return raw, {"ERROR": MISSING_MONTAGE_MSG}
 
-    # prep for ica - make a copy
-    raw_filtered_1 = raw.copy()
+    try:
+        # prep for ica - load and make a copy
+        raw.load_data()
+        raw_filt_copy = raw.copy()
 
-    # High-pass with 1. Hz cut-off is recommended for ICA
-    raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
+        # High-pass with 1. Hz cut-off is recommended for ICA
+        raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {"ERROR": str(error_msg)}
 
     # epoch with arbitrary 1s
-    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
+    epochs_prep = mne.make_fixed_length_epochs(raw_filt_copy,
                                                duration=1.0,
                                                preload=True,
                                                overlap=0.0)
@@ -221,7 +225,7 @@ def ica_raw(raw):
     # compute channel locations
     # first get a list of channel names after removing bad channels and the
     # reference channel
-    raw_locs = raw_filtered_1.copy()
+    raw_locs = raw_filt_copy.copy()
     bad_chans = raw_locs.info['bads']
 
     # remove bad channels
@@ -649,6 +653,7 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     """
 
     try:
+        raw.load_data()
         events, event_id = mne.events_from_annotations(raw)
         epochs = mne.Epochs(raw, events, event_id=event_id,
                             tmin=tmin,
@@ -778,6 +783,7 @@ def interpolate_data(epochs, mode='accurate'):
     Modified in place epochs object and output dictionary
     """
     try:
+        epochs.load_data()
         bads_before = epochs.info['bads']
     except (TypeError, AttributeError) as error_msg:
         return epochs, {"ERROR": str(error_msg)}
@@ -895,14 +901,13 @@ def identify_badchans_raw(raw, ref_elec_name):
     output_dict_flter:  dictionary
                         dictionary with relevant bad channel information
     """
-
-    # get raw data matrix
-    raw_data = raw.get_data()
-
-    # get the index of reference electrode
     try:
+        raw.load_data()
+        # get raw data matrix
+        raw_data = raw.get_data()
+        # get the index of reference electrode
         ref_index = raw.ch_names.index(ref_elec_name)
-    except ValueError as error_msg:
+    except (ValueError, TypeError, AttributeError) as error_msg:
         return raw, {"ERROR": str(error_msg)}
 
     # get reference electrode location
