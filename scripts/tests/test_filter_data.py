@@ -25,7 +25,7 @@ def test_return_values(default_params, bids_test_data):
     filt_obj, output_dict = pre.filter_data(eeg_obj, **filt_param)
 
     # assert valid output objects
-    assert None not in output_dict.values()
+    assert "ERROR" not in output_dict.keys()
     assert isinstance(filt_obj, BaseRaw)
 
 

@@ -29,7 +29,7 @@ def test_return_values(default_params, bids_test_data):
     ica_obj, output_dict = pre.ica_raw(filt_obj, **ica_param)
 
     # assert that None does not exist in bad chans
-    assert None not in output_dict.values()
+    assert "ERROR" not in output_dict.keys()
     assert isinstance(ica_obj, BaseRaw)
 
 

@@ -42,7 +42,7 @@ def test_return_values(default_params, bids_test_data):
     rej_epo, output_dict = pre.final_reject_epoch(epo)
 
     # assert that data is valid
-    assert None not in output_dict.values()
+    assert "ERROR" not in output_dict.keys()
     assert isinstance(rej_epo, mne.Epochs)
 
 
