@@ -167,8 +167,11 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
 
     # set up default preprocess params
     user_params["preprocess"] = {
+        "set_reference": {
+            "ref_channels": "Cz"
+        },
         "set_montage": {
-            "montage": "standard_1020"
+            "montage": "GSN-HydroCel-129"
         },
         "filter_data": {
             "l_freq": 0.3,
