@@ -22,7 +22,7 @@ def test_return_values(default_params, bids_test_data):
     # set montage
     pre.set_montage(eeg_obj, **montage_file)
 
-    # filter
+    # filter to generate valid epoch events
     filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
 
     # apply ica to filtered eeg object
@@ -42,7 +42,7 @@ def test_bad_object(default_params, error_obj):
     assert "ERROR" in output.keys()
 
 
-def test_missing_montage(default_params, bids_test_data, error_obj):
+def test_missing_montage(default_params, bids_test_data):
     # get default pipeline params
     feature_params = default_params["preprocess"]
 
