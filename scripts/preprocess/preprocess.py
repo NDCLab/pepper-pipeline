@@ -173,11 +173,9 @@ def ica_raw(raw):
     output_dict_ica:  dictionary
                       dictionary with relevant ica information
     """
-
-    if raw.get_montage() is None:
-        return raw, {"ERROR": MISSING_MONTAGE_MSG}
-
     try:
+        if raw.get_montage() is None:
+            return raw, {"ERROR": MISSING_MONTAGE_MSG}
         # prep for ica - load and make a copy
         raw.load_data()
         raw_filt_copy = raw.copy()
