@@ -3,38 +3,8 @@ from scripts.preprocess import preprocess as pre
 import mne
 
 
-@pytest.fixture
-def single_event_epoch_data(default_params, bids_test_data):
-    # Get the default parameters for segmenting
-    feature_params = default_params["preprocess"]
-    seg_params = feature_params["segment_data"]
-    montage_param = feature_params["set_montage"]
-
-    # Get events and sampling frequency
-    events, _ = mne.events_from_annotations(bids_test_data)
-    s_freq = bids_test_data.info["sfreq"]
-
-    # Convert events to annotations
-    annotate = mne.annotations_from_events(events, sfreq=s_freq)
-
-    # Limit annotations to single event and set
-    annotate.delete(list(range(1, annotate.__len__())))
-    single_event_data = bids_test_data.copy().set_annotations(annotate)
-
-    # Run on both preloaded and non-preloaded data
-    eeg_obj = single_event_data
-
-    # Set the montage file
-    eeg_obj, _ = pre.set_montage(eeg_obj, **montage_param)
-
-    # generate epoched object to be rejected
-    epo, _ = pre.segment_data(eeg_obj, **seg_params)
-
-    return epo
-
-
-@pytest.fixture
-def epoch_data(default_params, bids_test_data):
+@pytest.fixture(params=['preloaded_data', 'non_preloaded_data'])
+def epoch_data(request, default_params, bids_test_data):
     # Get montage and segment params
     feature_params = default_params["preprocess"]
     seg_params = feature_params["segment_data"]
@@ -46,10 +16,50 @@ def epoch_data(default_params, bids_test_data):
     # Set the montage file
     eeg_obj, _ = pre.set_montage(eeg_obj, **montage_param)
 
-    # Generate epoched object to be rejected
+    # Generate epoched object
     epo, _ = pre.segment_data(eeg_obj, **seg_params)
 
+    if request.param == 'preloaded_data':
+        epo.load_data()
+
     return epo
+
+
+@pytest.fixture(params=['preloaded_data', 'non_preloaded_data'])
+def single_event_epoch_data(request, default_params, bids_test_data):
+    # Get montage and segment params
+    feature_params = default_params["preprocess"]
+    seg_params = feature_params["segment_data"]
+    montage_param = feature_params["set_montage"]
+
+    # Set the montage file
+    eeg_obj, _ = pre.set_montage(bids_test_data, **montage_param)
+
+    # Generate epoch object
+    epo, _ = pre.segment_data(eeg_obj, **seg_params)
+
+    # Get sfreq and event metadata
+    s_freq = epo.info["sfreq"]
+    events = epo.events
+    event_id = epo.event_id
+
+    # Convert events to annotations from epoch events
+    annotate = mne.annotations_from_events(events, sfreq=s_freq)
+
+    # Delete all other event annotations except for first
+    annotate.delete(list(range(1, annotate.__len__())))
+    # Set newly deleted annotations to raw
+    single_event_data = bids_test_data.set_annotations(annotate)
+    # Generate epochs from raw containing single event
+    events, event_id = mne.events_from_annotations(single_event_data)
+    single_event_epo = mne.Epochs(single_event_data,
+                                  events,
+                                  event_id,
+                                  )
+    if request.param == 'preloaded_data':
+        single_event_epo.load_data()
+
+    return single_event_epo
 
 
 @pytest.fixture
