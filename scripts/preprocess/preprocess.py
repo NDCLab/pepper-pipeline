@@ -60,6 +60,7 @@ def set_reference(raw, ref_channels):
                             dictionary with reference information
     """
     try:
+        raw.load_data()
         raw_new_ref = mne.add_reference_channels(raw, ref_channels)
         reference_details = {
             "Reference": ref_channels
@@ -920,8 +921,13 @@ def identify_badchans_raw(raw, ref_elec_name):
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
-    reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
-    fitcurve_var = np.polyval(reg_var, chan_ref_dist)
+
+    try:
+        reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
+        fitcurve_var = np.polyval(reg_var, chan_ref_dist)
+    except np.linalg.LinAlgError as error_msg:
+        return raw, {"ERROR": str(error_msg)}
+
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
                                                         threshold=3.0,
