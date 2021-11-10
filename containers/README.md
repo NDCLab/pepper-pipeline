@@ -20,7 +20,7 @@ To work with an existing PEPPER container simply use the `pull` command exactly 
 
 To build a new docker file with a specific tag, execute the following command within the *PEPPER-pipeline* root directory: 
    ```
-   docker build -t [tag] container/docker/Dockerfile
+   docker build -t [tag] containers/docker/
    ```
 
 ## Binding Data & Running
@@ -34,8 +34,8 @@ The two scripts `init_docker.cmd` and `init_docker.sh` are provided for the auto
 
 Run the `init_docker.cmd` script within your command prompt by executing:
    ```
-   cd container/docker
-   init_start_docker.cmd
+   cd containers/docker
+   init_docker.cmd [tag]
    ```
 
 ### If on MacOS/Linux
@@ -43,7 +43,7 @@ Run the `init_docker.cmd` script within your command prompt by executing:
 Run the `init_docker.sh` script within your command prompt by executing:
    ```
    cd container/docker
-   sh init_start_docker.sh
+   sh init_start_docker.sh [tag]
    ```
 
 
