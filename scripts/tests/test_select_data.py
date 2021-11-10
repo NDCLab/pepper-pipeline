@@ -126,7 +126,7 @@ def test_select_task(default_params, avail_subj, subj_files, select_task):
     assert len(data) == count
 
 
-def test_select_subj_task(default_params, subj_files, select_subj, 
+def test_select_subj_task(default_params, subj_files, select_subj,
                           select_task):
     default_params["load_data"]["subjects"] = select_subj
     default_params["load_data"]["tasks"] = select_task
