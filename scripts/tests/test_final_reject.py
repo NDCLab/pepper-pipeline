@@ -4,36 +4,14 @@ import mne
 
 
 @pytest.fixture(params=['preloaded_data', 'non_preloaded_data'])
-def epoch_data(request, default_params, bids_test_data):
-    # Get montage and segment params
-    feature_params = default_params["preprocess"]
-    seg_params = feature_params["segment_data"]
-    montage_param = feature_params["set_montage"]
-
-    # Run on both preloaded and non-preloaded data
-    eeg_obj = bids_test_data
-
-    # Set the montage file
-    eeg_obj, _ = pre.set_montage(eeg_obj, **montage_param)
-
-    # Generate epoched object
-    epo, _ = pre.segment_data(eeg_obj, **seg_params)
-
-    if request.param == 'preloaded_data':
-        epo.load_data()
-
-    return epo
-
-
-@pytest.fixture(params=['preloaded_data', 'non_preloaded_data'])
-def single_event_epoch_data(request, default_params, bids_test_data):
+def single_event_epoch_data(request, default_params, raw_data):
     # Get montage and segment params
     feature_params = default_params["preprocess"]
     seg_params = feature_params["segment_data"]
     montage_param = feature_params["set_montage"]
 
     # Set the montage file
-    eeg_obj, _ = pre.set_montage(bids_test_data, **montage_param)
+    eeg_obj, _ = pre.set_montage(raw_data, **montage_param)
 
     # Generate epoch object
     epo, _ = pre.segment_data(eeg_obj, **seg_params)
@@ -49,7 +27,7 @@ def single_event_epoch_data(request, default_params, bids_test_data):
     # Delete all other event annotations except for first
     annotate.delete(list(range(1, annotate.__len__())))
     # Set newly deleted annotations to raw
-    single_event_data = bids_test_data.set_annotations(annotate)
+    single_event_data = raw_data.set_annotations(annotate)
     # Generate epochs from raw containing single event
     events, event_id = mne.events_from_annotations(single_event_data)
     single_event_epo = mne.Epochs(single_event_data,
@@ -68,9 +46,9 @@ def error_obj():
     return None
 
 
-def test_return_values(epoch_data):
+def test_return_values(bids_test_epoch_data):
     # Reject epochs using ar
-    rej_epo, output_dict = pre.final_reject_epoch(epoch_data)
+    rej_epo, output_dict = pre.final_reject_epoch(bids_test_epoch_data)
 
     # assert that data is valid
     assert "ERROR" not in output_dict.keys()
