@@ -25,7 +25,7 @@ def test_return_values(default_params, bids_test_data):
     seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
 
     # assert that data is valid
-    assert None not in output_dict.values()
+    assert "ERROR" not in output_dict.values()
     assert isinstance(seg_epo, Epochs)
 
 
