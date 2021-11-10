@@ -1,34 +1,23 @@
-from scripts.data import write, load
-
 import pytest
 
-from pathlib import Path
-import os
+from scripts.data import load
 
 import mne_bids
 import pandas as pd
+import os
 
 
 @pytest.fixture
-def root():
-    root = Path("CMI/rawdata")
-    return root
-
-
-@pytest.fixture
-def default_param(root, tmp_path):
-    default_param = write.write_template_params(root, tmp_path)
-    return default_param
-
-
-@pytest.fixture
-def avail_subj(root):
+def avail_subj(default_params):
+    # Get all available subjects from test default params
+    root = default_params["load_data"]["root"]
     avail_subj = mne_bids.get_entity_vals(root, 'subject')
     return avail_subj
 
 
 @pytest.fixture
-def subj_files(avail_subj, root):
+def subj_files(avail_subj, default_params):
+    root = default_params["load_data"]["root"]
     # create a dictionary of subjects and corresponding files
     subjects = {}
     for subject in avail_subj:
@@ -55,22 +44,22 @@ def all():
 
 @pytest.fixture
 def select_subj():
-    return ["NDARAB793GL3"]
+    return ["testdata"]
 
 
 @pytest.fixture
 def select_task():
-    return ["ContrastChangeBlock1"]
+    return ["SurroundSupression"]
 
 
 @pytest.fixture
 def except_subj():
-    return ["NDARAB793GL3"]
+    return ["testdata"]
 
 
 @pytest.fixture
 def except_task():
-    return ["ContrastChangeBlock1"]
+    return ["SurroundSupression"]
 
 
 @pytest.fixture
@@ -88,24 +77,24 @@ def error_except_param():
     return None
 
 
-def test_select_all(default_param, avail_subj, subj_files):
+def test_select_all(default_params, avail_subj, subj_files):
     # Load data using the default parameters
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
-    # check if the number of files loaded matches
-    # the number of all files available
+    # check if the number of files loaded matches number of files
+    # available in subj_files
     count = 0
     for subject in avail_subj:
         count += len(subj_files[subject])
     assert len(data) == count
 
 
-def test_select_subj(default_param, subj_files, select_subj):
+def test_select_subj(default_params, subj_files, select_subj):
     # select participants (make this a random selection?)
-    default_param["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["subjects"] = select_subj
 
     # Load data using the selected participants
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects
@@ -115,12 +104,12 @@ def test_select_subj(default_param, subj_files, select_subj):
     assert len(data) == count
 
 
-def test_select_task(default_param, avail_subj, subj_files, select_task):
+def test_select_task(default_params, avail_subj, subj_files, select_task):
     # select tasks (make this a random selection?)
-    default_param["load_data"]["tasks"] = select_task
+    default_params["load_data"]["tasks"] = select_task
 
     # Load data using the selected task
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected task
@@ -137,12 +126,12 @@ def test_select_task(default_param, avail_subj, subj_files, select_task):
     assert len(data) == count
 
 
-def test_select_subj_task(default_param, subj_files, select_subj, select_task):
-    default_param["load_data"]["subjects"] = select_subj
-    default_param["load_data"]["tasks"] = select_task
+def test_select_subj_task(default_params, subj_files, select_subj, select_task):
+    default_params["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["tasks"] = select_task
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected tasks & subjects
@@ -157,13 +146,13 @@ def test_select_subj_task(default_param, subj_files, select_subj, select_task):
     assert len(data) == count
 
 
-def test_except_subj(default_param, avail_subj, subj_files, all, except_subj):
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = all
-    default_param["load_data"]["exceptions"]["runs"] = all
+def test_except_subj(default_params, avail_subj, subj_files, all, except_subj):
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = all
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the excluded subjects
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # get the excluded subset of subjects
     subjects_diff = set(avail_subj).difference(set(except_subj))
@@ -176,13 +165,13 @@ def test_except_subj(default_param, avail_subj, subj_files, all, except_subj):
     assert len(data) == count
 
 
-def test_except_task(default_param, avail_subj, subj_files, all, except_task):
-    default_param["load_data"]["exceptions"]["subjects"] = all
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = all
+def test_except_task(default_params, avail_subj, subj_files, all, except_task):
+    default_params["load_data"]["exceptions"]["subjects"] = all
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the excluded tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all tasks apart from the excluded
@@ -199,14 +188,14 @@ def test_except_task(default_param, avail_subj, subj_files, all, except_task):
     assert len(data) == count
 
 
-def test_except_subj_task(default_param, avail_subj, subj_files, all,
+def test_except_subj_task(default_params, avail_subj, subj_files, all,
                           except_subj, except_task):
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all subjects & tasks apart from the excluded
@@ -227,14 +216,14 @@ def test_except_subj_task(default_param, avail_subj, subj_files, all,
     assert len(data) == count
 
 
-def test_except_subj_task_run(default_param, avail_subj, subj_files,
+def test_except_subj_task_run(default_params, avail_subj, subj_files,
                               except_subj, except_task, except_run):
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = except_run
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = except_run
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of all subjects & tasks apart from the excluded
@@ -260,31 +249,31 @@ def test_except_subj_task_run(default_param, avail_subj, subj_files,
     assert len(data) == count
 
 
-def test_except_all(default_param, all):
+def test_except_all(default_params, all):
     # select all for exceptions
-    default_param["load_data"]["exceptions"]["subjects"] = all
-    default_param["load_data"]["exceptions"]["tasks"] = all
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = all
+    default_params["load_data"]["exceptions"]["tasks"] = all
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the excluded subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # assert nothing is selected
     assert len(data) == 0
 
 
-def test_select_all_except_subj(default_param, subj_files, all,
+def test_select_all_except_subj(default_params, subj_files, all,
                                 select_subj, select_task, except_subj):
 
-    default_param["load_data"]["subjects"] = select_subj
-    default_param["load_data"]["tasks"] = select_task
+    default_params["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["tasks"] = select_task
 
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = all
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = all
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # get the excluded subset of subjects
     subjects_diff = set(select_subj).difference(set(except_subj))
@@ -304,18 +293,18 @@ def test_select_all_except_subj(default_param, subj_files, all,
     assert len(data) == count
 
 
-def test_select_all_except_task(default_param, subj_files, all,
+def test_select_all_except_task(default_params, subj_files, all,
                                 select_subj, select_task, except_task):
 
-    default_param["load_data"]["subjects"] = select_subj
-    default_param["load_data"]["tasks"] = select_task
+    default_params["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["tasks"] = select_task
 
-    default_param["load_data"]["exceptions"]["subjects"] = all
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = all
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
@@ -334,19 +323,19 @@ def test_select_all_except_task(default_param, subj_files, all,
     assert len(data) == count
 
 
-def test_sel_all_except_subj_task(default_param, avail_subj, subj_files, all,
+def test_sel_all_except_subj_task(default_params, avail_subj, subj_files, all,
                                   select_subj, select_task, except_subj,
                                   except_task):
 
-    default_param["load_data"]["subjects"] = select_subj
-    default_param["load_data"]["tasks"] = select_task
+    default_params["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["tasks"] = select_task
 
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
@@ -368,19 +357,19 @@ def test_sel_all_except_subj_task(default_param, avail_subj, subj_files, all,
     assert len(data) == count
 
 
-def test_select_all_except_all(default_param, subj_files,
+def test_select_all_except_all(default_params, subj_files,
                                select_subj, select_task, except_subj,
                                except_task, except_run):
 
-    default_param["load_data"]["subjects"] = select_subj
-    default_param["load_data"]["tasks"] = select_task
+    default_params["load_data"]["subjects"] = select_subj
+    default_params["load_data"]["tasks"] = select_task
 
-    default_param["load_data"]["exceptions"]["subjects"] = except_subj
-    default_param["load_data"]["exceptions"]["tasks"] = except_task
-    default_param["load_data"]["exceptions"]["runs"] = except_run
+    default_params["load_data"]["exceptions"]["subjects"] = except_subj
+    default_params["load_data"]["exceptions"]["tasks"] = except_task
+    default_params["load_data"]["exceptions"]["runs"] = except_run
 
     # Load data using the selected subjects & tasks
-    data = load.load_files(default_param["load_data"])
+    data = load.load_files(default_params["load_data"])
 
     # check if the number of files loaded matches
     # the total number of files for all selected subjects excluding exceptions
@@ -407,84 +396,84 @@ def test_select_all_except_all(default_param, subj_files,
     assert len(data) == count
 
 
-def test_missing_subj(default_param, error_select_param):
+def test_missing_subj(default_params, error_select_param):
     # input invalid value for subjects
-    default_param["load_data"]["subjects"] = error_select_param
+    default_params["load_data"]["subjects"] = error_select_param
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_missing_task(default_param, error_select_param):
+def test_missing_task(default_params, error_select_param):
     # input invalid value for tasks
-    default_param["load_data"]["tasks"] = error_select_param
+    default_params["load_data"]["tasks"] = error_select_param
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_missing_except_subj(default_param, error_except_param, all):
+def test_missing_except_subj(default_params, error_except_param, all):
     # input invalid value for tasks
-    default_param["load_data"]["exceptions"]["subjects"] = error_except_param
-    default_param["load_data"]["exceptions"]["tasks"] = all
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = error_except_param
+    default_params["load_data"]["exceptions"]["tasks"] = all
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_missing_except_task(default_param, error_except_param, all):
+def test_missing_except_task(default_params, error_except_param, all):
     # input invalid value for tasks
-    default_param["load_data"]["exceptions"]["subjects"] = all
-    default_param["load_data"]["exceptions"]["tasks"] = error_except_param
-    default_param["load_data"]["exceptions"]["runs"] = all
+    default_params["load_data"]["exceptions"]["subjects"] = all
+    default_params["load_data"]["exceptions"]["tasks"] = error_except_param
+    default_params["load_data"]["exceptions"]["runs"] = all
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_missing_except_run(default_param, error_except_param, all):
+def test_missing_except_run(default_params, error_except_param, all):
     # input invalid value for tasks
-    default_param["load_data"]["exceptions"]["subjects"] = all
-    default_param["load_data"]["exceptions"]["tasks"] = all
-    default_param["load_data"]["exceptions"]["runs"] = error_except_param
+    default_params["load_data"]["exceptions"]["subjects"] = all
+    default_params["load_data"]["exceptions"]["tasks"] = all
+    default_params["load_data"]["exceptions"]["runs"] = error_except_param
 
     # Load data using the invalid field
     with pytest.raises(TypeError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_missing_data(default_param, tmp_path):
+def test_missing_data(default_params, tmp_path):
     # create empty and temporary directory
     empty_path = str(tmp_path) + "empty"
     os.mkdir(empty_path)
 
     # input invalid value for tasks
-    default_param["load_data"]["root"] = empty_path
+    default_params["load_data"]["root"] = empty_path
 
     # Load data using the invalid field
     with pytest.raises(FileNotFoundError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
 
 
-def test_bad_path(default_param, tmp_path):
+def test_bad_path(default_params, tmp_path):
     # create empty and temporary directory
     invalid_path = str(tmp_path) + "empty"
 
     # input invalid value for tasks
-    default_param["load_data"]["root"] = invalid_path
+    default_params["load_data"]["root"] = invalid_path
 
     # Load data using the invalid field
     with pytest.raises(FileNotFoundError):
-        load.load_files(default_param["load_data"])
+        load.load_files(default_params["load_data"])
         assert True
