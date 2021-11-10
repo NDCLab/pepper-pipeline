@@ -10,16 +10,11 @@ RUN apt-get update && apt-get -y upgrade\
  git \
  git-core \
  golang \
- htop \
  locales \
- man \
- nmap \
  python3-pip \
  ruby-full \
- strace \
  sudo \
- tig \
- vim \
+ nano \
  wget
 
 RUN locale-gen en_US.UTF-8

@@ -50,16 +50,11 @@ From: ubuntu:20.04
 	 curl \
 	 git git-core \
 	 golang \
-	 htop \
 	 locales \
-	 man \
-	 nmap \
 	 python3-pip \
 	 ruby-full \
-	 strace \
 	 sudo \
-	 tig \
-	 vim \
+	 nano \
 	 wget
 
 	# set time
