@@ -1,41 +1,6 @@
-from scripts.preprocess import preprocess as pre
-from scripts.data import load, write
-
 import pytest
-
-from pathlib import Path
-
-import mne_bids
+from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
-
-
-@pytest.fixture
-def root():
-    root = Path("CMI/rawdata")
-    return root
-
-
-@pytest.fixture
-def default_params(root, tmp_path):
-    default_param = write.write_template_params(root, tmp_path)
-    return default_param
-
-
-@pytest.fixture
-def sel_subjects():
-    return ["NDARAB793GL3"]
-
-
-@pytest.fixture
-def sel_tasks():
-    return ["ContrastChangeBlock1"]
-
-
-@pytest.fixture
-def select_data_params(default_params, sel_subjects, sel_tasks):
-    default_params["load_data"]["subjects"] = sel_subjects
-    default_params["load_data"]["tasks"] = sel_tasks
-    return default_params
 
 
 @pytest.fixture
@@ -43,21 +8,26 @@ def error_obj():
     return None
 
 
-def test_return_values(select_data_params):
+def test_return_values(default_params, bids_test_data):
+    # # get default pipeline params
+    feature_params = default_params["preprocess"]
 
-    # Load data using the selected subjects & tasks
-    data = load.load_files(select_data_params["load_data"])
+    montage_params = feature_params["set_montage"]
+    filt_params = feature_params["filter_data"]
+    bparams = feature_params["identify_badchans_raw"]
 
-    # get badchans param
-    feature_params = select_data_params["preprocess"]
-    bparam = feature_params["identify_badchans_raw"]
+    eeg_obj = bids_test_data
 
-    for file in data:
-        eeg_obj = mne_bids.read_raw_bids(file)
+    # Set the montage file
+    eeg_obj, _ = pre.set_montage(eeg_obj, **montage_params)
+    # filter to generate valid epoch events
+    filt_obj, _ = pre.filter_data(eeg_obj, **filt_params)
 
-        # reject epochs
-        badchan_obj, output_dict = pre.identify_badchans_raw(eeg_obj, **bparam)
+    # reject epochs
+    badchan_obj, output_dict = pre.identify_badchans_raw(filt_obj, **bparams)
 
-        # assert that None does not exist in bad chans
-        assert None not in output_dict.values()
-        assert isinstance(badchan_obj, BaseRaw)
+    print(output_dict)
+
+    # assert that None does not exist in bad chans
+    assert "ERROR" not in output_dict.keys()
+    assert isinstance(badchan_obj, BaseRaw)
