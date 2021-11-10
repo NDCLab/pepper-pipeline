@@ -9,10 +9,11 @@ def error_obj():
 
 
 def test_return_values(default_params, bids_test_epoch_data):
-    epoch_data = bids_test_epoch_data
-    # interpolate data
+    # get interpolate params
     feature_params = default_params["preprocess"]
     interp_params = feature_params["interpolate_data"]
+
+    epoch_data = bids_test_epoch_data
     interp_eeg, output_dict = pre.interpolate_data(epoch_data, **interp_params)
 
     # assert that all data is valid
