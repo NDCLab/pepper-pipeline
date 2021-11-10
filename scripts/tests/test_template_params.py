@@ -93,7 +93,7 @@ def reref_params():
 
 def test_params(default_params, load_params, preprocess_params, write_params,
                 exception_params, set_ref_params, montage_params,
-                filter_params, badchans_params, ica_params, segment_params, 
+                filter_params, badchans_params, ica_params, segment_params,
                 finalReject_params, interp_params, reref_params):
     # get overall sections of user_params
     load_data = default_params["load_data"]
