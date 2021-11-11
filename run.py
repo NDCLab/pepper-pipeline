@@ -2,14 +2,20 @@ from scripts.data import load, write
 from scripts.preprocess import preprocess as pre
 
 from collections import ChainMap
-
 import mne_bids
 
+import logging
+import traceback
+
+import sys
 from scripts.constants import \
     CAUGHT_EXCEPTION_SKIP, \
     EXIT_MESSAGE, \
     ERROR_KEY
-import sys
+
+
+def clean_outputs(output_dict):
+    output_dict = [result for result in output_dict if result is not None]
 
 
 def run_pipeline(preprocess, load_data, write_data):
@@ -42,20 +48,28 @@ def run_pipeline(preprocess, load_data, write_data):
         # initialize output list
         outputs = [None] * len(preprocess)
 
-        # for each pipeline step in user_params, execute with parameters
+        # For each pipeline step in user_params, execute with parameters
         for idx, (func, params) in enumerate(preprocess.items()):
-            eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
+            # Handle any unexpected exceptions by logging to shell and skipping
+            try:
+                eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
+            except Exception as e:
+                logging.error(e)
+                logging.info(traceback.format_exc())
+                clean_outputs(outputs)
+                break
 
+            # If a caught error has been detected, log and skip
             if ERROR_KEY in outputs[idx].keys():
-                print(func, CAUGHT_EXCEPTION_SKIP)
-                outputs = [result for result in outputs if result is not None]
-                # if pipeline should exit on error, do so
+                logging.info(CAUGHT_EXCEPTION_SKIP)
+                clean_outputs(outputs)
+                # or exit if pipeline specifies
                 if exit_on_error:
                     sys.exit(EXIT_MESSAGE)
                 break
 
             # check if this is the final preprocessed eeg object
-            final = idx == len(preprocess.items()) - 1
+            final = (idx == len(preprocess.items()) - 1)
             # write object out to file
             write.write_eeg_data(eeg_obj, func, file, ch_type, final, path,
                                  rewrite)
