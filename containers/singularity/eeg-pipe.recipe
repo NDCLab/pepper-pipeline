@@ -69,5 +69,3 @@ From: ubuntu:20.04
 	adduser ndc sudo
 	echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 	su ndc
-
-
