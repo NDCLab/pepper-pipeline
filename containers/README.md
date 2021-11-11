@@ -13,7 +13,7 @@ Once Docker is installed to your computer, open the "Docker Desktop" application
 
 To work with an existing PEPPER container simply use the `pull` command exactly as described below:
    ```
-   docker pull fsaid22/pepper_container:latest
+   docker pull ndclab/pepper_container:szegedi-1.0.0
    ```
 
 ## Building a New Container
@@ -38,6 +38,11 @@ Run the `init_docker.cmd` script within your command prompt by executing:
    init_docker.cmd [tag]
    ```
 
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
+   ```
+
 ### If on MacOS/Linux
 
 Run the `init_docker.sh` script within your command prompt by executing:
@@ -46,6 +51,10 @@ Run the `init_docker.sh` script within your command prompt by executing:
    sh init_start_docker.sh [tag]
    ```
 
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
+   ```
 
 ## Restarting Container
 
@@ -54,6 +63,13 @@ Once the container has been successfully set up, it can be stopped at any time a
    docker start pepper
    docker exec -u root -it pepper bash
    ```
+
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
+   ```
+
+## Developing on the Docker Container
 
 # Singularity
 
