@@ -1,6 +1,6 @@
 {
     "load_data": {
-        "root": "CMI/rawdata",
+        "root": "scripts/tests/test_bids_data",
         "subjects": [
             "*"
         ],
