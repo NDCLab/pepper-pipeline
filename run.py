@@ -13,7 +13,16 @@ import sys
 
 
 def run_pipeline(preprocess, load_data, write_data):
-    """
+    """Function to take in user_params parameters to preprocess EEG data
+    Parameters
+    ----------
+    preprocess: dict()
+                Dictionary containing preprocess features and their parameters
+    load_data:  dict()
+                Dictionary containing data selection and pipeline meta-params
+    write_data: dict()
+                Dictionary containing parameters to write data
+
     """
     # get pipeline parameters
     ch_type = load_data["channel-type"]
