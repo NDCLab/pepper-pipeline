@@ -1,6 +1,7 @@
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:4.7.12
 
 LABEL MAINTAINER="Steven W. Tolbert <stolb002@fiu.edu>" 
+LABEL MAINTAINER="Farukh Saidmuratov <fsaidmur@fiu.edu>" 
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y  \
