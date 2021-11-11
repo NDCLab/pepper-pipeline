@@ -40,12 +40,11 @@ From: ubuntu:20.04
 	requirements.txt
 
 %post
-       
-	# update package repository list
-    apt-get update -y --allow-releaseinfo-change
-	export DEBIAN_FRONTEND=noninteractive
 
-	apt-get install -y  \
+	export DEBIAN_FRONTEND=noninteractive
+	
+	# update package list and install tools
+	apt-get update -y --allow-releaseinfo-change && apt-get install -y  \
  	 build-essential \
  	 bash-completion=1:2.8-6 \
  	 golang=2:1.11~1 \
