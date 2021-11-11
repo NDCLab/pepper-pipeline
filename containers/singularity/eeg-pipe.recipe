@@ -44,7 +44,7 @@ From: ubuntu:20.04
 	export DEBIAN_FRONTEND=noninteractive
 	
 	# update package list and install tools
-	apt-get update -y --allow-releaseinfo-change && apt-get install -y  \
+	apt-get update --allow-releaseinfo-change && apt-get install -y  \
  	 build-essential \
  	 bash-completion=1:2.8-6 \
  	 golang=2:1.11~1 \
