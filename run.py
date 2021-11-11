@@ -13,7 +13,7 @@ import sys
 
 
 def run_pipeline(preprocess, load_data, write_data):
-    """Function to take in user_params parameters to preprocess EEG data. 
+    """Function to take in user_params parameters to preprocess EEG data.
     Writes out derivates.
 
     Parameters
