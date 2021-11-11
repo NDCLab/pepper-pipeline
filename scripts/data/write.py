@@ -35,7 +35,7 @@ def write_output_param(dict_array, file, datatype, root, rewrite):
 
     # Creates the directory if it does not exist
     dir_path = '{}/derivatives/{}/{}/sub-{}/ses-{}/{}/'.format(
-        root, PIPE_NAME, PIPE_NAME + FINAL, subj, ses, datatype)
+        root, PIPE_NAME, FINAL, subj, ses, datatype)
 
     temp = ""
     for sec in dir_path.split("/"):
@@ -89,7 +89,7 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
     obj_type = "_epo.fif" if isinstance(obj, mne.Epochs) else ".fif"
 
     # determine directory child based on feature position
-    child_dir = PIPE_NAME + FINAL if final else PIPE_NAME + INTERM
+    child_dir = FINAL if final else INTERM
 
     # Un-standardize function names for close-to-BIDS standard
     func = PIPE_NAME if final else func.replace("_", "")

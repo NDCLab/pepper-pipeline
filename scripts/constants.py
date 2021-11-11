@@ -2,8 +2,8 @@ import mne
 
 # Pipeline name constants
 PIPE_NAME = "PEPPER_pipeline"
-INTERM = "_intermediate"
-FINAL = "_preprocessed"
+INTERM = PIPE_NAME + "_intermediate"
+FINAL = PIPE_NAME + "_preprocessed"
 ERROR_KEY = "ERROR"
 
 # Load data error messages

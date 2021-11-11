@@ -66,13 +66,14 @@ def run_pipeline(preprocess, load_data, write_data):
         write.write_output_param(output, file, ch_type, path, rewrite)
 
 
-# load all parameters
-user_params = load.load_params("user_params.json")
+if __name__ == "__main__":
+    # load all parameters
+    user_params = load.load_params("user_params.json")
 
-# get data and metadata sections
-preprocess_params = user_params["preprocess"]
-load_params = user_params["load_data"]
-write_params = user_params["output_data"]
+    # get data and metadata sections
+    preprocess_params = user_params["preprocess"]
+    load_params = user_params["load_data"]
+    write_params = user_params["output_data"]
 
-# Execute pipeline steps specified in user_params.json
-run_pipeline(preprocess_params, load_params, write_params)
+    # Execute pipeline steps specified in user_params.json
+    run_pipeline(preprocess_params, load_params, write_params)
