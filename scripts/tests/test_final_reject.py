@@ -2,6 +2,8 @@ import pytest
 from scripts.preprocess import preprocess as pre
 import mne
 
+from scripts.constants import ERROR_KEY
+
 
 @pytest.fixture(params=['preloaded_data', 'non_preloaded_data'])
 def single_event_epoch_data(request, default_params, raw_data):
@@ -51,18 +53,18 @@ def test_return_values(bids_test_epoch_data):
     rej_epo, output_dict = pre.final_reject_epoch(bids_test_epoch_data)
 
     # assert that data is valid
-    assert "ERROR" not in output_dict.keys()
+    assert ERROR_KEY not in output_dict.keys()
     assert isinstance(rej_epo, mne.Epochs)
 
 
 def test_bad_object(error_obj):
     # attempt to filter data w/invalid data
     _, output = pre.final_reject_epoch(error_obj)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()
 
 
 def test_single_event(single_event_epoch_data):
     # attempt to reject epochs with data containing only one entire epoch
     # across each channel
     _, output = pre.final_reject_epoch(single_event_epoch_data)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()

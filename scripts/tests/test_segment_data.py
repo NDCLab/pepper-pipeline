@@ -2,6 +2,8 @@ import pytest
 from scripts.preprocess import preprocess as pre
 from mne import Epochs
 
+from scripts.constants import ERROR_KEY
+
 
 @pytest.fixture
 def none_event_data(bids_test_data):
@@ -25,7 +27,7 @@ def test_return_values(default_params, bids_test_data):
     seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
 
     # assert that data is valid
-    assert "ERROR" not in output_dict.values()
+    assert ERROR_KEY not in output_dict.values()
     assert isinstance(seg_epo, Epochs)
 
 
@@ -36,7 +38,7 @@ def test_bad_object(default_params, error_obj):
 
     # attempt to segment epochs with invalid epoch object
     _, output = pre.segment_data(error_obj, **seg_param)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()
 
 
 def test_no_event(default_params, none_event_data):
@@ -52,4 +54,4 @@ def test_no_event(default_params, none_event_data):
 
     # attempt to reject epochs with data containing no events
     _, output = pre.final_reject_epoch(epo)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()

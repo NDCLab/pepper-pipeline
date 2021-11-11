@@ -3,6 +3,8 @@ import pytest
 import mne
 import numpy as np
 
+from scripts.constants import ERROR_KEY
+
 
 @pytest.fixture
 def simulated_raw_hydrocel_129():
@@ -29,4 +31,4 @@ def test_invalid_montage(simulated_raw_hydrocel_129):
     # Apply an incorrect montage
     montage_to_use = 'standard_1020'
     data_with_montage, montage_output = pre.set_montage(simulated_raw_hydrocel_129, montage_to_use)
-    assert "ERROR" in montage_output.keys()
+    assert ERROR_KEY in montage_output.keys()

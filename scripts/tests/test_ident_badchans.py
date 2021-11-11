@@ -2,6 +2,8 @@ import pytest
 from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
 
+from scripts.constants import ERROR_KEY
+
 
 @pytest.fixture
 def error_obj():
@@ -29,5 +31,5 @@ def test_return_values(default_params, bids_test_data):
     print(output_dict)
 
     # assert that None does not exist in bad chans
-    assert "ERROR" not in output_dict.keys()
+    assert ERROR_KEY not in output_dict.keys()
     assert isinstance(badchan_obj, BaseRaw)

@@ -3,6 +3,8 @@ import pytest
 from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
 
+from scripts.constants import ERROR_KEY
+
 
 @pytest.fixture
 def error_obj():
@@ -39,7 +41,7 @@ def test_bad_object(default_params, error_obj):
 
     # attempt to process ica w/invalid data
     _, output = pre.ica_raw(error_obj, **ica_param)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()
 
 
 def test_missing_montage(default_params, bids_test_data):
@@ -58,4 +60,4 @@ def test_missing_montage(default_params, bids_test_data):
     _, output = pre.ica_raw(filt_obj, **ica_param)
 
     # attempt to process ica w/invalid data
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()
