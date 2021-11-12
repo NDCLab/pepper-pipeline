@@ -1,46 +1,9 @@
-from scripts.preprocess import preprocess as pre
-from scripts.data import load, write
 
 import pytest
-
-from pathlib import Path
-
-import mne_bids
+from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
 
-
-@pytest.fixture
-def root():
-    root = Path("CMI/rawdata")
-    return root
-
-
-@pytest.fixture
-def default_params(root, tmp_path):
-    default_param = write.write_template_params(root, tmp_path)
-    return default_param
-
-
-@pytest.fixture
-def sel_subjects():
-    return ["NDARAB793GL3"]
-
-
-@pytest.fixture
-def sel_tasks():
-    return ["SurrSuppBlock2"]
-
-
-@pytest.fixture
-def select_data_params(default_params, sel_subjects, sel_tasks):
-    default_params["load_data"]["subjects"] = sel_subjects
-    default_params["load_data"]["tasks"] = sel_tasks
-    return default_params
-
-
-@pytest.fixture
-def error_mnt():
-    return "Fake_Montage"
+from scripts.constants import ERROR_KEY
 
 
 @pytest.fixture
@@ -48,38 +11,53 @@ def error_obj():
     return None
 
 
-def test_return_values(select_data_params):
-    # Load data using the selected subjects & tasks
-    data = load.load_files(select_data_params["load_data"])
+def test_return_values(default_params, bids_test_data):
+    # get default pipeline params
+    feature_params = default_params["preprocess"]
 
-    # get the pipeline steps
-    feature_params = select_data_params["preprocess"]
     ica_param = feature_params["ica_raw"]
     filt_param = feature_params["filter_data"]
     montage_file = feature_params["set_montage"]
 
-    for file in data:
-        eeg_obj = mne_bids.read_raw_bids(file)
+    eeg_obj = bids_test_data
 
-        # set montage
-        pre.set_montage(eeg_obj, **montage_file)
+    # set montage
+    pre.set_montage(eeg_obj, **montage_file)
 
-        # filter
-        filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
+    # filter to generate valid epoch events
+    filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
 
-        # reject epochs
-        ica_obj, output_dict = pre.ica_raw(filt_obj, **ica_param)
+    # apply ica to filtered eeg object
+    ica_obj, output_dict = pre.ica_raw(filt_obj, **ica_param)
 
-        # assert that None does not exist in bad chans
-        assert None not in output_dict.values()
-        assert isinstance(ica_obj, BaseRaw)
+    # assert that None does not exist in bad chans
+    assert "ERROR" not in output_dict.keys()
+    assert isinstance(ica_obj, BaseRaw)
 
 
-def test_except_bad_object(select_data_params, error_obj):
-    feature_params = select_data_params["preprocess"]
+def test_bad_object(default_params, error_obj):
+    feature_params = default_params["preprocess"]
     ica_param = feature_params["ica_raw"]
 
     # attempt to process ica w/invalid data
-    with pytest.raises(AttributeError):
-        _, output = pre.ica_raw(error_obj, **ica_param)
-        assert "ERROR" in output.keys()
+    _, output = pre.ica_raw(error_obj, **ica_param)
+    assert ERROR_KEY in output.keys()
+
+
+def test_missing_montage(default_params, bids_test_data):
+    # get default pipeline params
+    feature_params = default_params["preprocess"]
+
+    ica_param = feature_params["ica_raw"]
+    filt_param = feature_params["filter_data"]
+
+    eeg_obj = bids_test_data
+
+    # filter
+    filt_obj, _ = pre.filter_data(eeg_obj, **filt_param)
+
+    # apply ica to raw filt object with no montage file
+    _, output = pre.ica_raw(filt_obj, **ica_param)
+
+    # attempt to process ica w/invalid data
+    assert ERROR_KEY in output.keys()

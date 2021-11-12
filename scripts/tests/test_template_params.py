@@ -1,15 +1,8 @@
 from scripts.data import write
 import pytest
 
-from pathlib import Path
 import json
 import os
-
-
-@pytest.fixture
-def root():
-    root = Path("CMI/rawdata")
-    return root
 
 
 @pytest.fixture
@@ -22,13 +15,8 @@ def write_path():
 
 
 @pytest.fixture
-def default_params(root, tmp_path):
-    default_params = write.write_template_params(root, tmp_path)
-    return default_params
-
-
-@pytest.fixture
-def default_params_write(root, tmp_path, write_path):
+def default_params_write(default_params, tmp_path, write_path):
+    root = default_params["load_data"]["root"]
     default_param = write.write_template_params(str(root), str(tmp_path),
                                                 to_file=write_path)
     return default_param
@@ -42,9 +30,9 @@ def load_params():
 
 @pytest.fixture
 def preprocess_params():
-    return set(["set_montage", "filter_data", "identify_badchans_raw",
-                "ica_raw", "segment_data", "final_reject_epoch",
-                "interpolate_data", "reref_raw"])
+    return set(["set_reference", "set_montage", "filter_data",
+                "identify_badchans_raw", "ica_raw", "segment_data",
+                "final_reject_epoch", "interpolate_data", "reref_raw"])
 
 
 @pytest.fixture
@@ -55,6 +43,16 @@ def write_params():
 @pytest.fixture
 def exception_params():
     return set(["subjects", "tasks", "runs"])
+
+
+@pytest.fixture
+def set_ref_params():
+    return set(["ref_channels"])
+
+
+@pytest.fixture
+def montage_params():
+    return set(["montage"])
 
 
 @pytest.fixture
@@ -94,9 +92,9 @@ def reref_params():
 
 
 def test_params(default_params, load_params, preprocess_params, write_params,
-                exception_params, filter_params, badchans_params, ica_params,
-                segment_params, finalReject_params, interp_params,
-                reref_params):
+                exception_params, set_ref_params, montage_params,
+                filter_params, badchans_params, ica_params, segment_params,
+                finalReject_params, interp_params, reref_params):
     # get overall sections of user_params
     load_data = default_params["load_data"]
     preprocess = default_params["preprocess"]
@@ -114,6 +112,8 @@ def test_params(default_params, load_params, preprocess_params, write_params,
     assert exception_params == set(exceptions)
 
     # get a param list of each feature
+    set_ref = preprocess["set_reference"]
+    montage = preprocess["set_montage"]
     filter = preprocess["filter_data"]
     bad_chans = preprocess["identify_badchans_raw"]
     ica = preprocess["ica_raw"]
@@ -123,6 +123,8 @@ def test_params(default_params, load_params, preprocess_params, write_params,
     reref = preprocess["reref_raw"]
 
     # check that a set of valid params is equal to the set of created params
+    assert set_ref_params == set(set_ref)
+    assert montage_params == set(montage)
     assert filter_params == set(filter)
     assert badchans_params == set(bad_chans)
     assert ica_params == set(ica)

@@ -42,6 +42,8 @@ Modules that are part of the creation and reading of data.
 
 All functions for the pre-processing pipeline must contain the following parameter list and return values to satisfy `run.py` constraints.
 
+If a function will modify data in-place for the EEG object, then the data must be loaded via the mne function `load_data()`. All other functions that strictly modify meta-data can omit this function.
+
 In addition, function documentation must include the following class comments as specified by the [NDClab programming standards](https://ndclab.github.io/wiki/docs/etiquette/programming-standards.html#python). 
 ```python
 def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
@@ -67,6 +69,7 @@ def preprocess_step(EEG_object, [user_param1, user_param2, ...]):
     output_dictionary:  dictionary
                         description of annotations 
     """
+    EEG_object.load_data()
     # code to do pipeline step
 
     return EEG_object_modified, output_dict 

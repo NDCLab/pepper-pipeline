@@ -9,7 +9,7 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG
+from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG, ERROR_KEY
 
 
 def set_montage(raw, montage):
@@ -33,7 +33,7 @@ def set_montage(raw, montage):
     try:
         raw.set_montage(montage)
     except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     montage_details = {
         "Montage": montage
@@ -60,6 +60,7 @@ def set_reference(raw, ref_channels):
                             dictionary with reference information
     """
     try:
+        raw.load_data()
         raw_new_ref = mne.add_reference_channels(raw, ref_channels)
         reference_details = {
             "Reference": ref_channels
@@ -67,7 +68,8 @@ def set_reference(raw, ref_channels):
         return raw_new_ref, {"Reference": reference_details}
     except ValueError:
         reference_details = {
-            "Reference": "Reference is already specified. Or invalid reference channel name."
+            "Reference": "Reference is already specified. Or invalid reference \
+            channel name."
         }
         return raw, {"Reference": reference_details}
 
@@ -80,10 +82,13 @@ def reref_raw(raw, reref_channels='average'):
          EEG data
     reref_channels: list of str | str
                     Can be:
-                    The name(s) of the channel(s) used to construct the reference.
+                    The name(s) of the channel(s) used to construct the
+                    reference.
                     'average' to apply an average reference (default)
-                    'REST' to use the Reference Electrode Standardization Technique infinity reference 4.
-                    An empty list, in which case MNE will not attempt any re-referencing of the data
+                    'REST' to use the Reference Electrode Standardization
+                    Technique infinity reference 4.
+                    An empty list, in which case MNE will not attempt any
+                    re-referencing of the data
 
     Throws
     ----------
@@ -102,7 +107,7 @@ def reref_raw(raw, reref_channels='average'):
     try:
         raw.load_data()
     except (AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     raw_new_ref = raw.set_eeg_reference(reref_channels)
 
@@ -139,7 +144,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
     except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -169,18 +174,20 @@ def ica_raw(raw):
     output_dict_ica:  dictionary
                       dictionary with relevant ica information
     """
+    try:
+        if raw.get_montage() is None:
+            return raw, {ERROR_KEY: MISSING_MONTAGE_MSG}
+        # prep for ica - load and make a copy
+        raw.load_data()
+        raw_filt_copy = raw.copy()
 
-    if raw.get_montage() is None:
-        return raw, {"ERROR": MISSING_MONTAGE_MSG}
-
-    # prep for ica - make a copy
-    raw_filtered_1 = raw.copy()
-
-    # High-pass with 1. Hz cut-off is recommended for ICA
-    raw_filtered_1 = raw_filtered_1.load_data().filter(l_freq=1, h_freq=None)
+        # High-pass with 1. Hz cut-off is recommended for ICA
+        raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
+    except (ValueError, AttributeError, TypeError) as error_msg:
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # epoch with arbitrary 1s
-    epochs_prep = mne.make_fixed_length_epochs(raw_filtered_1,
+    epochs_prep = mne.make_fixed_length_epochs(raw_filt_copy,
                                                duration=1.0,
                                                preload=True,
                                                overlap=0.0)
@@ -217,7 +224,7 @@ def ica_raw(raw):
     # compute channel locations
     # first get a list of channel names after removing bad channels and the
     # reference channel
-    raw_locs = raw_filtered_1.copy()
+    raw_locs = raw_filt_copy.copy()
     bad_chans = raw_locs.info['bads']
 
     # remove bad channels
@@ -331,7 +338,8 @@ def _adjust(icaact, icawinv, chanlocs):
             # difference between el and the average of 10 neighbors
             # weighted according to weightchas
             aux.append(abs(topografie_normed[ic, el] -
-                       np.mean(weightchas * topografie_normed[ic, repchas])))
+                           np.mean(weightchas * topografie_normed[ic, repchas])
+                           ))
 
         res[ic] = max(aux)
 
@@ -574,7 +582,7 @@ def _em(arr):
 
     c = (np.log((k * prior1 * np.sqrt(var2)) / (prior2 * np.sqrt(var1)))
          * (var2 * var1)) + (((((med2) ** 2) * var1) -
-                             (((med1) ** 2) * var2)) / 2)
+                              (((med1) ** 2) * var2)) / 2)
 
     rad = (b ** 2) - (4 * a * c)
     if rad < 0:
@@ -644,21 +652,21 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     """
 
     try:
+        raw.load_data()
         events, event_id = mne.events_from_annotations(raw)
-    except (TypeError, AttributeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
-
-    epochs = mne.Epochs(raw, events, event_id=event_id,
-                        tmin=tmin,
-                        tmax=tmax,
-                        baseline=baseline,
-                        picks=picks,
-                        reject_tmin=reject_tmin,
-                        reject_tmax=reject_tmax,
-                        decim=decim,
-                        verbose=verbose,
-                        preload=preload
-                        )
+        epochs = mne.Epochs(raw, events, event_id=event_id,
+                            tmin=tmin,
+                            tmax=tmax,
+                            baseline=baseline,
+                            picks=picks,
+                            reject_tmin=reject_tmin,
+                            reject_tmax=reject_tmax,
+                            decim=decim,
+                            verbose=verbose,
+                            preload=preload
+                            )
+    except (TypeError, AttributeError, ValueError) as error_msg:
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # get count of all epochs to output dictionary
     ch_names = epochs.info.ch_names
@@ -714,11 +722,11 @@ def final_reject_epoch(epochs):
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
     try:
-        # Quick-fix, re-load epochs
+        # load in epochs and fit on autoRej model
         epochs.load_data()
         autoRej.fit(epochs)
     except (ValueError, TypeError, AttributeError) as error_msg:
-        return epochs, {"ERROR": str(error_msg)}
+        return epochs, {ERROR_KEY: str(error_msg)}
 
     # creates the output dictionary to store the function output
     output_dict_finalRej = {}
@@ -774,9 +782,10 @@ def interpolate_data(epochs, mode='accurate'):
     Modified in place epochs object and output dictionary
     """
     try:
+        epochs.load_data()
         bads_before = epochs.info['bads']
     except (TypeError, AttributeError) as error_msg:
-        return epochs, {"ERROR": str(error_msg)}
+        return epochs, {ERROR_KEY: str(error_msg)}
 
     if len(bads_before) == 0:
         return epochs, {"Interpolation": {"Affected": bads_before}}
@@ -785,7 +794,7 @@ def interpolate_data(epochs, mode='accurate'):
             epochs_interp = epochs.interpolate_bads(mode=mode)
             return epochs_interp, {"Interpolation": {"Affected": bads_before}}
         except (TypeError, AttributeError) as error_msg:
-            return epochs, {"ERROR": str(error_msg)}
+            return epochs, {ERROR_KEY: str(error_msg)}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -891,15 +900,14 @@ def identify_badchans_raw(raw, ref_elec_name):
     output_dict_flter:  dictionary
                         dictionary with relevant bad channel information
     """
-
-    # get raw data matrix
-    raw_data = raw.get_data()
-
-    # get the index of reference electrode
     try:
+        raw.load_data()
+        # get raw data matrix
+        raw_data = raw.get_data()
+        # get the index of reference electrode
         ref_index = raw.ch_names.index(ref_elec_name)
-    except ValueError as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+    except (ValueError, TypeError, AttributeError) as error_msg:
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100
@@ -909,12 +917,17 @@ def identify_badchans_raw(raw, ref_elec_name):
 
     # get distances between electrodes and the reference electrode
     chan_ref_dist = [np.sqrt((x[0] - ref_x) ** 2 + (x[1] - ref_y) ** 2 +
-                     (x[2] - ref_z) ** 2) for x in channel_positions]
+                             (x[2] - ref_z) ** 2) for x in channel_positions]
 
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
-    reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
-    fitcurve_var = np.polyval(reg_var, chan_ref_dist)
+
+    try:
+        reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
+        fitcurve_var = np.polyval(reg_var, chan_ref_dist)
+    except np.linalg.LinAlgError as error_msg:
+        return raw, {ERROR_KEY: str(error_msg)}
+
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
                                                         threshold=3.0,

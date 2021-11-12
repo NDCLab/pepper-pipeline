@@ -40,27 +40,19 @@ From: ubuntu:20.04
 	requirements.txt
 
 %post
-       
-	# update package repository list
-        apt-get -y update
-	export DEBIAN_FRONTEND=noninteractive
 
-	apt-get -y upgrade bash-completion \
-	 build-essential \
-	 curl \
-	 git git-core \
-	 golang \
-	 htop \
-	 locales \
-	 man \
-	 nmap \
-	 python3-pip \
-	 ruby-full \
-	 strace \
-	 sudo \
-	 tig \
-	 vim \
-	 wget
+	export DEBIAN_FRONTEND=noninteractive
+	
+	# update package list and install tools
+	apt-get update --allow-releaseinfo-change && apt-get install -y  \
+ 	 build-essential \
+ 	 bash-completion=1:2.10-1ubuntu1 \
+ 	 golang=2:1.13~1ubuntu2 \
+ 	 locales=2.31-0ubuntu9 \
+ 	 python3-pip=20.0.2-5ubuntu1.6 \
+ 	 sudo=1.8.31-1ubuntu1.2 \
+ 	 nano=4.8-1ubuntu1 \
+	 && rm -rf /var/lib/apt/lists/* && apt-get clean
 
 	# set time
 	locale-gen en_US.UTF-8
@@ -73,5 +65,3 @@ From: ubuntu:20.04
 	adduser ndc sudo
 	echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 	su ndc
-
-

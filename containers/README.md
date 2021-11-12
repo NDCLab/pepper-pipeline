@@ -13,14 +13,14 @@ Once Docker is installed to your computer, open the "Docker Desktop" application
 
 To work with an existing PEPPER container simply use the `pull` command exactly as described below:
    ```
-   docker pull fsaid22/pepper_container:latest
+   docker pull ndclab/pepper_container:szegedi-1.0.0
    ```
 
 ## Building a New Container
 
 To build a new docker file with a specific tag, execute the following command within the *PEPPER-pipeline* root directory: 
    ```
-   docker build -t [tag] container/docker/Dockerfile
+   docker build -t [tag] containers/docker/
    ```
 
 ## Binding Data & Running
@@ -34,8 +34,13 @@ The two scripts `init_docker.cmd` and `init_docker.sh` are provided for the auto
 
 Run the `init_docker.cmd` script within your command prompt by executing:
    ```
-   cd container/docker
-   init_start_docker.cmd
+   cd containers/docker
+   init_docker.cmd [tag]
+   ```
+
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
    ```
 
 ### If on MacOS/Linux
@@ -43,9 +48,13 @@ Run the `init_docker.cmd` script within your command prompt by executing:
 Run the `init_docker.sh` script within your command prompt by executing:
    ```
    cd container/docker
-   sh init_start_docker.sh
+   sh init_start_docker.sh [tag]
    ```
 
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
+   ```
 
 ## Restarting Container
 
@@ -53,6 +62,31 @@ Once the container has been successfully set up, it can be stopped at any time a
    ```
    docker start pepper
    docker exec -u root -it pepper bash
+   ```
+
+Once inside the container shell, restart the conda environment by executing:
+   ```
+   conda activate pipe
+   ```
+
+## Using the Docker Container
+
+Development, testing, and running on small data are all supported on this docker container.
+
+To run the pipeline on data specified in `user_params.json`, execute the following command inside of the container:
+   ```
+   python run.py
+   ```
+
+To test out all features, execute the following command inside of the container:
+   ```
+   pytest scripts/tests/
+   ```
+
+Finally, to develop and test new features on the container, you must write out all new code outside the container via your favorite IDE or text-editor and then copy in the code to the container via `docker cp`.
+   ```
+   # After changes have been made to the code
+   docker cp <path/to/file> pepper:/projects/pepper-pipeline
    ```
 
 # Singularity

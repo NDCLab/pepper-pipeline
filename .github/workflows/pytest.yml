@@ -3,23 +3,17 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: ndclab/pepper_container:szegedi-1.0.0
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 notebook
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run tests with pytest
-        run: pytest 
+      - name: Activate pipe and run pytest
+        run: conda activate pipe 
+        run: sudo pytest 

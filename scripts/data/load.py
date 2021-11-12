@@ -5,6 +5,7 @@ from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
 import os
+from tqdm import tqdm
 
 from scripts.constants import \
     INVALID_UPARAM_MSG, \
@@ -51,7 +52,8 @@ def _init_subjects(filter_sub, root, ch_type):
     bids_root = pathlib.Path(root)
     type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
 
-    for subject in filter_sub:
+    print("Loading participants")
+    for subject in tqdm(filter_sub):
         bids_path = mne_bids.BIDSPath(subject=subject,
                                       datatype=ch_type,
                                       root=bids_root)
@@ -82,7 +84,7 @@ def _filter_tasks(filter_tasks, files):
     if filter_tasks == ["*"]:
         return files
 
-    return [f for f in files if f.task in filter_tasks]
+    return [f for f in tqdm(files) if f.task in filter_tasks]
 
 
 def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
@@ -124,7 +126,8 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     bids_root = pathlib.Path(root)
     type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
     # turn each exception into a BIDS path
-    for i in range(len(exceptions)):
+    print("Filtering exceptions")
+    for i in tqdm(range(len(exceptions))):
         file = exceptions[i]
 
         sub = file[0]

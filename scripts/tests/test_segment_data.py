@@ -1,41 +1,14 @@
-from scripts.preprocess import preprocess as pre
-from scripts.data import load, write
-
 import pytest
-
-from pathlib import Path
-
-import mne_bids
+from scripts.preprocess import preprocess as pre
 from mne import Epochs
 
-
-@pytest.fixture
-def root():
-    root = Path("CMI/rawdata")
-    return root
+from scripts.constants import ERROR_KEY
 
 
 @pytest.fixture
-def default_params(root, tmp_path):
-    default_param = write.write_template_params(root, tmp_path)
-    return default_param
-
-
-@pytest.fixture
-def sel_subjects():
-    return ["NDARAB793GL3"]
-
-
-@pytest.fixture
-def sel_tasks():
-    return ["ContrastChangeBlock1"]
-
-
-@pytest.fixture
-def select_data_params(default_params, sel_subjects, sel_tasks):
-    default_params["load_data"]["subjects"] = sel_subjects
-    default_params["load_data"]["tasks"] = sel_tasks
-    return default_params
+def none_event_data(bids_test_data):
+    none_event_data = bids_test_data.copy().set_annotations(None)
+    return none_event_data
 
 
 @pytest.fixture
@@ -43,30 +16,42 @@ def error_obj():
     return None
 
 
-def test_return_values(select_data_params):
-    # Load data using the selected subjects & tasks
-    data = load.load_files(select_data_params["load_data"])
-
+def test_return_values(default_params, bids_test_data):
     # get the pipeline steps and seg params
-    feature_params = select_data_params["preprocess"]
+    feature_params = default_params["preprocess"]
     seg_param = feature_params["segment_data"]
 
-    for file in data:
-        eeg_obj = mne_bids.read_raw_bids(file)
+    eeg_obj = bids_test_data
 
-        # segment data
-        seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
+    # segment data
+    seg_epo, output_dict = pre.segment_data(eeg_obj, **seg_param)
 
-        # assert that data is valid
-        assert None not in output_dict.values()
-        assert isinstance(seg_epo, Epochs)
+    # assert that data is valid
+    assert ERROR_KEY not in output_dict.values()
+    assert isinstance(seg_epo, Epochs)
 
 
-def test_except_value(select_data_params, error_obj):
+def test_bad_object(default_params, error_obj):
     # get the pipeline steps and seg params
-    feature_params = select_data_params["preprocess"]
+    feature_params = default_params["preprocess"]
     seg_param = feature_params["segment_data"]
 
     # attempt to segment epochs with invalid epoch object
     _, output = pre.segment_data(error_obj, **seg_param)
-    assert "ERROR" in output.keys()
+    assert ERROR_KEY in output.keys()
+
+
+def test_no_event(default_params, none_event_data):
+    # Get the default parameters for segmenting
+    feature_params = default_params["preprocess"]
+    seg_params = feature_params["segment_data"]
+
+    # Run on both preloaded and non-preloaded data
+    eeg_obj = none_event_data
+
+    # generate epoched object to be rejected
+    epo, _ = pre.segment_data(eeg_obj, **seg_params)
+
+    # attempt to reject epochs with data containing no events
+    _, output = pre.final_reject_epoch(epo)
+    assert ERROR_KEY in output.keys()
