@@ -35,7 +35,7 @@ def two_condition_data(test_data):
     cond_two_rows = test_data.trial_type == 'incongruent'
     condition_one_data = [test_data[(
         test_data.participant_number == p) & cond_one_rows].RT
-            for p in participant_list]
+        for p in participant_list]
     condition_two_data = [test_data[(
         test_data.participant_number == p) & cond_two_rows].RT
         for p in participant_list]
