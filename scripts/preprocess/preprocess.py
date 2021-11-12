@@ -185,6 +185,35 @@ def ica_raw(raw):
                                                preload=True,
                                                overlap=0.0)
 
+    # first get a list without badchans
+    chs_all = epochs_prep.ch_names.copy()
+    chs_bad = np.unique(epochs_prep.info['bads'])
+    if len(chs_bad) > 0:
+        for i in chs_bad: chs_all.remove(i)
+
+    # then identified channels with unusually high/low amplitudes
+    badchans_list = []
+
+    for chn in chs_all:
+        epochs_prep_copy = epochs_prep.copy()
+        epochs_prep_copy_pick = epochs_prep_copy.pick(picks=chn)
+
+        reject_criteria = dict(eeg=1000e-6)  # 1000 µV
+        epochs_prep_copy_pick.drop_bad(reject=reject_criteria)
+
+        # if more than 20% epochs have been rejected, then remove this channel from both epochs_prep and raw
+        if epochs_prep_copy_pick.drop_log_stats() > 20:
+            badchans_list.append(chn)
+
+    # if 20% channels have been identified, skip
+    if (len(badchans_list) + len(chs_bad)) / len(epochs_prep.ch_names) > .2:
+        # should be edit later to raise an error to skip this subject
+        print("too many bad channels")
+
+    # remove bad channels globally
+    raw.info['bads'].extend(badchans_list)
+    epochs_prep.info['bads'].extend(badchans_list)
+
     # number of epeochs pre-rejection
     epochs_original = epochs_prep.__len__()
 
@@ -195,6 +224,12 @@ def ica_raw(raw):
     # compute the number of epochs after removal
     epochs_bads_removal = epochs_prep.__len__()
     epochs_bads = epochs_original - epochs_bads_removal
+
+    # if certain percentage epochs have been rejected, ship this subject
+    # the cutoff point should be edited later
+    if epochs_bads / epochs_original > 0.5:
+        # should be edit later to raise an error to skip this subject
+        print("too many bad epochs")
 
     # ica
     method = 'infomax'
@@ -250,6 +285,7 @@ def ica_raw(raw):
     raw_icaed = ica.apply(raw.load_data())
 
     ica_details = {"original epochs": epochs_original,
+                   "bad channels": badchans_list,
                    "bad epochs": epochs_bads,
                    "bad epochs rate": epochs_bads / epochs_original,
                    "Horizontal Eye Movement": list(arti_hem.astype(str)),
