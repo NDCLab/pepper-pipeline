@@ -9,7 +9,12 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG, ERROR_KEY
+from scripts.constants import \
+    MISSING_MONTAGE_MSG, \
+    BAD_CHAN_MSG, \
+    BAD_EPOCH_MSG, \
+    INVALID_DATA_MSG, \
+    ERROR_KEY
 
 
 def set_montage(raw, montage):
@@ -209,7 +214,8 @@ def ica_raw(raw):
         reject_criteria = dict(eeg=1000e-6)  # 1000 µV
         epochs_prep_copy_pick.drop_bad(reject=reject_criteria)
 
-        # if more than 20% epochs have been rejected, then remove this channel from both epochs_prep and raw
+        # if more than 20% epochs have been rejected, then remove this channel
+        # from both epochs_prep and raw
         if epochs_prep_copy_pick.drop_log_stats() > 20:
             badchans_list.append(chn)
 
