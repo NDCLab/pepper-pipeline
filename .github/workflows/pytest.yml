@@ -14,10 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
       - name: Run tests with pytest
-        run: pytest 
+        run: sudo pytest 

@@ -80,7 +80,7 @@ To run the pipeline on data specified in `user_params.json`, execute the followi
 
 To test out all features, execute the following command inside of the container:
    ```
-   pytest
+   pytest scripts/tests/
    ```
 
 Finally, to develop and test new features on the container, you must write out all new code outside the container via your favorite IDE or text-editor and then copy in the code to the container via `docker cp`.
