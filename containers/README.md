@@ -69,7 +69,25 @@ Once inside the container shell, restart the conda environment by executing:
    conda activate pipe
    ```
 
-## Developing on the Docker Container
+## Using the Docker Container
+
+Development, testing, and running on small data are all supported on this docker container.
+
+To run the pipeline on data specified in `user_params.json`, execute the following command inside of the container:
+   ```
+   python run.py
+   ```
+
+To test out all features, execute the following command inside of the container:
+   ```
+   pytest
+   ```
+
+Finally, to develop and test new features on the container, you must write out all new code outside the container via your favorite IDE or text-editor and then copy in the code to the container via `docker cp`.
+   ```
+   # After changes have been made to the code
+   docker cp <path/to/file> pepper:/projects/pepper-pipeline
+   ```
 
 # Singularity
 
