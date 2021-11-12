@@ -189,7 +189,8 @@ def ica_raw(raw):
     chs_all = epochs_prep.ch_names.copy()
     chs_bad = np.unique(epochs_prep.info['bads'])
     if len(chs_bad) > 0:
-        for i in chs_bad: chs_all.remove(i)
+        for i in chs_bad:
+            chs_all.remove(i)
 
     # then identified channels with unusually high/low amplitudes
     badchans_list = []
