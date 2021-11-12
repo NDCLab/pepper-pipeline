@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
+      - name: conda init shell
+        run: conda init
       - name: Activate pipe conda env
         run: conda activate pipe 
       - name: Run pytest
