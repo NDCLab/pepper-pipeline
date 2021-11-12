@@ -15,6 +15,6 @@ jobs:
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
       - name: Activate pipe conda env
-        run: sudo conda activate pipe 
+        run: conda activate pipe 
       - name: Pytest
         run: pytest
