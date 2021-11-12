@@ -9,7 +9,7 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG
+from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG, ERROR_KEY
 
 
 def set_montage(raw, montage):
@@ -33,7 +33,7 @@ def set_montage(raw, montage):
     try:
         raw.set_montage(montage)
     except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     montage_details = {
         "Montage": montage
@@ -107,7 +107,7 @@ def reref_raw(raw, reref_channels='average'):
     try:
         raw.load_data()
     except (AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     raw_new_ref = raw.set_eeg_reference(reref_channels)
 
@@ -144,7 +144,7 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
         raw.load_data()
         raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
     except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -176,7 +176,7 @@ def ica_raw(raw):
     """
     try:
         if raw.get_montage() is None:
-            return raw, {"ERROR": MISSING_MONTAGE_MSG}
+            return raw, {ERROR_KEY: MISSING_MONTAGE_MSG}
         # prep for ica - load and make a copy
         raw.load_data()
         raw_filt_copy = raw.copy()
@@ -184,7 +184,7 @@ def ica_raw(raw):
         # High-pass with 1. Hz cut-off is recommended for ICA
         raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
     except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # epoch with arbitrary 1s
     epochs_prep = mne.make_fixed_length_epochs(raw_filt_copy,
@@ -666,7 +666,7 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
                             preload=preload
                             )
     except (TypeError, AttributeError, ValueError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # get count of all epochs to output dictionary
     ch_names = epochs.info.ch_names
@@ -726,7 +726,7 @@ def final_reject_epoch(epochs):
         epochs.load_data()
         autoRej.fit(epochs)
     except (ValueError, TypeError, AttributeError) as error_msg:
-        return epochs, {"ERROR": str(error_msg)}
+        return epochs, {ERROR_KEY: str(error_msg)}
 
     # creates the output dictionary to store the function output
     output_dict_finalRej = {}
@@ -785,7 +785,7 @@ def interpolate_data(epochs, mode='accurate'):
         epochs.load_data()
         bads_before = epochs.info['bads']
     except (TypeError, AttributeError) as error_msg:
-        return epochs, {"ERROR": str(error_msg)}
+        return epochs, {ERROR_KEY: str(error_msg)}
 
     if len(bads_before) == 0:
         return epochs, {"Interpolation": {"Affected": bads_before}}
@@ -794,7 +794,7 @@ def interpolate_data(epochs, mode='accurate'):
             epochs_interp = epochs.interpolate_bads(mode=mode)
             return epochs_interp, {"Interpolation": {"Affected": bads_before}}
         except (TypeError, AttributeError) as error_msg:
-            return epochs, {"ERROR": str(error_msg)}
+            return epochs, {ERROR_KEY: str(error_msg)}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -907,7 +907,7 @@ def identify_badchans_raw(raw, ref_elec_name):
         # get the index of reference electrode
         ref_index = raw.ch_names.index(ref_elec_name)
     except (ValueError, TypeError, AttributeError) as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100
@@ -926,7 +926,7 @@ def identify_badchans_raw(raw, ref_elec_name):
         reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
         fitcurve_var = np.polyval(reg_var, chan_ref_dist)
     except np.linalg.LinAlgError as error_msg:
-        return raw, {"ERROR": str(error_msg)}
+        return raw, {ERROR_KEY: str(error_msg)}
 
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
