@@ -19,8 +19,8 @@ import tarfile
 def flatten(t):
     return [item for sublist in t for item in sublist]
 
-sourcedata_root = pathlib.Path.cwd() / '../CMI/sourcedata'
-bids_root = pathlib.Path.cwd() / '../CMI/rawdata'
+sourcedata_root = '/home/data/NDClab/datasets/cmi-dataset/sourcedata/raw'
+bids_root = '/home/data/NDClab/datasets/cmi-dataset/rawdata'
 
 launch_time = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 logging.basicConfig(filename=f'import_cmi_hbn_data_{launch_time}.log',
@@ -66,11 +66,11 @@ for input_path in eeg_file_paths:
     pheno_data_rows = (pheno_data['EID'] == participant_code).sum()
     # fetch metadata
     if pheno_data_rows < 1:
-        raise Exception('Participant not in metadata')
-	continue
+        print('Participant not in metadata')
+        continue
     elif pheno_data_rows > 1:
-        raise Exception('Participant in metadata more than once')
-	continue
+        print('Participant in metadata more than once')
+        continue
     else:
         participant_age = float(pheno_data.loc[pheno_data['EID'] == participant_code, 'Age'])
         participant_sex = sex_mapping[int(pheno_data.loc[pheno_data['EID'] == participant_code, 'Sex'])]
@@ -97,13 +97,13 @@ for input_path in eeg_file_paths:
             else:
                 task_file_obj = tar_data.extractfile(task_filename)
                 mat_data = scipy.io.loadmat(task_file_obj, simplify_cells = True)
-		try:
-                	EEG = mat_data['EEG']
-		except:
-			continue
+                try:
+                    EEG = mat_data['EEG']
+                except:
+                    continue
                 info = mne.create_info(channel_names, ch_types='eeg', sfreq=EEG['srate'])
                 info['line_freq'] = 60
-                raw = mne.io.RawArray(EEG['data'], info) * 1e-6
+                raw = mne.io.RawArray(EEG['data'] * 1e-6, info)
                 raw.set_montage('GSN-HydroCel-129')
                 raw.set_eeg_reference(ref_channels=['Cz'], ch_type='eeg')
 
@@ -124,7 +124,7 @@ for input_path in eeg_file_paths:
                 mne_bids.update_sidecar_json(bids_path, eeg_sidecar_values)
 
     # update participants.tsv
-    participant_data = pd.read_csv(bids_root / 'participants.tsv', sep='\t', na_filter=False)
+    participant_data = pd.read_csv(bids_root + '/participants.tsv', sep='\t', na_filter=False)
     participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
     participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
-    participant_data.to_csv(bids_root / 'participants.tsv', sep='\t', index=False)
+    participant_data.to_csv(bids_root + '/participants.tsv', sep='\t', index=False)
