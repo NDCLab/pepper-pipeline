@@ -38,6 +38,10 @@ INVALID_MONTAGE_MSG = f"Invalid value for the 'montage' parameter.\
 # reference channel error
 INVALID_REF_MSG = "The reference electrode is NOT provided or in the list."
 
+# ica error
+BAD_CHAN_MSG = "20% or more channels are bad channels and have been removed."
+BAD_EPOCH_MSG = "50% or more epochs have been rejected."
+
 # write error messages
 SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
  parameter."

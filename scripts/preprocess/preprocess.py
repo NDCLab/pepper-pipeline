@@ -9,7 +9,12 @@ from functools import reduce
 from mne.preprocessing.bads import _find_outliers
 from scipy.stats import zscore
 
-from scripts.constants import MISSING_MONTAGE_MSG, INVALID_DATA_MSG, ERROR_KEY
+from scripts.constants import \
+    MISSING_MONTAGE_MSG, \
+    BAD_CHAN_MSG, \
+    BAD_EPOCH_MSG, \
+    INVALID_DATA_MSG, \
+    ERROR_KEY
 
 
 def set_montage(raw, montage):
@@ -209,14 +214,15 @@ def ica_raw(raw):
         reject_criteria = dict(eeg=1000e-6)  # 1000 µV
         epochs_prep_copy_pick.drop_bad(reject=reject_criteria)
 
-        # if more than 20% epochs have been rejected, then remove this channel from both epochs_prep and raw
+        # if more than 20% epochs have been rejected, then remove this channel
+        # from both epochs_prep and raw
         if epochs_prep_copy_pick.drop_log_stats() > 20:
             badchans_list.append(chn)
 
     # if 20% channels have been identified, skip
     if (len(badchans_list) + len(chs_bad)) / len(epochs_prep.ch_names) > .2:
-        # should be edit later to raise an error to skip this subject
-        print("too many bad channels")
+        # raise an error to skip this subject
+        return raw, {ERROR_KEY: BAD_CHAN_MSG}
 
     # remove bad channels globally
     raw.info['bads'].extend(badchans_list)
@@ -233,11 +239,10 @@ def ica_raw(raw):
     epochs_bads_removal = epochs_prep.__len__()
     epochs_bads = epochs_original - epochs_bads_removal
 
-    # if certain percentage epochs have been rejected, ship this subject
-    # the cutoff point should be edited later
+    # if 50% epochs have been rejected, ship this subject
     if epochs_bads / epochs_original > 0.5:
-        # should be edit later to raise an error to skip this subject
-        print("too many bad epochs")
+        # raise an error to skip this subject
+        return raw, {ERROR_KEY: BAD_EPOCH_MSG}
 
     # ica
     method = 'infomax'
