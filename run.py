@@ -16,6 +16,7 @@ from scripts.constants import \
 
 def clean_outputs(output_dict):
     output_dict = [result for result in output_dict if result is not None]
+    return output_dict
 
 
 def run_pipeline(preprocess, load_data, write_data):
@@ -56,13 +57,13 @@ def run_pipeline(preprocess, load_data, write_data):
             except Exception as e:
                 logging.error(e)
                 logging.info(traceback.format_exc())
-                clean_outputs(outputs)
+                outputs = clean_outputs(outputs)
                 break
 
             # If a caught error has been detected, log and skip
             if ERROR_KEY in outputs[idx].keys():
                 logging.info(CAUGHT_EXCEPTION_SKIP)
-                clean_outputs(outputs)
+                outputs = clean_outputs(outputs)
                 # or exit if pipeline specifies
                 if exit_on_error:
                     sys.exit(EXIT_MESSAGE)
