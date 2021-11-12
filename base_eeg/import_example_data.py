@@ -67,8 +67,10 @@ for input_path in eeg_file_paths:
     # fetch metadata
     if pheno_data_rows < 1:
         raise Exception('Participant not in metadata')
+	continue
     elif pheno_data_rows > 1:
         raise Exception('Participant in metadata more than once')
+	continue
     else:
         participant_age = float(pheno_data.loc[pheno_data['EID'] == participant_code, 'Age'])
         participant_sex = sex_mapping[int(pheno_data.loc[pheno_data['EID'] == participant_code, 'Sex'])]
@@ -95,10 +97,13 @@ for input_path in eeg_file_paths:
             else:
                 task_file_obj = tar_data.extractfile(task_filename)
                 mat_data = scipy.io.loadmat(task_file_obj, simplify_cells = True)
-                EEG = mat_data['EEG']
+		try:
+                	EEG = mat_data['EEG']
+		except:
+			continue
                 info = mne.create_info(channel_names, ch_types='eeg', sfreq=EEG['srate'])
                 info['line_freq'] = 60
-                raw = mne.io.RawArray(EEG['data'], info)
+                raw = mne.io.RawArray(EEG['data'], info) * 1e-6
                 raw.set_montage('GSN-HydroCel-129')
                 raw.set_eeg_reference(ref_channels=['Cz'], ch_type='eeg')
 
