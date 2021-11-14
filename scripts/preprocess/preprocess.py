@@ -227,6 +227,7 @@ def ica_raw(raw):
     # remove bad channels globally
     raw.info['bads'].extend(badchans_list)
     epochs_prep.info['bads'].extend(badchans_list)
+    raw_filt_copy.info['bads'].extend(badchans_list)
 
     # number of epeochs pre-rejection
     epochs_original = epochs_prep.__len__()
