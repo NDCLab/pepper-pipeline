@@ -19,8 +19,8 @@ import tarfile
 def flatten(t):
     return [item for sublist in t for item in sublist]
 
-sourcedata_root = '/home/data/NDClab/datasets/cmi-dataset/sourcedata/raw'
-bids_root = '/home/data/NDClab/datasets/cmi-dataset/rawdata'
+sourcedata_root = pathlib.Path.cwd() / '../CMI/sourcedata'
+bids_root = pathlib.Path.cwd() / '../CMI/rawdata'
 
 launch_time = datetime.datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 logging.basicConfig(filename=f'import_cmi_hbn_data_{launch_time}.log',
@@ -124,7 +124,7 @@ for input_path in eeg_file_paths:
                 mne_bids.update_sidecar_json(bids_path, eeg_sidecar_values)
 
     # update participants.tsv
-    participant_data = pd.read_csv(bids_root + '/participants.tsv', sep='\t', na_filter=False)
+    participant_data = pd.read_csv(bids_root / '/participants.tsv', sep='\t', na_filter=False)
     participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'age'] = participant_age
     participant_data.loc[participant_data['participant_id'] == f'sub-{participant_code}', 'sex'] = participant_sex
-    participant_data.to_csv(bids_root + '/participants.tsv', sep='\t', index=False)
+    participant_data.to_csv(bids_root / '/participants.tsv', sep='\t', index=False)
