@@ -58,6 +58,9 @@ def set_reference(raw, ref_channels):
     output_dict_reference:  dictionary
                             dictionary with reference information
     """
+    # Check if reference channel is already set, return
+    if ref_channels in raw.info['ch_names']:
+        return raw, {"Reference": "Reference is already specified."}
     raw.load_data()
     raw_new_ref = mne.add_reference_channels(raw, ref_channels)
     reference_details = {
