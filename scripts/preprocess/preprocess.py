@@ -796,20 +796,14 @@ def interpolate_data(epochs, mode='accurate'):
     ----------
     Modified in place epochs object and output dictionary
     """
-    try:
-        epochs.load_data()
-        bads_before = epochs.info['bads']
-    except (TypeError, AttributeError) as error_msg:
-        return epochs, {ERROR_KEY: str(error_msg)}
+    epochs.load_data()
+    bads_before = epochs.info['bads']
 
     if len(bads_before) == 0:
         return epochs, {"Interpolation": {"Affected": bads_before}}
     else:
-        try:
-            epochs_interp = epochs.interpolate_bads(mode=mode)
-            return epochs_interp, {"Interpolation": {"Affected": bads_before}}
-        except (TypeError, AttributeError) as error_msg:
-            return epochs, {ERROR_KEY: str(error_msg)}
+        epochs_interp = epochs.interpolate_bads(mode=mode)
+        return epochs_interp, {"Interpolation": {"Affected": bads_before}}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
