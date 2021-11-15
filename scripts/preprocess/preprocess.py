@@ -98,13 +98,8 @@ def reref_raw(raw, reref_channels='average'):
     output_dict_reference:  dictionary
                             dictionary with relevant information on re-ref
     """
-    try:
-        raw.load_data()
-    except (AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
-
+    raw.load_data()
     raw_new_ref = raw.set_eeg_reference(reref_channels)
-
     reref_details = {
         "Rereference": reref_channels
     }
