@@ -803,7 +803,7 @@ def interpolate_data(epochs, mode='accurate'):
         return epochs, {"Interpolation": {"Affected": bads_before}}
     else:
         epochs_interp = epochs.interpolate_bads(mode=mode)
-        return epochs_interp, {"Interpolation": {"Affected": bads_before}}}
+        return epochs_interp, {"Interpolation": {"Affected": bads_before}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -827,10 +827,6 @@ def plot_orig_and_interp(orig_raw, interp_raw):
     interpolated data
 
     """
-    if not orig_raw or not interp_raw:
-        print(INVALID_DATA_MSG)
-        return 1
-
     for title_, data_ in zip(['orig.', 'interp.'], [orig_raw, interp_raw]):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
