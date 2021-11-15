@@ -107,7 +107,7 @@ def reref_raw(raw, reref_channels='average'):
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
-    """Final and automatic rejection of bad epochs
+    """Filter subset of channels using mne.filter
     Parameters
     ----------
     raw:    mne.io.Raw
