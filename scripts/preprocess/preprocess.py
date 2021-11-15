@@ -60,19 +60,12 @@ def set_reference(raw, ref_channels):
     output_dict_reference:  dictionary
                             dictionary with reference information
     """
-    try:
-        raw.load_data()
-        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
-        reference_details = {
-            "Reference": ref_channels
-        }
-        return raw_new_ref, {"Reference": reference_details}
-    except ValueError:
-        reference_details = {
-            "Reference": "Reference is already specified. Or invalid reference \
-            channel name."
-        }
-        return raw, {"Reference": reference_details}
+    raw.load_data()
+    raw_new_ref = mne.add_reference_channels(raw, ref_channels)
+    reference_details = {
+        "Reference": ref_channels
+    }
+    return raw_new_ref, {"Reference": reference_details}
 
 
 def reref_raw(raw, reref_channels='average'):
