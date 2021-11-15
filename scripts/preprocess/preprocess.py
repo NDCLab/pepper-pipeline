@@ -739,12 +739,9 @@ def final_reject_epoch(epochs):
     """
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
-    try:
-        # load in epochs and fit on autoRej model
-        epochs.load_data()
-        autoRej.fit(epochs)
-    except (ValueError, TypeError, AttributeError) as error_msg:
-        return epochs, {ERROR_KEY: str(error_msg)}
+    # load in epochs and fit on autoRej model
+    epochs.load_data()
+    autoRej.fit(epochs)
 
     # creates the output dictionary to store the function output
     output_dict_finalRej = {}
