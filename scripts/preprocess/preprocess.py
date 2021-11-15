@@ -35,11 +35,7 @@ def set_montage(raw, montage):
     output_dict_montage:  dictionary
                           dictionary with montage information
     """
-    try:
-        raw.set_montage(montage)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
-
+    raw.set_montage(montage)
     montage_details = {
         "Montage": montage
     }
