@@ -672,22 +672,19 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     during segmentation stage
     """
 
-    try:
-        raw.load_data()
-        events, event_id = mne.events_from_annotations(raw)
-        epochs = mne.Epochs(raw, events, event_id=event_id,
-                            tmin=tmin,
-                            tmax=tmax,
-                            baseline=baseline,
-                            picks=picks,
-                            reject_tmin=reject_tmin,
-                            reject_tmax=reject_tmax,
-                            decim=decim,
-                            verbose=verbose,
-                            preload=preload
-                            )
-    except (TypeError, AttributeError, ValueError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    events, event_id = mne.events_from_annotations(raw)
+    epochs = mne.Epochs(raw, events, event_id=event_id,
+                        tmin=tmin,
+                        tmax=tmax,
+                        baseline=baseline,
+                        picks=picks,
+                        reject_tmin=reject_tmin,
+                        reject_tmax=reject_tmax,
+                        decim=decim,
+                        verbose=verbose,
+                        preload=preload
+                        )
 
     # get count of all epochs to output dictionary
     ch_names = epochs.info.ch_names
