@@ -160,17 +160,14 @@ def ica_raw(raw):
     output_dict_ica:  dictionary
                       dictionary with relevant ica information
     """
-    try:
-        if raw.get_montage() is None:
-            return raw, {ERROR_KEY: MISSING_MONTAGE_MSG}
-        # prep for ica - load and make a copy
-        raw.load_data()
-        raw_filt_copy = raw.copy()
+    if raw.get_montage() is None:
+        raise AttributeError(MISSING_MONTAGE_MSG)
+    # prep for ica - load and make a copy
+    raw.load_data()
+    raw_filt_copy = raw.copy()
 
-        # High-pass with 1. Hz cut-off is recommended for ICA
-        raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    # High-pass with 1. Hz cut-off is recommended for ICA
+    raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
 
     # epoch with arbitrary 1s
     epochs_prep = mne.make_fixed_length_epochs(raw_filt_copy,
@@ -203,7 +200,7 @@ def ica_raw(raw):
     # if 20% channels have been identified, skip
     if (len(badchans_list) + len(chs_bad)) / len(epochs_prep.ch_names) > .2:
         # raise an error to skip this subject
-        return raw, {ERROR_KEY: BAD_CHAN_MSG}
+        raise RuntimeError(BAD_CHAN_MSG)
 
     # remove bad channels globally
     raw.info['bads'].extend(badchans_list)
@@ -224,7 +221,7 @@ def ica_raw(raw):
     # if 50% epochs have been rejected, ship this subject
     if epochs_bads / epochs_original > 0.5:
         # raise an error to skip this subject
-        return raw, {ERROR_KEY: BAD_EPOCH_MSG}
+        raise RuntimeError(BAD_EPOCH_MSG)
 
     # ica
     method = 'infomax'
