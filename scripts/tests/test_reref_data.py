@@ -1,13 +1,5 @@
-import pytest
 from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
-
-from scripts.constants import ERROR_KEY
-
-
-@pytest.fixture
-def error_obj():
-    return None
 
 
 def test_return_values(default_params, bids_test_data):
@@ -21,13 +13,4 @@ def test_return_values(default_params, bids_test_data):
     reref_eeg, output_dict = pre.reref_raw(eeg_obj, **reref_param)
 
     # assert that all data is valid
-    assert ERROR_KEY not in output_dict.values()
     assert isinstance(reref_eeg, BaseRaw)
-
-
-def test_except_value(error_obj):
-    eeg_obj = error_obj
-
-    # attempt to reref w/invalid data
-    _, output = pre.reref_raw(eeg_obj)
-    assert ERROR_KEY in output.keys()
