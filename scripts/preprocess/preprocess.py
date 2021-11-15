@@ -903,14 +903,11 @@ def identify_badchans_raw(raw, ref_elec_name):
     output_dict_flter:  dictionary
                         dictionary with relevant bad channel information
     """
-    try:
-        raw.load_data()
-        # get raw data matrix
-        raw_data = raw.get_data()
-        # get the index of reference electrode
-        ref_index = raw.ch_names.index(ref_elec_name)
-    except (ValueError, TypeError, AttributeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    # get raw data matrix
+    raw_data = raw.get_data()
+    # get the index of reference electrode
+    ref_index = raw.ch_names.index(ref_elec_name)
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100
@@ -925,11 +922,8 @@ def identify_badchans_raw(raw, ref_elec_name):
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
 
-    try:
-        reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
-        fitcurve_var = np.polyval(reg_var, chan_ref_dist)
-    except np.linalg.LinAlgError as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
+    fitcurve_var = np.polyval(reg_var, chan_ref_dist)
 
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,
