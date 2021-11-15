@@ -4,7 +4,7 @@ import mne
 PIPE_NAME = "PEPPER_pipeline"
 INTERM = PIPE_NAME + "_intermediate"
 FINAL = PIPE_NAME + "_preprocessed"
-ERROR_KEY = "ERROR"
+ERROR_KEY = "ERROR: "
 
 # Load data error messages
 MISSING_PATH_MSG = "Missing path. Please check if file or directory exists."
