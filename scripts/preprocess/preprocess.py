@@ -12,9 +12,7 @@ from scipy.stats import zscore
 from scripts.constants import \
     MISSING_MONTAGE_MSG, \
     BAD_CHAN_MSG, \
-    BAD_EPOCH_MSG, \
-    INVALID_DATA_MSG, \
-    ERROR_KEY
+    BAD_EPOCH_MSG
 
 
 def set_montage(raw, montage):
