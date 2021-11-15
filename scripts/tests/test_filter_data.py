@@ -1,4 +1,3 @@
-import pytest
 from scripts.preprocess import preprocess as pre
 from mne.io import BaseRaw
 
