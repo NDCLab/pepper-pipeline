@@ -129,11 +129,8 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     output_dict_flter:  dictionary
                         dictionary with relevant filter information
     """
-    try:
-        raw.load_data()
-        raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
