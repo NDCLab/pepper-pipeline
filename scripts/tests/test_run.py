@@ -3,7 +3,6 @@ import os
 import mne
 
 from run import run_pipeline
-from scripts.preprocess import preprocess as pre
 from scripts.constants import INTERM, FINAL
 
 
