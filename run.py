@@ -5,8 +5,7 @@ from collections import ChainMap
 import mne_bids
 
 import logging
-import traceback
-
+from multiprocessing import Pool
 import sys
 from scripts.constants import \
     CAUGHT_EXCEPTION_SKIP, \
@@ -33,41 +32,29 @@ def run_pipeline(preprocess, load_data, write_data):
                 Dictionary containing parameters to write data
 
     """
-    # get pipeline parameters
-    ch_type = load_data["channel-type"]
-    exit_on_error = load_data["exit_on_error"]
-    rewrite = load_data["overwrite"]
-    path = write_data["root"]
-
-    # get set of subjects & tasks to run while omitting existing exceptions
-    data = load.load_files(load_data)
-
-    # for each file in filtered data
-    for file in data:
-        # load raw data
+    def preprocess_data(file):
+        """Nested function to preprocess data
+        """
+        # load raw data from file
         eeg_obj = mne_bids.read_raw_bids(file)
         # initialize output list
         outputs = [None] * len(preprocess)
 
-        # For each pipeline step in user_params, execute with parameters
+        # For each pipeline step, execute with parameters
         for idx, (func, params) in enumerate(preprocess.items()):
-            # Handle any unexpected exceptions by logging to shell and skipping
             try:
                 eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
             except Exception as e:
-                logging.error(e)
-                logging.info(traceback.format_exc())
+                # On error, replace output with exception
+                outputs[idx] = {func: ERROR_KEY + str(e)}
+                # Remove all un-filled outputs
                 outputs = clean_outputs(outputs)
-                break
 
-            # If a caught error has been detected, log and skip
-            if ERROR_KEY in outputs[idx].keys():
-                logging.info(CAUGHT_EXCEPTION_SKIP)
-                outputs = clean_outputs(outputs)
-                # or exit if pipeline specifies
+                # Exit pipeline or skip subject
                 if exit_on_error:
                     sys.exit(EXIT_MESSAGE)
-                break
+                logging.info(CAUGHT_EXCEPTION_SKIP)
+                return
 
             # check if this is the final preprocessed eeg object
             final = (idx == len(preprocess.items()) - 1)
@@ -79,6 +66,23 @@ def run_pipeline(preprocess, load_data, write_data):
         outputs.reverse()
         output = dict(ChainMap(*outputs))
         write.write_output_param(output, file, ch_type, path, rewrite)
+
+    # get pipeline parameters
+    ch_type = load_data["channel-type"]
+    exit_on_error = load_data["exit_on_error"]
+    rewrite = load_data["overwrite"]
+    parallel = load_data["parallel"]
+    path = write_data["root"]
+
+    # get set of subjects & tasks to run while omitting existing exceptions
+    data = load.load_files(load_data)
+
+    # get number of runs based on available cpus and param
+    runs = 1 if parallel else None
+
+    with Pool(runs) as worker:
+        # for each file in filtered data
+        worker.map(preprocess_data, data)
 
 
 if __name__ == "__main__":
