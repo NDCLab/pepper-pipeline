@@ -7,6 +7,7 @@ import os
 from scripts.data import load
 from scripts.constants import ALL, OMIT
 
+
 @pytest.fixture
 def avail_subj(default_params):
     # Get all available subjects from test default params
