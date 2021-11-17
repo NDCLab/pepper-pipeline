@@ -15,7 +15,9 @@ from scripts.constants import \
     MISSING_DATA_MSG, \
     INVALID_E_SUBJ_MSG, \
     INVALID_E_TASK_MSG, \
-    INVALID_E_RUN_MSG
+    INVALID_E_RUN_MSG, \
+    ALL, \
+    OMIT
 
 
 def load_params(user_param_path):
@@ -27,11 +29,11 @@ def load_params(user_param_path):
         raise FileNotFoundError(user_param_path, ":", MISSING_PATH_MSG)
 
 
-def _init_subjects(filter_sub, root, ch_type):
+def _filter_subjects(select_sub, root, ch_type):
     """Initialize collection of files by loading selected subjects
     Parameters
     ----------
-    filter_sub : list
+    select_sub : list
                  a list of subjects to select from all BIDS files
     root : str
            root of BIDS dataset
@@ -43,17 +45,17 @@ def _init_subjects(filter_sub, root, ch_type):
     files: list
            a list of partially filtered BIDS paths according to subjects
     """
-    if not isinstance(filter_sub, list):
+    if not isinstance(select_sub, list):
         raise TypeError(INVALID_SUBJ_PARAM_MSG)
-    if filter_sub == ["*"]:
-        filter_sub = mne_bids.get_entity_vals(root, 'subject')
+    if select_sub == ALL:
+        select_sub = mne_bids.get_entity_vals(root, 'subject')
 
     filtered_subjects = []
     bids_root = pathlib.Path(root)
     type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
 
     print("Loading participants")
-    for subject in tqdm(filter_sub):
+    for subject in tqdm(select_sub):
         bids_path = mne_bids.BIDSPath(subject=subject,
                                       datatype=ch_type,
                                       root=bids_root)
@@ -81,10 +83,10 @@ def _filter_tasks(filter_tasks, files):
     """
     if not isinstance(filter_tasks, list):
         raise TypeError(INVALID_TASK_PARAM_MSG)
-    if filter_tasks == ["*"]:
+    if filter_tasks == ALL:
         return files
 
-    return [f for f in tqdm(files) if f.task in filter_tasks]
+    return [f for f in files if f.task in filter_tasks]
 
 
 def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
@@ -106,18 +108,18 @@ def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
     files: list
            a list of fully filtered BIDS paths according to exceptions
     """
-    if not isinstance(subjects, list) and subjects != "":
+    if not isinstance(subjects, list) and subjects != OMIT:
         raise TypeError(INVALID_E_SUBJ_MSG)
-    elif not isinstance(tasks, list) and tasks != "":
+    elif not isinstance(tasks, list) and tasks != OMIT:
         raise TypeError(INVALID_E_TASK_MSG)
-    elif not isinstance(runs, list) and runs != "":
+    elif not isinstance(runs, list) and runs != OMIT:
         raise TypeError(INVALID_E_RUN_MSG)
 
-    if subjects == ["*"]:
+    if subjects == ALL:
         subjects = mne_bids.get_entity_vals(root, 'subject')
-    if tasks == ["*"]:
+    if tasks == ALL:
         tasks = mne_bids.get_entity_vals(root, 'task')
-    if runs == ["*"]:
+    if runs == ALL:
         runs = mne_bids.get_entity_vals(root, 'run')
 
     # get cartesian product of subjects, tasks, and runs
@@ -190,7 +192,7 @@ def load_files(data_params):
     e_runs = exceptions["runs"]
 
     # initialize files by loading selected subjects
-    files = _init_subjects(subjects_sel, root, ch_type)
+    files = _filter_subjects(subjects_sel, root, ch_type)
     # filter tasks
     files = _filter_tasks(tasks_sel, files)
     # filter exceptions
