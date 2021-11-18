@@ -5,7 +5,6 @@ from collections import ChainMap
 import mne_bids
 
 import logging
-import traceback
 
 import sys
 from scripts.constants import \
@@ -44,29 +43,25 @@ def run_pipeline(preprocess, load_data, write_data):
 
     # for each file in filtered data
     for file in data:
-        # load raw data
+        # load raw data from file
         eeg_obj = mne_bids.read_raw_bids(file)
         # initialize output list
         outputs = [None] * len(preprocess)
 
-        # For each pipeline step in user_params, execute with parameters
+        # For each pipeline step, execute with parameters
         for idx, (func, params) in enumerate(preprocess.items()):
-            # Handle any unexpected exceptions by logging to shell and skipping
             try:
                 eeg_obj, outputs[idx] = getattr(pre, func)(eeg_obj, **params)
             except Exception as e:
-                logging.error(e)
-                logging.info(traceback.format_exc())
+                # On error, replace output with exception
+                outputs[idx] = {func: ERROR_KEY + str(e)}
+                # Remove all un-filled outputs
                 outputs = clean_outputs(outputs)
-                break
 
-            # If a caught error has been detected, log and skip
-            if ERROR_KEY in outputs[idx].keys():
-                logging.info(CAUGHT_EXCEPTION_SKIP)
-                outputs = clean_outputs(outputs)
-                # or exit if pipeline specifies
+                # Exit pipeline or skip subject
                 if exit_on_error:
                     sys.exit(EXIT_MESSAGE)
+                logging.info(CAUGHT_EXCEPTION_SKIP)
                 break
 
             # check if this is the final preprocessed eeg object

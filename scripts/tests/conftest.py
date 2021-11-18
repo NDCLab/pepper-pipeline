@@ -31,14 +31,11 @@ def bids_test_data(request, raw_data):
 def bids_test_epoch_data(request, raw_data, default_params):
     # Get default montage, ref, and segment params
     feature_params = default_params["preprocess"]
-    ref_params = feature_params["set_reference"]
     seg_params = feature_params["segment_data"]
     montage_param = feature_params["set_montage"]
 
-    # Set the ref electrode
-    eeg_obj, _ = pre.set_reference(raw_data, **ref_params)
     # Set the montage file
-    eeg_obj, _ = pre.set_montage(eeg_obj, **montage_param)
+    eeg_obj, _ = pre.set_montage(raw_data, **montage_param)
     # Generate epoched object
     epo, _ = pre.segment_data(eeg_obj, **seg_params)
 

@@ -4,6 +4,7 @@ import mne
 PIPE_NAME = "PEPPER_pipeline"
 INTERM = PIPE_NAME + "_intermediate"
 FINAL = PIPE_NAME + "_preprocessed"
+ERROR_KEY = "ERROR: "
 
 # Data selection
 ALL = ["*"]

@@ -1,9 +1,7 @@
+import pytest
 from scripts.data import write, load
 
-import pytest
-
 import os
-
 import mne_bids
 
 
