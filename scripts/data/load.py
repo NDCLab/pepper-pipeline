@@ -1,10 +1,10 @@
 import pathlib
 import mne_bids
 import json
-from mne_bids.config import ALLOWED_DATATYPE_EXTENSIONS
 
 from itertools import product
 import os
+import warnings
 from tqdm import tqdm
 
 from scripts.constants import \
@@ -15,7 +15,9 @@ from scripts.constants import \
     MISSING_DATA_MSG, \
     INVALID_E_SUBJ_MSG, \
     INVALID_E_TASK_MSG, \
-    INVALID_E_RUN_MSG
+    INVALID_E_RUN_MSG, \
+    ALL, \
+    OMIT
 
 
 def load_params(user_param_path):
@@ -27,126 +29,84 @@ def load_params(user_param_path):
         raise FileNotFoundError(user_param_path, ":", MISSING_PATH_MSG)
 
 
-def _init_subjects(filter_sub, root, ch_type):
-    """Initialize collection of files by loading selected subjects
-    Parameters
-    ----------
-    filter_sub : list
-                 a list of subjects to select from all BIDS files
-    root : str
-           root of BIDS dataset
-    ch_type: str
-             type of BIDS dataset
-
-    Returns
-    ----------
-    files: list
-           a list of partially filtered BIDS paths according to subjects
-    """
-    if not isinstance(filter_sub, list):
+def _check_params(s_sub, s_task, e_sub, e_task, e_run):
+    if not isinstance(s_sub, list):
         raise TypeError(INVALID_SUBJ_PARAM_MSG)
-    if filter_sub == ["*"]:
-        filter_sub = mne_bids.get_entity_vals(root, 'subject')
-
-    filtered_subjects = []
-    bids_root = pathlib.Path(root)
-    type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
-
-    print("Loading participants")
-    for subject in tqdm(filter_sub):
-        bids_path = mne_bids.BIDSPath(subject=subject,
-                                      datatype=ch_type,
-                                      root=bids_root)
-
-        files = bids_path.match()
-        files_eeg = [f for f in files if f.extension.lower() in type_exten]
-        filtered_subjects += files_eeg
-
-    return filtered_subjects
-
-
-def _filter_tasks(filter_tasks, files):
-    """Select tasks as defined by user_params
-    Parameters
-    ----------
-    filter_tasks : list
-                   list of tasks to run pipeline on
-    files : list
-            list of BIDS paths filtered according to subjects
-
-    Returns
-    ----------
-    files: list
-           a list of partially filtered BIDS paths according to tasks
-    """
-    if not isinstance(filter_tasks, list):
+    if not isinstance(s_task, list):
         raise TypeError(INVALID_TASK_PARAM_MSG)
-    if filter_tasks == ["*"]:
-        return files
 
-    return [f for f in tqdm(files) if f.task in filter_tasks]
-
-
-def _filter_exceptions(subjects, tasks, runs, files, root, ch_type):
-    """Remove exceptions as defined by user_params
-    Parameters
-    ----------
-    subjects, tasks, runs : list
-                            a list of subjects, tasks, and runs to be
-                            cartesian multiplied to get omitted files
-    files: list
-           list of partially filtered files according to subject and tasks
-    root: str
-          root of BIDS dataset
-    ch_type: str
-             type of BIDS dataset
-
-    Returns
-    ----------
-    files: list
-           a list of fully filtered BIDS paths according to exceptions
-    """
-    if not isinstance(subjects, list) and subjects != "":
+    if not isinstance(e_sub, list) and e_sub != OMIT:
         raise TypeError(INVALID_E_SUBJ_MSG)
-    elif not isinstance(tasks, list) and tasks != "":
+    elif not isinstance(e_task, list) and e_task != OMIT:
         raise TypeError(INVALID_E_TASK_MSG)
-    elif not isinstance(runs, list) and runs != "":
+    elif not isinstance(e_run, list) and e_run != OMIT:
         raise TypeError(INVALID_E_RUN_MSG)
 
-    if subjects == ["*"]:
-        subjects = mne_bids.get_entity_vals(root, 'subject')
-    if tasks == ["*"]:
-        tasks = mne_bids.get_entity_vals(root, 'task')
-    if runs == ["*"]:
-        runs = mne_bids.get_entity_vals(root, 'run')
 
-    # get cartesian product of subjects, tasks, and runs
-    exceptions = list(product(subjects, tasks, runs))
+def _select_except(s_sub, s_task, e_sub, e_task, e_run, root, ch_type):
+    """Initialize collection of files by loading selected subjects
+    Parameters
+
+    Returns
+    """
+    # Set warnings to be handled as errors
+    warnings.filterwarnings("error")
 
     bids_root = pathlib.Path(root)
-    type_exten = ALLOWED_DATATYPE_EXTENSIONS[ch_type]
-    # turn each exception into a BIDS path
-    print("Filtering exceptions")
-    for i in tqdm(range(len(exceptions))):
-        file = exceptions[i]
+    selected_files = []
 
-        sub = file[0]
-        task = file[1]
-        run = file[2]
+    # Select all subjects and tasks if specified
+    if s_sub == ALL:
+        s_sub = mne_bids.get_entity_vals(bids_root, 'subject')
+    if s_task == ALL:
+        s_task = mne_bids.get_entity_vals(bids_root, 'task')
+    # By default, select all subjects and runs
+    ses = mne_bids.get_entity_vals(bids_root, 'session')
+    run = mne_bids.get_entity_vals(bids_root, 'run')
+    # Get cartesian product of selection
+    selections = list(product(s_sub, s_task, ses, run))
 
-        bids_path = mne_bids.BIDSPath(subject=sub,
-                                      task=task,
-                                      run=run,
-                                      datatype=ch_type,
-                                      root=bids_root)
-        e_files = bids_path.match()
-        e_files_eeg = [f for f in e_files if f.extension.lower() in type_exten]
+    # Select all except sub, tasks, and runs if specified
+    if e_sub == ALL:
+        e_sub = mne_bids.get_entity_vals(bids_root, 'subject')
+    if e_task == ALL:
+        e_task = mne_bids.get_entity_vals(bids_root, 'task')
+    if e_run == ALL:
+        e_run = mne_bids.get_entity_vals(bids_root, 'run')
+    # Get cartesian product of exceptions
+    exceptions = list(product(e_sub, e_task, ses, e_run))
 
-        if len(e_files_eeg):
-            exceptions[i] = e_files_eeg[0]
+    # Select files if they exist
+    for sub, task, ses, run in tqdm(selections):
+        # Skip file if RunTimeWarning
+        try:
+            bids_path = mne_bids.BIDSPath(subject=sub,
+                                          task=task,
+                                          session=ses,
+                                          run=run,
+                                          datatype=ch_type,
+                                          extension='.vhdr',
+                                          root=bids_root)
+            selected_files.append(bids_path)
+        except RuntimeWarning:
+            continue
 
-    # remove any file in files that shows up in exceptions and return
-    return [f for f in files if f not in exceptions]
+    # Remove exception files if they exist
+    for sub, task, ses, run in tqdm(exceptions):
+        # Skip file if RunTimeWarning
+        try:
+            bids_path = mne_bids.BIDSPath(subject=sub,
+                                          task=task,
+                                          session=ses,
+                                          run=run,
+                                          datatype=ch_type,
+                                          extension='.vhdr',
+                                          root=bids_root)
+            selected_files.remove(bids_path)
+        except (RuntimeWarning, ValueError):
+            continue
+
+    return selected_files
 
 
 def load_files(data_params):
@@ -189,11 +149,11 @@ def load_files(data_params):
     e_tasks = exceptions["tasks"]
     e_runs = exceptions["runs"]
 
-    # initialize files by loading selected subjects
-    files = _init_subjects(subjects_sel, root, ch_type)
-    # filter tasks
-    files = _filter_tasks(tasks_sel, files)
-    # filter exceptions
-    files = _filter_exceptions(e_sub, e_tasks, e_runs, files, root, ch_type)
+    # Raise exception if any data param violates preconditions
+    _check_params(subjects_sel, tasks_sel, e_sub, e_tasks, e_runs)
 
-    return files
+    # initialize files by loading selected subjects
+    paths = _select_except(subjects_sel, tasks_sel, e_sub, e_tasks, e_runs,
+                           root, ch_type)
+
+    return paths
