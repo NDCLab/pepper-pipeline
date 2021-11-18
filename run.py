@@ -80,7 +80,7 @@ def run_pipeline(preprocess, load_data, write_data):
     data = load.load_files(load_data)
 
     # get number of workers based on available cpus and param
-    runs = None if load_data["parallel"] else 1
+    runs = load_data["parallel-runs"] if load_data["parallel-runs"] else 1
 
     # parallelize data by executing pipeline steps on each loaded file
     with Pool(runs) as worker:
