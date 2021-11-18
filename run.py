@@ -12,7 +12,8 @@ import sys
 from scripts.constants import \
     CAUGHT_EXCEPTION_SKIP, \
     EXIT_MESSAGE, \
-    ERROR_KEY
+    ERROR_KEY, \
+    DEFAULT_RUNS
 
 
 def clean_outputs(output_dict):
@@ -42,7 +43,7 @@ def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
             if exit_on_error:
                 sys.exit(EXIT_MESSAGE)
             logging.info(CAUGHT_EXCEPTION_SKIP)
-            return
+            break
 
         # check if this is the final preprocessed eeg object
         final = (idx == len(preprocess.items()) - 1)
@@ -74,13 +75,14 @@ def run_pipeline(preprocess, load_data, write_data):
     ch_type = load_data["channel-type"]
     exit_error = load_data["exit_on_error"]
     rewrite = load_data["overwrite"]
+    parallel_work = load_data["parallel-runs"]
     path = write_data["root"]
 
     # get set of subjects & tasks to run while omitting existing exceptions
     data = load.load_files(load_data)
 
     # get number of workers based on available cpus and param
-    runs = None if load_data["parallel"] else 1
+    runs = parallel_work if parallel_work else DEFAULT_RUNS
 
     # parallelize data by executing pipeline steps on each loaded file
     with Pool(runs) as worker:

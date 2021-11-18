@@ -9,6 +9,7 @@ ERROR_KEY = "ERROR: "
 # Data selection
 ALL = ["*"]
 OMIT = ""
+DEFAULT_RUNS = 1
 
 # Load data error messages
 ERROR_KEY = "ERROR"
