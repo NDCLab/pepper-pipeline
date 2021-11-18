@@ -162,7 +162,7 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
         "channel-type": "eeg",
         "exit_on_error": False,
         "overwrite": True,
-        "parallel": False
+        "parallel-runs": 0
     }
 
     # set up default preprocess params
