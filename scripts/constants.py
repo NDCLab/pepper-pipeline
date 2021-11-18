@@ -4,9 +4,14 @@ import mne
 PIPE_NAME = "PEPPER_pipeline"
 INTERM = PIPE_NAME + "_intermediate"
 FINAL = PIPE_NAME + "_preprocessed"
-ERROR_KEY = "ERROR"
+ERROR_KEY = "ERROR: "
+
+# Data selection
+ALL = ["*"]
+OMIT = ""
 
 # Load data error messages
+ERROR_KEY = "ERROR"
 MISSING_PATH_MSG = "Missing path. Please check if file or directory exists."
 MISSING_DATA_MSG = "Missing data at path. Please check if data at path exists\
  and is a valid BIDS directory."
@@ -34,10 +39,8 @@ MISSING_MONTAGE_MSG = "This operation requires a montage however the data does \
  set_montage()."
 INVALID_MONTAGE_MSG = f"Invalid value for the 'montage' parameter.\
  Allowed values are: {', '.join(mne.channels.get_builtin_montages())}."
-
 # reference channel error
 INVALID_REF_MSG = "The reference electrode is NOT provided or in the list."
-
 # ica error
 BAD_CHAN_MSG = "20% or more channels are bad channels and have been removed."
 BAD_EPOCH_MSG = "50% or more epochs have been rejected."

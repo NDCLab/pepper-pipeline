@@ -123,14 +123,14 @@ The following examples show how to select data using the `load_data` section, fr
         "subjects": ["*"],
         "tasks": ["*"],
         "exceptions": {
-            "subjects": ["*"],
+            "subjects": ["NDARAB793GL3"],
             "tasks": ["*"], 
-            "runs": ["2"]
+            "runs": ["*"]
         },
         "channel-type": "eeg"
     },
 ```
-*In this example, every single data file that contains "run-2" will be omitted from the preprocessing process*
+*In this example, every single data file that contains "sub-NDARAB793GL3" will be omitted from the preprocessing process*
 
 3. Select a subset of data w/multiple exceptions 
 
@@ -140,14 +140,14 @@ The following examples show how to select data using the `load_data` section, fr
         "subjects": ["NDARAB793GL3"],
         "tasks": ["*"],
         "exceptions": {
-            "subjects": "NDARAB793GL3",
-            "tasks": "Video1", 
+            "subjects": ["NDARAB793GL3"],
+            "tasks": ["Video1"], 
             "runs": ["*"]
         },
         "channel-type": "eeg"
     },
 ```
-*In this example, only the "NDARAB793GL3" subject is selected to be processed. Every single data file that strictly contains "sub-NDARAB793GL3" and "Video1" will be omitted from the preprocessing process*
+*In this example, only the "NDARAB793GL3" subject is selected to be processed. Every single data file that strictly contains "sub-NDARAB793GL3_..._task-Video1" will be omitted from the preprocessing process*
 
 **Preprocess**
 

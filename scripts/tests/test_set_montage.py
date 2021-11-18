@@ -3,8 +3,6 @@ import pytest
 import mne
 import numpy as np
 
-from scripts.constants import ERROR_KEY
-
 
 @pytest.fixture
 def sim_raw_hydrocel_129():
@@ -26,11 +24,3 @@ def test_valid_montage(sim_raw_hydrocel_129):
                                                         montage_to_use)
     assert data_with_montage.get_montage() is not None
     assert montage_output['Montage']['Montage'] == montage_to_use
-
-
-def test_invalid_montage(sim_raw_hydrocel_129):
-    # Apply an incorrect montage
-    montage_to_use = 'standard_1020'
-    data_with_montage, montage_output = pre.set_montage(sim_raw_hydrocel_129,
-                                                        montage_to_use)
-    assert ERROR_KEY in montage_output.keys()

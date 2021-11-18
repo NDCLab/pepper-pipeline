@@ -12,9 +12,7 @@ from scipy.stats import zscore
 from scripts.constants import \
     MISSING_MONTAGE_MSG, \
     BAD_CHAN_MSG, \
-    BAD_EPOCH_MSG, \
-    INVALID_DATA_MSG, \
-    ERROR_KEY
+    BAD_EPOCH_MSG
 
 
 def set_montage(raw, montage):
@@ -35,11 +33,7 @@ def set_montage(raw, montage):
     output_dict_montage:  dictionary
                           dictionary with montage information
     """
-    try:
-        raw.set_montage(montage)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
-
+    raw.set_montage(montage)
     montage_details = {
         "Montage": montage
     }
@@ -64,19 +58,15 @@ def set_reference(raw, ref_channels):
     output_dict_reference:  dictionary
                             dictionary with reference information
     """
-    try:
-        raw.load_data()
-        raw_new_ref = mne.add_reference_channels(raw, ref_channels)
-        reference_details = {
-            "Reference": ref_channels
-        }
-        return raw_new_ref, {"Reference": reference_details}
-    except ValueError:
-        reference_details = {
-            "Reference": "Reference is already specified. Or invalid reference \
-            channel name."
-        }
-        return raw, {"Reference": reference_details}
+    # Check if reference channel is already set, return
+    if ref_channels in raw.info['ch_names']:
+        return raw, {"Reference": "Reference is already specified."}
+    raw.load_data()
+    raw_new_ref = mne.add_reference_channels(raw, ref_channels)
+    reference_details = {
+        "Reference": ref_channels
+    }
+    return raw_new_ref, {"Reference": reference_details}
 
 
 def reref_raw(raw, reref_channels='average'):
@@ -109,13 +99,8 @@ def reref_raw(raw, reref_channels='average'):
     output_dict_reference:  dictionary
                             dictionary with relevant information on re-ref
     """
-    try:
-        raw.load_data()
-    except (AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
-
+    raw.load_data()
     raw_new_ref = raw.set_eeg_reference(reref_channels)
-
     reref_details = {
         "Rereference": reref_channels
     }
@@ -125,7 +110,7 @@ def reref_raw(raw, reref_channels='average'):
 
 
 def filter_data(raw, l_freq=0.3, h_freq=40):
-    """Final and automatic rejection of bad epochs
+    """Filter subset of channels using mne.filter
     Parameters
     ----------
     raw:    mne.io.Raw
@@ -145,11 +130,8 @@ def filter_data(raw, l_freq=0.3, h_freq=40):
     output_dict_flter:  dictionary
                         dictionary with relevant filter information
     """
-    try:
-        raw.load_data()
-        raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    raw_filtered = raw.filter(l_freq=l_freq, h_freq=h_freq)
 
     h_pass = raw_filtered.info["highpass"]
     l_pass = raw_filtered.info["lowpass"]
@@ -179,17 +161,14 @@ def ica_raw(raw):
     output_dict_ica:  dictionary
                       dictionary with relevant ica information
     """
-    try:
-        if raw.get_montage() is None:
-            return raw, {ERROR_KEY: MISSING_MONTAGE_MSG}
-        # prep for ica - load and make a copy
-        raw.load_data()
-        raw_filt_copy = raw.copy()
+    if raw.get_montage() is None:
+        raise AttributeError(MISSING_MONTAGE_MSG)
+    # prep for ica - load and make a copy
+    raw.load_data()
+    raw_filt_copy = raw.copy()
 
-        # High-pass with 1. Hz cut-off is recommended for ICA
-        raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
-    except (ValueError, AttributeError, TypeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    # High-pass with 1. Hz cut-off is recommended for ICA
+    raw_filt_copy = raw_filt_copy.load_data().filter(l_freq=1, h_freq=None)
 
     # epoch with arbitrary 1s
     epochs_prep = mne.make_fixed_length_epochs(raw_filt_copy,
@@ -222,7 +201,7 @@ def ica_raw(raw):
     # if 20% channels have been identified, skip
     if (len(badchans_list) + len(chs_bad)) / len(epochs_prep.ch_names) > .2:
         # raise an error to skip this subject
-        return raw, {ERROR_KEY: BAD_CHAN_MSG}
+        raise RuntimeError(BAD_CHAN_MSG)
 
     # remove bad channels globally
     raw.info['bads'].extend(badchans_list)
@@ -243,7 +222,7 @@ def ica_raw(raw):
     # if 50% epochs have been rejected, ship this subject
     if epochs_bads / epochs_original > 0.5:
         # raise an error to skip this subject
-        return raw, {ERROR_KEY: BAD_EPOCH_MSG}
+        raise RuntimeError(BAD_EPOCH_MSG)
 
     # ica
     method = 'infomax'
@@ -694,22 +673,19 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     during segmentation stage
     """
 
-    try:
-        raw.load_data()
-        events, event_id = mne.events_from_annotations(raw)
-        epochs = mne.Epochs(raw, events, event_id=event_id,
-                            tmin=tmin,
-                            tmax=tmax,
-                            baseline=baseline,
-                            picks=picks,
-                            reject_tmin=reject_tmin,
-                            reject_tmax=reject_tmax,
-                            decim=decim,
-                            verbose=verbose,
-                            preload=preload
-                            )
-    except (TypeError, AttributeError, ValueError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    events, event_id = mne.events_from_annotations(raw)
+    epochs = mne.Epochs(raw, events, event_id=event_id,
+                        tmin=tmin,
+                        tmax=tmax,
+                        baseline=baseline,
+                        picks=picks,
+                        reject_tmin=reject_tmin,
+                        reject_tmax=reject_tmax,
+                        decim=decim,
+                        verbose=verbose,
+                        preload=preload
+                        )
 
     # get count of all epochs to output dictionary
     ch_names = epochs.info.ch_names
@@ -764,12 +740,9 @@ def final_reject_epoch(epochs):
     """
     # fit and clean epoch data using autoreject
     autoRej = ar.AutoReject()
-    try:
-        # load in epochs and fit on autoRej model
-        epochs.load_data()
-        autoRej.fit(epochs)
-    except (ValueError, TypeError, AttributeError) as error_msg:
-        return epochs, {ERROR_KEY: str(error_msg)}
+    # load in epochs and fit on autoRej model
+    epochs.load_data()
+    autoRej.fit(epochs)
 
     # creates the output dictionary to store the function output
     output_dict_finalRej = {}
@@ -824,20 +797,14 @@ def interpolate_data(epochs, mode='accurate'):
     ----------
     Modified in place epochs object and output dictionary
     """
-    try:
-        epochs.load_data()
-        bads_before = epochs.info['bads']
-    except (TypeError, AttributeError) as error_msg:
-        return epochs, {ERROR_KEY: str(error_msg)}
+    epochs.load_data()
+    bads_before = epochs.info['bads']
 
     if len(bads_before) == 0:
         return epochs, {"Interpolation": {"Affected": bads_before}}
     else:
-        try:
-            epochs_interp = epochs.interpolate_bads(mode=mode)
-            return epochs_interp, {"Interpolation": {"Affected": bads_before}}
-        except (TypeError, AttributeError) as error_msg:
-            return epochs, {ERROR_KEY: str(error_msg)}
+        epochs_interp = epochs.interpolate_bads(mode=mode)
+        return epochs_interp, {"Interpolation": {"Affected": bads_before}}
 
 
 def plot_orig_and_interp(orig_raw, interp_raw):
@@ -861,10 +828,6 @@ def plot_orig_and_interp(orig_raw, interp_raw):
     interpolated data
 
     """
-    if not orig_raw or not interp_raw:
-        print(INVALID_DATA_MSG)
-        return 1
-
     for title_, data_ in zip(['orig.', 'interp.'], [orig_raw, interp_raw]):
         figure = data_.plot(butterfly=True, color='#00000022', bad_color='r')
         figure.subplots_adjust(top=0.9)
@@ -943,14 +906,11 @@ def identify_badchans_raw(raw, ref_elec_name):
     output_dict_flter:  dictionary
                         dictionary with relevant bad channel information
     """
-    try:
-        raw.load_data()
-        # get raw data matrix
-        raw_data = raw.get_data()
-        # get the index of reference electrode
-        ref_index = raw.ch_names.index(ref_elec_name)
-    except (ValueError, TypeError, AttributeError) as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    raw.load_data()
+    # get raw data matrix
+    raw_data = raw.get_data()
+    # get the index of reference electrode
+    ref_index = raw.ch_names.index(ref_elec_name)
 
     # get reference electrode location
     channel_positions = raw._get_channel_positions() * 100
@@ -965,11 +925,8 @@ def identify_badchans_raw(raw, ref_elec_name):
     # find bad channels based on their variances and correct for the distance
     chns_var = np.var(raw_data, axis=1)
 
-    try:
-        reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
-        fitcurve_var = np.polyval(reg_var, chan_ref_dist)
-    except np.linalg.LinAlgError as error_msg:
-        return raw, {ERROR_KEY: str(error_msg)}
+    reg_var = np.polyfit(chan_ref_dist, chns_var, 2)
+    fitcurve_var = np.polyval(reg_var, chan_ref_dist)
 
     corrected_var = chns_var - fitcurve_var
     bads_var = [raw.ch_names[i] for i in _find_outliers(corrected_var,

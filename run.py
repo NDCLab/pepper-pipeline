@@ -7,6 +7,7 @@ from itertools import repeat
 
 import logging
 from multiprocessing import Pool
+
 import sys
 from scripts.constants import \
     CAUGHT_EXCEPTION_SKIP, \
