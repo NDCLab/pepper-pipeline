@@ -2,43 +2,15 @@
 #SBATCH --qos medium
 #SBATCH --account iacc_gbuzzell
 #SBATCH --partition 6g-per-core
-#SBATCH --ntasks=2                 # set tasks equal to subject count
-#SBATCH --time=02:00:00            # quit if job hangs after two hours
-#SBATCH --job-name=pipeline_run
+
+
+#SBATCH --nodes=1                # node count
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --cpus-per-task=4        # CPUS to use when data parallelization
+#SBATCH --time=05:00:00          # total run time limit (HH:MM:SS)
 
 # load singularity module
 module load singularity-3.5.3
 
-# get collection of all available subjects
-ls /home/data/NDClab/datasets/pepper-pipeline-dataset/CMI/rawdata/ -F | grep / > subjects.txt
-
-cd ..
-
-# turn subjects into array
-arr=()
-while IFS= read -r line; do
-  arr+=("$line")
-done < subjects.txt
-
-cd ..
-
-parallel_script=""
-for sub in "${arr[@]}"
-do
-   sub=${sub:4}
-   sub_num=${sub::-1}
-
-   parallel_script+="srun --ntasks=1 "
-   parallel_script+="singularity exec --bind /home/data/NDClab/tools/pepper-pipeline/CMI/derivatives,"
-   parallel_script+="/home/data/NDClab/tools/pepper-pipeline/CMI/rawdata"
-   parallel_script+=" /home/data/NDClab/tools/pepper-pipeline/containers/singularity/run-container.simg python3 run.py & "
-done
-
-parallel_script+="wait"
-
-# use singularity container for each available subject and run in parallel
-echo $parallel_script
-eval "$parallel_script"
-
-# delete subjects.txt 
-rm -f subjects.txt
+# use singularity image to run all tests
+singularity exec --bind /home/data/NDClab/datasets/cmi-dataset /home/data/NDClab/tools/pepper-pipeline/containers/singularity/container.simg python3 run.py
