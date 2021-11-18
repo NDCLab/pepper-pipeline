@@ -1,20 +1,23 @@
-import os
+import mne_bids
 import postprocess
 from reliability import split_half
+
 import csv
 import sys
-import mne_bids
+import os
 
-# Get all tasks
-tasks = mne_bids.get_entity_vals(bids_root, 'task')
 # Get path from command line
 data_path = sys.argv[1]
+
+# Get all tasks
+tasks = mne_bids.get_entity_vals(data_path, 'task')
 
 # gen csv file name using task
 file_name = "metrics.csv"
 
 # hard code split_half column names
-columns = ["task", "corr_mean", "corr_lower", "corr_upper", "reliab_mean", "reliab_lower", "reliab_upper", "sme"]
+columns = ["task", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
+           "reliab_lower", "reliab_upper", "sme"]
 
 # Create task dict for data storage
 task_data = {}
@@ -35,7 +38,7 @@ for task in tasks:
 
     # call Dan's splithalf
     split = split_half(datalist1, datalist2)
-    
+
     # store data into dict
     metric_data["task"] = task
     metric_data["corr_mean"] = split.correlation.mean
@@ -49,14 +52,14 @@ for task in tasks:
     # calc sme
     sme = postprocess.sme(fileList, 0.1, 0.15, ['4'], ['E75'])
 
-    unpacked = [ str(val[0]) for val in sme ]
+    unpacked = [str(val[0]) for val in sme]
     metric_data["sme"] = unpacked
 
     task_data[task] = metric_data
-    
+
 with open(file_name, 'w') as f:
     writer = csv.writer(f)
-    write.writerow(columns)
-    
+    writer.writerow(columns)
+
     for key in task_data:
-        write.writerow(list(task_data[key].values()))
+        writer.writerow(list(task_data[key].values()))
