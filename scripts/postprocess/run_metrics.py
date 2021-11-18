@@ -35,7 +35,8 @@ for task in tasks:
 
     # compute splithalf reliability
     # get trial level erp for all participants
-    datalist1, datalist2 = postprocess.get_trial_erp(fileList, 0.1, 0.15, '4')
+    datalist1, datalist2 = postprocess.get_trial_erp(fileList, 0, 0.1, '12',
+                                                     '5')
 
     # call Dan's splithalf
     try:
@@ -57,7 +58,7 @@ for task in tasks:
 
     # calc sme
     try:
-        sme = postprocess.sme(fileList, 0.1, 0.15, ['4'], ['E75'])
+        sme = postprocess.sme(fileList, 0, 0.1, ['12', '5'], ['E75'])
         unpacked = str([str(val[0]) for val in sme])
         metric_data["sme"] = unpacked
     except Exception as e:
