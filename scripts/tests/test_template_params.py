@@ -25,7 +25,7 @@ def default_params_write(default_params, tmp_path, write_path):
 @pytest.fixture
 def load_params():
     return set(["root", "subjects", "tasks", "exceptions", "channel-type",
-                "exit_on_error", "overwrite", "parallel"])
+                "exit_on_error", "overwrite", "parallel-runs"])
 
 
 @pytest.fixture
