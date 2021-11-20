@@ -49,9 +49,6 @@ def _select_except(s_sub, s_task, e_sub, e_task, e_run, root, ch_type):
 
     Returns
     """
-    # Set warnings to be handled as errors
-    warnings.filterwarnings("error")
-
     bids_root = pathlib.Path(root)
     selected_files = []
 
@@ -78,33 +75,27 @@ def _select_except(s_sub, s_task, e_sub, e_task, e_run, root, ch_type):
 
     # Select files if they exist
     for sub, task, ses, run in tqdm(selections):
-        # Skip file if RunTimeWarning
-        try:
-            bids_path = mne_bids.BIDSPath(subject=sub,
-                                          task=task,
-                                          session=ses,
-                                          run=run,
-                                          datatype=ch_type,
-                                          extension='.vhdr',
-                                          root=bids_root)
+        bids_path = mne_bids.BIDSPath(subject=sub,
+                                      task=task,
+                                      session=ses,
+                                      run=run,
+                                      datatype=ch_type,
+                                      extension='.vhdr',
+                                      root=bids_root)
+        if os.path.isfile(bids_path.fpath):
             selected_files.append(bids_path)
-        except RuntimeWarning:
-            continue
 
     # Remove exception files if they exist
     for sub, task, ses, run in tqdm(exceptions):
-        # Skip file if RunTimeWarning
-        try:
-            bids_path = mne_bids.BIDSPath(subject=sub,
-                                          task=task,
-                                          session=ses,
-                                          run=run,
-                                          datatype=ch_type,
-                                          extension='.vhdr',
-                                          root=bids_root)
+        bids_path = mne_bids.BIDSPath(subject=sub,
+                                      task=task,
+                                      session=ses,
+                                      run=run,
+                                      datatype=ch_type,
+                                      extension='.vhdr',
+                                      root=bids_root)
+        if os.path.isfile(bids_path.fpath):
             selected_files.remove(bids_path)
-        except (RuntimeWarning, ValueError):
-            continue
 
     return selected_files
 
