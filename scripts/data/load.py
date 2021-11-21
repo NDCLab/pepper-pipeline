@@ -4,18 +4,13 @@ import json
 
 from itertools import product
 import os
-import warnings
 from tqdm import tqdm
 
 from scripts.constants import \
-    INVALID_UPARAM_MSG, \
-    INVALID_SUBJ_PARAM_MSG, \
-    INVALID_TASK_PARAM_MSG, \
     MISSING_PATH_MSG, \
     MISSING_DATA_MSG, \
-    INVALID_E_SUBJ_MSG, \
-    INVALID_E_TASK_MSG, \
-    INVALID_E_RUN_MSG, \
+    INVALID_SELECT_PARAM_MSG, \
+    INVALID_EXCEPT_PARAM_MSG, \
     ALL, \
     OMIT
 
@@ -31,16 +26,16 @@ def load_params(user_param_path):
 
 def _check_params(s_sub, s_task, e_sub, e_task, e_run):
     if not isinstance(s_sub, list):
-        raise TypeError(INVALID_SUBJ_PARAM_MSG)
+        raise TypeError(INVALID_SELECT_PARAM_MSG)
     if not isinstance(s_task, list):
-        raise TypeError(INVALID_TASK_PARAM_MSG)
+        raise TypeError(INVALID_SELECT_PARAM_MSG)
 
     if not isinstance(e_sub, list) and e_sub != OMIT:
-        raise TypeError(INVALID_E_SUBJ_MSG)
+        raise TypeError(INVALID_EXCEPT_PARAM_MSG)
     elif not isinstance(e_task, list) and e_task != OMIT:
-        raise TypeError(INVALID_E_TASK_MSG)
+        raise TypeError(INVALID_EXCEPT_PARAM_MSG)
     elif not isinstance(e_run, list) and e_run != OMIT:
-        raise TypeError(INVALID_E_RUN_MSG)
+        raise TypeError(INVALID_EXCEPT_PARAM_MSG)
 
 
 def _select_except(s_sub, s_task, e_sub, e_task, e_run, root, ch_type):
@@ -125,7 +120,8 @@ def load_files(data_params):
         # Get selection of exceptions
         exceptions = data_params["exceptions"]
     except TypeError:
-        raise TypeError(INVALID_UPARAM_MSG)
+        raise TypeError("Missing pipeline parameter. Valid template file can be written using \
+                         write.write_template_params()")
 
     # if the path does not exist, exit and throw exception
     if not os.path.exists(root):
