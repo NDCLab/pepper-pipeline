@@ -111,7 +111,7 @@ def load_files(data_params):
     # get metadata
     try:
         root = data_params["root"]
-        ch_type = data_params["channel-type"]
+        ch_type = data_params["channel_type"]
 
         # get selection of subjects & tasks
         subjects_sel = data_params["subjects"]
