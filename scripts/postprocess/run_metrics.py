@@ -8,7 +8,7 @@ import os
 import sys
 
 # Get path from command line
-data_path = "CMI/derivatives/PEPPER_pipeline/PEPPER_pipeline_preprocessed" # TODO: change
+data_path = sys.argv[1]
 
 tasks = mne_bids.get_entity_vals(data_path, 'task')
 
