@@ -45,3 +45,12 @@ def test_default_pipeline(default_params, tmp_path):
         elif dirnames == FINAL:
             # if at final dir, assert final obj written
             assert len(filenames) == 1
+
+    # Assert immutability of user_params
+    preprocess_new = default_params["preprocess"]
+    load_new = default_params["load_data"]
+    write_new = default_params["output_data"]
+
+    assert preprocess_new == preprocess_params
+    assert load_params == load_new
+    assert write_params == write_new
