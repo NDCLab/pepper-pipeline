@@ -1,13 +1,14 @@
 import mne_bids
-import postprocess
-from reliability import split_half
+from metrics.sme import sme
+from metrics.reliability import split_half
+from measures.erp import get_trial_erp
 
 import csv
 import os
 import sys
 
 # Get path from command line
-data_path = sys.argv[1]
+data_path = "CMI/derivatives/PEPPER_pipeline/PEPPER_pipeline_preprocessed" # TODO: change
 
 tasks = mne_bids.get_entity_vals(data_path, 'task')
 
@@ -35,8 +36,7 @@ for task in tasks:
 
     # compute splithalf reliability
     # get trial level erp for all participants
-    datalist1, datalist2 = postprocess.get_trial_erp(fileList, 0, 0.1, '12',
-                                                     '5')
+    datalist1, datalist2 = get_trial_erp(fileList, 0, 0.1, '12', '5')
 
     # call Dan's splithalf
     try:
@@ -58,8 +58,8 @@ for task in tasks:
 
     # calc sme
     try:
-        sme = postprocess.sme(fileList, 0, 0.1, ['12', '5'], ['E75'])
-        unpacked = str([str(val[0]) for val in sme])
+        sme_val = sme(fileList, 0, 0.1, ['12', '5'], ['E75'])
+        unpacked = str([str(val[0]) for val in sme_val])
         metric_data["sme"] = unpacked
     except Exception as e:
         metric_data["sme"] = str(e)
