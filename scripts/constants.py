@@ -48,13 +48,13 @@ segdata = namedtuple('segment_data', 'tmin tmax baseline picks reject_tmin \
                       reject_tmax decim verbose preload')
 interpdata = namedtuple('interpolate_data', 'mode')
 
-LOAD_PARAMS = loaddata("eeg", False, True, 1)
-REF_PARAMS = setref("Cz")
-MONT_PARAMS = setmont("GSN-HydroCel-129")
-FILT_PARAMS = filtdata(0.3, 40)
-IDENT_PARAMS = identbad("Cz")
-SEG_PARAMS = segdata(-0.2, 0.5, None, None, None, None, 1, False, None)
-INTERP_PARAMS = interpdata("accurate")
+DEFAULT_LOAD_PARAMS = loaddata("eeg", False, True, 1)
+DEFAULT_REF_PARAMS = setref("Cz")
+DEFAULT_MONT_PARAMS = setmont("GSN-HydroCel-129")
+DEFAULT_FILT_PARAMS = filtdata(0.3, 40)
+DEFAULT_IDENT_PARAMS = identbad("Cz")
+DEFAULT_SEG_PARAMS = segdata(-0.2, 0.5, None, None, None, None, 1, False, None)
+DEFAULT_INTERP_PARAMS = interpdata("accurate")
 
 PARAM_FILE_NAME = "user_params.json"
 ICA_NAME = "ica_raw"
