@@ -640,7 +640,7 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     tmax:   float
             time after event
 
-    baseline:   None | tuple of length 2
+    baseline:   None | list of length 2
                 The time interval to consider as “baseline” when applying
                 baseline correction
 
@@ -672,7 +672,9 @@ def segment_data(raw, tmin, tmax, baseline, picks, reject_tmin, reject_tmax,
     Will return epochs and a dictionary of epochs information
     during segmentation stage
     """
-
+    # Convert baseline into tuple
+    if type(baseline) is list and len(baseline) == 2:
+        baseline = tuple(baseline)
     raw.load_data()
     events, event_id = mne.events_from_annotations(raw)
     epochs = mne.Epochs(raw, events, event_id=event_id,
