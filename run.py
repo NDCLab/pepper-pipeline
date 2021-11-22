@@ -10,10 +10,8 @@ from multiprocessing import Pool
 
 import sys
 from scripts.constants import \
-    CAUGHT_EXCEPTION_SKIP, \
-    EXIT_MESSAGE, \
     ERROR_KEY, \
-    DEFAULT_RUNS
+    DEFAULT_LOAD_PARAMS
 
 
 def clean_outputs(output_dict):
@@ -41,8 +39,9 @@ def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
 
             # Exit pipeline or skip subject
             if exit_on_error:
-                sys.exit(EXIT_MESSAGE)
-            logging.info(CAUGHT_EXCEPTION_SKIP)
+                sys.exit("Pipeline exited according to 'exit_on_error'")
+            logging.info("Exception caught in function. Skipping to next \
+                          subject.")
             break
 
         # check if this is the final preprocessed eeg object
@@ -72,17 +71,17 @@ def run_pipeline(preprocess, load_data, write_data):
 
     """
     # get pipeline parameters
-    ch_type = load_data["channel-type"]
+    ch_type = load_data["channel_type"]
     exit_error = load_data["exit_on_error"]
     rewrite = load_data["overwrite"]
-    parallel_work = load_data["parallel-runs"]
+    p_runs = load_data["parallel_runs"]
     path = write_data["root"]
 
     # get set of subjects & tasks to run while omitting existing exceptions
     data = load.load_files(load_data)
 
-    # get number of workers based on available cpus and param
-    runs = parallel_work if parallel_work else DEFAULT_RUNS
+    # get number of workers based on param
+    runs = p_runs if p_runs else DEFAULT_LOAD_PARAMS.parallel_runs
 
     # parallelize data by executing pipeline steps on each loaded file
     with Pool(runs) as worker:

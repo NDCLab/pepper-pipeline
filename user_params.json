@@ -1,6 +1,6 @@
 {
     "load_data": {
-        "root": "scripts/tests/test_bids_data",
+        "root": "CMI/rawdata",
         "subjects": [
             "*"
         ],
@@ -12,10 +12,10 @@
             "tasks": "",
             "runs": ""
         },
-        "channel-type": "eeg",
+        "channel_type": "eeg",
         "exit_on_error": false,
         "overwrite": true,
-        "parallel": false
+        "parallel_runs": 1
     },
     "preprocess": {
         "set_reference": {

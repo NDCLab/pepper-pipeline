@@ -6,7 +6,20 @@ from scripts.constants import \
     PIPE_NAME, \
     INTERM, \
     FINAL, \
-    SKIP_REWRITE_MSG
+    SKIP_REWRITE_MSG, \
+    ALL, \
+    OMIT, \
+    DEFAULT_LOAD_PARAMS, \
+    DEFAULT_REF_PARAMS, \
+    DEFAULT_MONT_PARAMS, \
+    DEFAULT_FILT_PARAMS, \
+    DEFAULT_IDENT_PARAMS, \
+    DEFAULT_SEG_PARAMS, \
+    DEFAULT_INTERP_PARAMS, \
+    PARAM_FILE_NAME, \
+    ICA_NAME, \
+    FINAL_NAME, \
+    REREF_NAME
 
 
 def write_output_param(dict_array, file, datatype, root, rewrite):
@@ -148,58 +161,40 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
 
     # Create default values of exceptions
     exceptions = {
-        "subjects": "" if e_subj is None else e_subj,
-        "tasks": "" if e_task is None else e_task,
-        "runs": "" if e_run is None else e_run
+        "subjects": OMIT if e_subj is None else e_subj,
+        "tasks": OMIT if e_task is None else e_task,
+        "runs": OMIT if e_run is None else e_run
     }
 
     # set up default load_data params
-    user_params["load_data"] = {
+    user_params[type(DEFAULT_LOAD_PARAMS).__name__] = {
         "root": root,
-        "subjects": ["*"] if subjects is None else subjects,
-        "tasks": ["*"] if tasks is None else tasks,
+        "subjects": ALL if subjects is None else subjects,
+        "tasks": ALL if tasks is None else tasks,
         "exceptions": exceptions,
-        "channel-type": "eeg",
-        "exit_on_error": False,
-        "overwrite": True,
-        "parallel-runs": 0
+        "channel_type": DEFAULT_LOAD_PARAMS.channel_type,
+        "exit_on_error": DEFAULT_LOAD_PARAMS.exit_on_error,
+        "overwrite": DEFAULT_LOAD_PARAMS.overwrite,
+        "parallel_runs": DEFAULT_LOAD_PARAMS.parallel_runs
     }
 
     # set up default preprocess params
     user_params["preprocess"] = {
-        "set_reference": {
-            "ref_channels": "Cz"
-        },
-        "set_montage": {
-            "montage": "GSN-HydroCel-129"
-        },
-        "filter_data": {
-            "l_freq": 0.3,
-            "h_freq": 40
-        },
-        "identify_badchans_raw": {
-            "ref_elec_name": "Cz"
-        },
-        "ica_raw": {
-        },
-        "segment_data": {
-            "tmin": -0.2,
-            "tmax": 0.5,
-            "baseline": None,
-            "picks": None,
-            "reject_tmin": None,
-            "reject_tmax": None,
-            "decim": 1,
-            "verbose": False,
-            "preload": None
-        },
-        "final_reject_epoch": {
-        },
-        "interpolate_data": {
-            "mode": "accurate"
-        },
-        "reref_raw": {
-        }
+        type(DEFAULT_REF_PARAMS).__name__:
+            DEFAULT_REF_PARAMS._asdict(),
+        type(DEFAULT_MONT_PARAMS).__name__:
+            DEFAULT_MONT_PARAMS._asdict(),
+        type(DEFAULT_FILT_PARAMS).__name__:
+            DEFAULT_FILT_PARAMS._asdict(),
+        type(DEFAULT_IDENT_PARAMS).__name__:
+            DEFAULT_IDENT_PARAMS._asdict(),
+        ICA_NAME: {},
+        type(DEFAULT_SEG_PARAMS).__name__:
+            DEFAULT_SEG_PARAMS._asdict(),
+        FINAL_NAME: {},
+        type(DEFAULT_INTERP_PARAMS).__name__:
+            DEFAULT_INTERP_PARAMS._asdict(),
+        REREF_NAME: {}
     }
 
     # set up write_data params
@@ -208,7 +203,7 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
     }
 
     if to_file is not None:
-        path_to_file = os.path.join(to_file, "user_params.json")
+        path_to_file = os.path.join(to_file, PARAM_FILE_NAME)
         with open(path_to_file, 'w') as file:
             str = json.dumps(user_params, indent=4)
             file.seek(0)
