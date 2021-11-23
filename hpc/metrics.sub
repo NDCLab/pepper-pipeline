@@ -12,5 +12,5 @@
 module load singularity-3.5.3
 
 # use singularity image to run all tests
-singularity exec --bind /home/data/NDClab/datasets/cmi-dataset /home/data/NDClab/tools/pepper-pipeline/containers/singularity/container.simg python3 scripts/postprocess/run_metrics.py
+singularity exec --bind /home/data/NDClab/datasets/cmi-dataset /home/data/NDClab/tools/pepper-pipeline/containers/singularity/container.simg python3 scripts/postprocess/run_metrics.py /home/data/NDClab/datasets/cmi-dataset/derivatives/PEPPER_pipeline/PEPPER_pipeline_preprocessed
 
