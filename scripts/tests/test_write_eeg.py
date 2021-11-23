@@ -26,7 +26,7 @@ def test_write(default_params, tmp_func):
     data_params = default_params["load_data"]
     output_params = default_params["output_data"]
 
-    ch_type = data_params["channel-type"]
+    ch_type = data_params["channel_type"]
     rewrite = data_params["overwrite"]
     write_root = output_params["root"]
 
@@ -45,7 +45,7 @@ def test_overwrite(default_params, tmp_func):
     data_params = default_params["load_data"]
     output_params = default_params["output_data"]
 
-    ch_type = data_params["channel-type"]
+    ch_type = data_params["channel_type"]
     rewrite = data_params["overwrite"]
     write_root = output_params["root"]
 
@@ -67,7 +67,7 @@ def test_non_overwrite(overwrite_params, tmp_func):
     data_params = overwrite_params["load_data"]
     output_params = overwrite_params["output_data"]
 
-    ch_type = data_params["channel-type"]
+    ch_type = data_params["channel_type"]
     rewrite = data_params["overwrite"]
     write_root = output_params["root"]
 
@@ -89,7 +89,7 @@ def test_non_path(non_path_params, tmp_func):
     data_params = non_path_params["load_data"]
     output_params = non_path_params["output_data"]
 
-    ch_type = data_params["channel-type"]
+    ch_type = data_params["channel_type"]
     rewrite = data_params["overwrite"]
     write_root = output_params["root"]
 
