@@ -37,13 +37,13 @@ for task in tasks:
     # compute splithalf reliability
     # get trial level erp for all participants
     try:
-        datalist1, datalist2 = get_trial_erp(fileList, 0.1, 0.15, '4')
+        datalist1, _ = get_trial_erp(fileList, 0.1, 0.15, '4')
     except KeyError:
         continue
 
     # call Dan's splithalf
     try:
-        split = split_half(datalist1, datalist2)
+        split = split_half(datalist1, None)
         # store data into dict
         metric_data["corr_mean"] = split.correlation.mean
         metric_data["corr_lower"] = split.correlation.lower
