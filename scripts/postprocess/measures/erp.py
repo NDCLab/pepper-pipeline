@@ -32,10 +32,7 @@ def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
         end_point = bisect.bisect_left(raw.times, end_t)
 
         # get erp data for condition 1
-        try:
-            epoch_con1 = raw[cond1]
-        except KeyError:
-            continue
+        epoch_con1 = raw[cond1]
         epoch_con1_arr = epoch_con1.get_data()
         # return a array of shape (n_epochs, n_channels, n_times)
         # cut the data to the time of interest
@@ -46,11 +43,7 @@ def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
 
         # get erp data for condition 2
         if cond2 is not None:
-            try:
-                epoch_con2 = raw[cond2]
-            except KeyError:
-                datalist1.pop()
-                continue
+            epoch_con2 = raw[cond2]
             epoch_con2_arr = epoch_con2.get_data()
             # return a array of shape (n_epochs, n_channels, n_times)
             # cut the data to the time of interest
