@@ -17,7 +17,7 @@ file_name = "metrics.csv"
 
 # hard code split_half column names
 columns = ["task", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
-           "reliab_lower", "reliab_upper", "sme"]
+           "reliab_lower", "reliab_upper"]
 
 # Create task dict for data storage
 task_data = {}
@@ -71,4 +71,4 @@ with open(file_name, 'w', newline='') as f:
 
 # cal sme
 sme_result = sme(fileList, 0.1, 0.15, tasks, ['E75'])
-sme_result.to_csv('output/sme.csv', index=False)
+sme_result.to_csv('sme.csv', index=False)
