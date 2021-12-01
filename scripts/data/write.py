@@ -1,12 +1,12 @@
 import json
 import os
+import glob
 import mne
 
 from scripts.constants import \
     PIPE_NAME, \
     INTERM, \
     FINAL, \
-    SKIP_REWRITE_MSG, \
     ALL, \
     OMIT, \
     DEFAULT_LOAD_PARAMS, \
@@ -22,7 +22,7 @@ from scripts.constants import \
     REREF_NAME
 
 
-def write_output_param(dict_array, file, datatype, root, rewrite):
+def write_output_param(dict_array, file, datatype, root):
     """Write output parameters of completed pipeline
     Parameters:
     -----------
@@ -60,9 +60,6 @@ def write_output_param(dict_array, file, datatype, root, rewrite):
     file_name = 'output_preproc_sub-{}_ses-{}_task-{}_run-{}_{}.json'.format(
         subj, ses, task, run, datatype)
 
-    if os.path.isfile(dir_path + file_name) and not rewrite:
-        print(SKIP_REWRITE_MSG)
-        return None
     with open(dir_path + file_name, 'w') as file:
         str = json.dumps(dict_array, indent=4)
         file.seek(0)
@@ -70,7 +67,27 @@ def write_output_param(dict_array, file, datatype, root, rewrite):
     return file_name
 
 
-def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
+def is_preprocessed(file, datatype, root, rewrite):
+    # get file metadata
+    subj, ses, task, run = file.subject, file.session, file.task, file.run
+
+    # Get final path
+    dir_path = '{}/derivatives/{}/{}/sub-{}/ses-{}/{}/'.format(
+        root, PIPE_NAME, FINAL, subj, ses, datatype) + "*"
+
+    # Get final file name
+    file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
+        subj, ses, task, run, PIPE_NAME, datatype)
+
+    # glob get file
+    file_exists = len(glob.glob(dir_path + file_name))
+
+    if file_exists and not rewrite:
+        return True
+    return False
+
+
+def write_eeg_data(obj, func, file, datatype, final, root):
     """Used to store the modified raw file after each processing step
     Parameters:
     -----------
@@ -125,12 +142,7 @@ def write_eeg_data(obj, func, file, datatype, final, root, rewrite):
     file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
-    # if the file has already been created, and it should not overwrite
-    if os.path.isfile(dir_path + file_name) and not rewrite:
-        # skip this write by returning none
-        print(SKIP_REWRITE_MSG)
-        return None
-    obj.save(dir_path + file_name, overwrite=rewrite)
+    obj.save(dir_path + file_name)
     return file_name
 
 
