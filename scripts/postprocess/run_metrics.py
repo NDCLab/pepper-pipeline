@@ -1,5 +1,4 @@
 import mne_bids
-import pandas
 from metrics.sme import sme
 from metrics.reliability import split_half
 from measures.erp import get_trial_erp
@@ -72,4 +71,4 @@ with open(file_name, 'w', newline='') as f:
 
 # cal sme
 sme_result = sme(fileList, 0.1, 0.15, tasks, ['E75'])
-sme_result.to_csv('output/sme.csv', index = False)
+sme_result.to_csv('output/sme.csv', index=False)
