@@ -71,5 +71,5 @@ with open(file_name, 'w', newline='') as f:
         writer.writerow(metrics)
 
 # cal sme
-sme_result = sme(fileList, 0.1, 0.15, ['4'], ['E75'])
+sme_result = sme(fileList, 0.1, 0.15, tasks, ['E75'])
 sme_result.to_csv('output/sme.csv', index = False)
