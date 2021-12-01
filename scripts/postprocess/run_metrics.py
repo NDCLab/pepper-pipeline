@@ -1,4 +1,5 @@
 import mne_bids
+import pandas
 from metrics.sme import sme
 from metrics.reliability import split_half
 from measures.erp import get_trial_erp
@@ -59,14 +60,6 @@ for task in tasks:
                 print(metric_data)
     metric_data["task"] = task
 
-    # calc sme
-    try:
-        sme_val = sme(fileList, 0.1, 0.15, ['4'], ['E75'])
-        unpacked = str([str(val[0]) for val in sme_val])
-        metric_data["sme"] = unpacked
-    except Exception as e:
-        metric_data["sme"] = str(e)
-
     task_data[task] = metric_data
 
 with open(file_name, 'w', newline='') as f:
@@ -76,3 +69,7 @@ with open(file_name, 'w', newline='') as f:
     for key in task_data:
         metrics = list(task_data[key].values())
         writer.writerow(metrics)
+
+# cal sme
+sme_result = sme(fileList, 0.1, 0.15, ['4'], ['E75'])
+sme_result.to_csv('output/sme.csv', index = False)
