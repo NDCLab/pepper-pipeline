@@ -142,7 +142,7 @@ def write_eeg_data(obj, func, file, datatype, final, root):
     file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
         subj, ses, task, run, func, datatype) + obj_type
 
-    obj.save(dir_path + file_name)
+    obj.save(dir_path + file_name, overwrite=True)
     return file_name
 
 
