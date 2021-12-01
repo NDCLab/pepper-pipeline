@@ -1,6 +1,8 @@
-import numpy as np
-import mne
 import bisect
+import mne
+import numpy as np
+import os
+import pandas as pd
 
 
 def sd_sample_mean(values):
@@ -33,10 +35,15 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
                names of the electrode of interest
     Returns
     ----------
-    smelist: a list of list
-             a list of SME value for each participant and each condition
+    result: dataframe - 
+            col1 - subject name (file name)
+            col2 - SME values for condition1
+            col3 - SME values for condition2
     """
-    smelist = []
+    # create a dataframe to save the result
+    col_index = cond.copy()
+    col_index.insert(0, 'subject')
+    result = pd.DataFrame(columns=col_index)
 
     for dt in filelist:
         raw = mne.read_epochs(dt)
@@ -48,7 +55,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
         # find the index of electrodes of interest
         elec = [raw.ch_names.index(i) for i in pick_elec]
 
-        sem_arr = np.empty(len(cond), dtype=float)
+        sem_arr = []
         # loop the condition list
         for i, element in enumerate(cond):
             # get epoch data within the condition of interest
@@ -64,7 +71,13 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
             epoch_con_dat_int_mean = np.mean(epoch_con_dat_int, axis=(1, 2))
 
             # compute standard error of the sample mean
-            sem_arr[i] = sd_sample_mean(epoch_con_dat_int_mean)
+            sem_arr.append(sd_sample_mean(epoch_con_dat_int_mean))
 
-        smelist.append(sem_arr)
-    return smelist
+        # get subject name (file name)
+        file_name = os.path.basename(dt)
+        subj_name = file_name.split('.')[0]
+        sem_arr.insert(0, subj_name)
+        
+        result.loc[len(result)] = sem_arr
+        
+    return result
