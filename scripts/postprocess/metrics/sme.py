@@ -35,7 +35,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
                names of the electrode of interest
     Returns
     ----------
-    result: dataframe - 
+    result: dataframe
             col1 - subject name (file name)
             col2 - SME values for condition1
             col3 - SME values for condition2
@@ -77,7 +77,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
         file_name = os.path.basename(dt)
         subj_name = file_name.split('.')[0]
         sem_arr.insert(0, subj_name)
-        
+
         result.loc[len(result)] = sem_arr
-        
+
     return result
