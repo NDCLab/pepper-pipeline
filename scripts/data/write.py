@@ -73,11 +73,11 @@ def is_preprocessed(file, datatype, root, rewrite):
 
     # Get final path
     dir_path = '{}/derivatives/{}/{}/sub-{}/ses-{}/{}/'.format(
-        root, PIPE_NAME, FINAL, subj, ses, datatype) + "*"
+        root, PIPE_NAME, FINAL, subj, ses, datatype)
 
     # Get final file name
     file_name = 'sub-{}_ses-{}_task-{}_run-{}_proc-{}_{}'.format(
-        subj, ses, task, run, PIPE_NAME, datatype)
+        subj, ses, task, run, PIPE_NAME, datatype) + "*"
 
     # glob get file
     file_exists = len(glob.glob(dir_path + file_name))
