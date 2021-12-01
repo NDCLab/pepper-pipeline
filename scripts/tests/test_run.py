@@ -54,3 +54,35 @@ def test_default_pipeline(default_params, tmp_path):
     assert preprocess_new == preprocess_params
     assert load_params == load_new
     assert write_params == write_new
+
+
+def test_non_overwrite_pipeline(default_params, tmp_path):
+    # get the default params
+    preprocess_params = default_params["preprocess"]
+    load_params = default_params["load_data"]
+    write_params = default_params["output_data"]
+
+    # set overwrite to be false
+    default_params["preprocess"]["overwrite"] = False
+
+    # run pipeline twice
+    for i in range(2):
+        run_pipeline(preprocess_params, load_params, write_params)
+
+    # assert data is written once in tmp_path
+    for _, dirnames, filenames in os.walk(tmp_path):
+        if dirnames == INTERM:
+            # if at interm dir, assert all but final obj written
+            assert len(filenames) == len(preprocess_params) - 1
+        elif dirnames == FINAL:
+            # if at final dir, assert final obj written
+            assert len(filenames) == 1
+
+    # Assert immutability of user_params
+    preprocess_new = default_params["preprocess"]
+    load_new = default_params["load_data"]
+    write_new = default_params["output_data"]
+
+    assert preprocess_new == preprocess_params
+    assert load_params == load_new
+    assert write_params == write_new
