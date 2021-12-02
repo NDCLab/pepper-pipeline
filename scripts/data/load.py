@@ -25,7 +25,7 @@ def load_params(user_param_path):
 
 
 def _check_params(s_sub, s_task, e_sub, e_task, e_run):
-    if not isinstance(s_sub, list):
+    if not isinstance(s_sub, list) and not isinstance(s_sub, int):
         raise TypeError(INVALID_SELECT_PARAM_MSG)
     if not isinstance(s_task, list):
         raise TypeError(INVALID_SELECT_PARAM_MSG)
@@ -50,6 +50,11 @@ def _select_except(s_sub, s_task, e_sub, e_task, e_run, root, ch_type):
     # Select all subjects and tasks if specified
     if s_sub == ALL:
         s_sub = mne_bids.get_entity_vals(bids_root, 'subject')
+    # if s_sub specifies int, get alphabetized selection of subjects
+    elif isinstance(s_sub, int):
+        all_sub = mne_bids.get_entity_vals(bids_root, 'subject')
+        all_sub.sort()
+        s_sub = all_sub[:s_sub]
     if s_task == ALL:
         s_task = mne_bids.get_entity_vals(bids_root, 'task')
     # By default, select all subjects and runs
