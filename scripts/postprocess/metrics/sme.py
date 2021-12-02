@@ -78,6 +78,8 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
         subj_name = file_name.split('.')[0]
         sem_arr.insert(0, subj_name)
 
-        result.loc[len(result)] = sem_arr
+        # append sem_arr to new row, account for None
+        sem_ser = pd.Series(sem_arr, index=result.columns[:len(sem_arr)])
+        result.append(sem_ser, ignore_index=True)
 
     return result
