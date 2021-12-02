@@ -21,6 +21,7 @@ columns = ["task", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
 
 # Create task dict for data storage
 task_data = {}
+total_fileList = []
 
 for task in tasks:
     fileList = []
@@ -31,13 +32,15 @@ for task in tasks:
     # if filelist is empty, ie no preprocessed data, skip task
     if not fileList:
         continue
+    # append to total fileList for sme computation
+    total_fileList += fileList
     # init dict for metric storage
     metric_data = {key: None for key in columns}
 
     # compute splithalf reliability
     # get trial level erp for all participants
     try:
-        datalist1, _ = get_trial_erp(fileList, 0.1, 0.15, '4')
+        datalist1, _ = get_trial_erp(fileList, 0.1, 0.15, '12', '5')
     except KeyError:
         continue
 
@@ -70,5 +73,5 @@ with open(file_name, 'w', newline='') as f:
         writer.writerow(metrics)
 
 # cal sme
-sme_result = sme(fileList, 0.1, 0.15, ['4'], ['E75'])
+sme_result = sme(total_fileList, 0.1, 0.15, ['12', '5'], ['E75'])
 sme_result.to_csv('sme.csv', index=False)
