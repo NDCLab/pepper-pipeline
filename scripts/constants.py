@@ -33,10 +33,6 @@ INVALID_REF_MSG = "The reference electrode is NOT provided or in the list."
 BAD_CHAN_MSG = "20% or more channels are bad channels and have been removed."
 BAD_EPOCH_MSG = "50% or more epochs have been rejected."
 
-# write error/warning messages
-SKIP_REWRITE_MSG = "File already exists. Skipping write according to 'rewrite'\
- parameter."
-
 # Pipeline default parameters
 loaddata = namedtuple('load_data', 'channel_type exit_on_error \
                        overwrite parallel_runs')

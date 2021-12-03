@@ -24,6 +24,12 @@ def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
     """
     # load raw data from file
     eeg_obj = mne_bids.read_raw_bids(file)
+
+    # if data has been preprocessed already, exit
+    if write.is_preprocessed(file, ch_type, path, rewrite):
+        logging.info("File already preprocessed. Skipping write according to 'rewrite'\
+                      parameter.")
+        return
     # initialize output list
     outputs = [None] * len(preprocess)
 
@@ -47,13 +53,12 @@ def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
         # check if this is the final preprocessed eeg object
         final = (idx == len(preprocess.items()) - 1)
         # write object out to file
-        write.write_eeg_data(eeg_obj, func, file, ch_type, final, path,
-                             rewrite)
+        write.write_eeg_data(eeg_obj, func, file, ch_type, final, path)
 
     # collect annotations of each step
     outputs.reverse()
     output = dict(ChainMap(*outputs))
-    write.write_output_param(output, file, ch_type, path, rewrite)
+    write.write_output_param(output, file, ch_type, path)
 
 
 def run_pipeline(preprocess, load_data, write_data):
