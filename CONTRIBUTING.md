@@ -1,4 +1,4 @@
-# PEPPER-Pipeline 
+# 🏁 PEPPER-Pipeline 
 Welcome to the PEPPER-Pipeline project! To get started on collaborating view the following [wiki link](https://ndclab.github.io/wiki/docs/technical-docs/pepper-usage.html). 
 
 ## General Reminders
