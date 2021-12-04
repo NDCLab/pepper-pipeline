@@ -1,5 +1,5 @@
-import numpy as np
 import mne
+
 
 def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
     """get trial level erp
@@ -29,6 +29,6 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
 
         # for each condition, get the average across the time window indicated
         for c in conditions:
-            trial_erp[c].append(data_cropped[c].get_data().mean(axis=(1,2)))
+            trial_erp[c].append(data_cropped[c].get_data().mean(axis=(1, 2)))
 
     return trial_erp
