@@ -2,7 +2,9 @@ import mne_bids
 from metrics.sme import sme
 from metrics.reliability import split_half
 from measures.erp import get_trial_erp
-
+import scipy.stats
+import pandas as pd
+from pathlib import Path
 import csv
 import os
 import sys
@@ -11,15 +13,21 @@ import sys
 data_path = sys.argv[1]
 
 tasks = mne_bids.get_entity_vals(data_path, 'task')
+conditions = ['12', '5']
+electrode = ['E75']
 
 # gen csv file name using task
 file_name = "metrics.csv"
 
 # hard code split_half column names
-columns = ["task", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
+columns = ["task", "condition", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
            "reliab_lower", "reliab_upper"]
 
-# Create task dict for data storage
+# metrics file header (could replace with pandas DataFrame)
+with open(file_name, 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(columns)
+
 task_data = {}
 total_fileList = []
 
@@ -40,38 +48,47 @@ for task in tasks:
     # compute splithalf reliability
     # get trial level erp for all participants
     try:
-        datalist1, _ = get_trial_erp(fileList, 0.1, 0.15, '12', '5')
+        erp_by_condition = get_trial_erp(fileList, 0.1, 0.15, conditions, electrode)
     except KeyError:
         continue
 
+    sem_output = pd.DataFrame(columns=['subject'] + conditions)
+    sem_output['subject'] = [Path(filename).stem for filename in fileList]
+
     # call Dan's splithalf
-    try:
-        split = split_half(datalist1, None)
-        # store data into dict
-        metric_data["corr_mean"] = split.correlation.mean
-        metric_data["corr_lower"] = split.correlation.lower
-        metric_data["corr_upper"] = split.correlation.upper
+    for c in conditions:
+        condition_data = erp_by_condition[c]
+        sem_output[c] = [scipy.stats.sem(values) for values in condition_data]
 
-        metric_data["reliab_mean"] = split.reliability.mean
-        metric_data["reliab_lower"] = split.reliability.lower
-        metric_data["reliab_upper"] = split.reliability.upper
-    except Exception as e:
-        for key in metric_data:
-            if key != "task":
-                metric_data[key] = str(e)
-                print(metric_data)
-    metric_data["task"] = task
+        try:
+            split = split_half(condition_data, None)
+            # store data into dict
+            metric_data["corr_mean"] = split.correlation.mean
+            metric_data["corr_lower"] = split.correlation.lower
+            metric_data["corr_upper"] = split.correlation.upper
 
-    task_data[task] = metric_data
+            metric_data["reliab_mean"] = split.reliability.mean
+            metric_data["reliab_lower"] = split.reliability.lower
+            metric_data["reliab_upper"] = split.reliability.upper
+        except Exception as e:
+            for key in metric_data:
+                if key != "task":
+                    metric_data[key] = str(e)
+                    print(metric_data)
+        metric_data["task"] = task
+        metric_data["condition"] = c
 
-with open(file_name, 'w', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(columns)
+        task_data[task] = metric_data
 
-    for key in task_data:
-        metrics = list(task_data[key].values())
-        writer.writerow(metrics)
+        # append data
+        with open(file_name, 'a', newline='') as f:
+            writer = csv.writer(f)
+            for key in task_data:
+                metrics = list(task_data[key].values())
+                writer.writerow(metrics)
+
+sem_output.to_csv(f'sme_new_{task}.csv', index=False)
 
 # cal sme
-sme_result = sme(total_fileList, 0.1, 0.15, ['12', '5'], ['E75'])
+sme_result = sme(total_fileList, 0.1, 0.15, conditions, electrode)
 sme_result.to_csv('sme.csv', index=False)
