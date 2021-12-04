@@ -80,6 +80,6 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
 
         # append sem_arr to new row, account for None
         sem_ser = pd.Series(sem_arr, index=result.columns[:len(sem_arr)])
-        result.append(sem_ser, ignore_index=True)
+        result = result.append(sem_ser, ignore_index=True)
 
     return result
