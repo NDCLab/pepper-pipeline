@@ -16,10 +16,8 @@ jobs:
     steps:
       - name: List conda info on container
         run: conda info 
-      - name: Initialize and restart shell
-        run: conda init bash && exec bash -l
       - name: Activate pipe conda environment
-        run: conda activate pipe
+        run: /opt/conda activate pipe
       - name: Verify pipe environment
         run: conda env list
       - name: Run pytest
