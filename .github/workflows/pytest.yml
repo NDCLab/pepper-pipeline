@@ -17,7 +17,7 @@ jobs:
       - name: List conda info on container
         run: conda info 
       - name: Activate pipe conda environment
-        run: . activate pipe
+        run: . /opt/conda/bin/activate pipe
       - name: Verify pipe environment
         run: conda env list
       - name: Run pytest
