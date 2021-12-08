@@ -19,7 +19,7 @@ jobs:
       - name: List available conda environments
         run: conda env list
       - name: Activate pipe conda environment
-        run: /opt/conda/bin/activate pipe
+        run: conda activate pipe
       - name: Verify pipe environment
         run: conda env list
       - name: Run pytest
