@@ -17,7 +17,7 @@ jobs:
       - name: List conda info on container
         run: conda info 
       - name: Initialize shell
-        run: conda init bash
+        run: source /opt/conda/etc/profile.d/conda.sh
       - name: Activate pipe conda environment
         run: conda activate pipe
       - name: Verify pipe environment
