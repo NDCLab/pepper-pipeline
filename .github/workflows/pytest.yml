@@ -1,4 +1,4 @@
-name: Pytest
+name: Pytest on docker
 on:
   push:
     branches:
@@ -16,7 +16,9 @@ jobs:
     steps:
       - name: List conda info on container
         run: conda info 
-      - name: Activate pipe conda env
-        run: $CONDA/bin/activate pipe
+      - name: List available conda environments
+        run: conda env list
+      - name: Activate pipe conda environment
+        run: /opt/conda/bin/activate pipe
       - name: Run pytest
         run: pytest scripts/tests/
