@@ -17,7 +17,7 @@ jobs:
       - name: List conda info on container
         run: conda info 
       - name: Initialize and restart shell
-        run: conda init "$SHELL" && exec "$SHELL"
+        run: conda init bash && exec bash
       - name: Activate pipe conda environment
         run: conda activate pipe
       - name: Verify pipe environment
