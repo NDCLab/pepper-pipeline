@@ -16,8 +16,10 @@ jobs:
     steps:
       - name: List conda info on container
         run: conda info 
-      - name: Activate pipe conda environment
+      - name: Init conda
         run: eval "$(conda shell.bash hook)"
+      - name: Activate pipe conda environment
+        run: conda activate pipe
       - name: Verify pipe environment
         run: conda env list
       - name: Run pytest
