@@ -14,11 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
-      - name: List conda info on container
-        run: conda info 
-      - name: Activate pipe conda environment
-        run: . /opt/conda/bin/activate pipe
-      - name: Verify pipe environment
-        run: conda env list
-      - name: Run pytest
-        run: pytest scripts/tests/
+      - name: Run pytest in conda env
+        run: conda run -n pipe pytest
