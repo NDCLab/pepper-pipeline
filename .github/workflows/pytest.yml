@@ -15,8 +15,8 @@ jobs:
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
       - name: Set permissions for docker container
-        run: chmod +x "/__w/pepper-pipeline/containers/docker/init_docker.cmd"
+        run: chmod +x ./containers/docker/init_docker.sh
       - name: Copy in data to docker container
-        run: "/__w/pepper-pipeline/containers/docker/init_docker.cmd"
+        run: ./containers/docker/init_docker.sh
       - name: Run pytest in conda env
         run: conda run -n pipe pytest scripts/tests/
