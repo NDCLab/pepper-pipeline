@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: List conda info on container
         run: conda info 
-      - name: List available conda environments
-        run: conda env list
+      - name: Initialize shell
+        run: conda init bash
       - name: Activate pipe conda environment
         run: conda activate pipe
       - name: Verify pipe environment
