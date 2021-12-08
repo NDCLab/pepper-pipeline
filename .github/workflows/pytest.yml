@@ -14,5 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     container: ndclab/pepper_container:szegedi-1.0.0
     steps:
+      - name: List dir
+        run: ls && pwd
       - name: Run pytest in conda env
-        run: conda run -n pipe pytest
+        run: conda run -n pipe pytest scripts/tests/
