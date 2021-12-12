@@ -1,6 +1,6 @@
 import mne_bids
 from scripts.data import load, write
-from scripts.preprocess import preprocess as pre
+from scripts import preprocess as pre
 
 from collections import ChainMap
 from itertools import repeat
@@ -11,7 +11,8 @@ from multiprocessing import Pool
 import sys
 from scripts.constants import \
     ERROR_KEY, \
-    DEFAULT_LOAD_PARAMS
+    DEFAULT_LOAD_PARAMS, \
+    CONFIG_FILE_NAME
 
 
 def clean_outputs(output_dict):
@@ -19,14 +20,29 @@ def clean_outputs(output_dict):
     return output_dict
 
 
-def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
+def preprocess_data(file, load_data, preprocess):
     """Function to preprocess data
+
+    Parameters
+    ----------
+    file:   BIDSPath
+            Path pointing to individual BIDS data
+    load_data:  dict()
+                Dictionary containing data selection and pipeline meta-params
+    preprocess: dict()
+                Dictionary containing preprocess params
     """
+    # get pipeline parameters
+    write_path = load_data["output_root"]
+    ch_type = load_data["channel_type"]
+    exit_on_error = load_data["exit_on_error"]
+    rewrite = load_data["overwrite"]
+
     # load raw data from file
     eeg_obj = mne_bids.read_raw_bids(file)
 
     # if data has been preprocessed already, exit
-    if write.is_preprocessed(file, ch_type, path, rewrite):
+    if write.is_preprocessed(file, ch_type, write_path, rewrite):
         logging.info("File already preprocessed. Skipping write according to 'rewrite'\
                       parameter.")
         return
@@ -53,34 +69,29 @@ def preprocess_data(file, preprocess, ch_type, exit_on_error, rewrite, path):
         # check if this is the final preprocessed eeg object
         final = (idx == len(preprocess.items()) - 1)
         # write object out to file
-        write.write_eeg_data(eeg_obj, func, file, ch_type, final, path)
+        write.write_eeg_data(eeg_obj, func, file, ch_type, final, write_path)
 
     # collect annotations of each step
     outputs.reverse()
     output = dict(ChainMap(*outputs))
-    write.write_output_param(output, file, ch_type, path)
+    write.write_output_param(output, file, ch_type, write_path)
 
 
-def run_pipeline(preprocess, load_data, write_data):
-    """Function to take in user_params parameters to preprocess EEG data.
+def run_pipeline(load_data, preprocess):
+    """Function to take in user_params parameters to preprocess EEG data 
+    and potentially run in parallel.
     Writes out derivates.
 
     Parameters
     ----------
-    preprocess: dict()
-                Dictionary containing preprocess features and their parameters
     load_data:  dict()
                 Dictionary containing data selection and pipeline meta-params
-    write_data: dict()
-                Dictionary containing parameters to write data
+    preprocess: dict()
+                Dictionary containing preprocess features and their parameters
 
     """
-    # get pipeline parameters
-    ch_type = load_data["channel_type"]
-    exit_error = load_data["exit_on_error"]
-    rewrite = load_data["overwrite"]
+    # Get number of workers to use for parallel runs
     p_runs = load_data["parallel_runs"]
-    path = write_data["root"]
 
     # get set of subjects & tasks to run while omitting existing exceptions
     data = load.load_files(load_data)
@@ -91,18 +102,16 @@ def run_pipeline(preprocess, load_data, write_data):
     # parallelize data by executing pipeline steps on each loaded file
     with Pool(runs) as worker:
         worker.starmap(preprocess_data,
-                       zip(data, repeat(preprocess), repeat(ch_type),
-                           repeat(exit_error), repeat(rewrite), repeat(path)))
+                       zip(data, repeat(load_data), repeat(preprocess)))
 
 
 if __name__ == "__main__":
     # load all parameters
-    user_params = load.load_params("user_params.json")
+    user_params = load.load_params(CONFIG_FILE_NAME)
 
     # get data and metadata sections
-    preprocess_params = user_params["preprocess"]
     load_params = user_params["load_data"]
-    write_params = user_params["output_data"]
+    preprocess_params = user_params["preprocess"]
 
     # Execute pipeline steps specified in user_params.json
-    run_pipeline(preprocess_params, load_params, write_params)
+    run_pipeline(load_params, preprocess_params)
