@@ -46,7 +46,17 @@
         },
         "reref_raw": {}
     },
-    "postprocess": {
+    "subject_level_postprocess": {
+        "measures": {
+            "erp": {
+                "tmin": 100, 
+                "tmax": 150, 
+                "channel": "Pz"
+            },
+        "metrics": ["sme", "split_half", "mean"]
+        }
+    }, 
+    "study_level_postprocess": {
         "measures": {
             "erp": {
                 "tmin": 100, 
