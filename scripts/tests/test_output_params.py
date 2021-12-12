@@ -1,5 +1,5 @@
 from scripts.data import write, load
-from scripts.preprocess import preprocess as pre
+from scripts import preprocess as pre
 
 import pytest
 import os
@@ -9,7 +9,7 @@ import mne_bids
 
 @pytest.fixture
 def non_path_params(default_params, tmp_path):
-    default_params["output_data"]["root"] = tmp_path / "CMI"
+    default_params["output_root"] = tmp_path / "CMI"
     return default_params
 
 
@@ -21,10 +21,9 @@ def overwrite_params(default_params):
 
 def test_write(default_params):
     data_params = default_params["load_data"]
-    output_params = default_params["output_data"]
 
+    write_root = data_params["output_root"]
     ch_type = data_params["channel_type"]
-    write_root = output_params["root"]
 
     # get the pipeline steps
     feature_params = default_params["preprocess"]
@@ -44,10 +43,9 @@ def test_write(default_params):
 
 def test_non_path(non_path_params):
     data_params = non_path_params["load_data"]
-    output_params = non_path_params["output_data"]
 
     ch_type = data_params["channel_type"]
-    write_root = output_params["root"]
+    write_root = data_params["output_root"]
 
     # get the pipeline steps
     feature_params = non_path_params["preprocess"]

@@ -1,4 +1,4 @@
-from scripts.preprocess import preprocess as pre
+from scripts import preprocess as pre
 import mne
 
 

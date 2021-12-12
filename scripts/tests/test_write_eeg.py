@@ -13,7 +13,7 @@ def overwrite_params(default_params):
 
 @pytest.fixture
 def non_path_params(default_params, tmp_path):
-    default_params["output_data"]["root"] = tmp_path / "CMI"
+    default_params["output_root"] = tmp_path / "CMI"
     return default_params
 
 
@@ -24,10 +24,9 @@ def tmp_func():
 
 def test_write(default_params, tmp_func):
     data_params = default_params["load_data"]
-    output_params = default_params["output_data"]
 
     ch_type = data_params["channel_type"]
-    write_root = output_params["root"]
+    write_root = data_params["output_root"]
 
     data = load.load_files(data_params)
     for file in data:
@@ -41,10 +40,9 @@ def test_write(default_params, tmp_func):
 
 def test_non_path(non_path_params, tmp_func):
     data_params = non_path_params["load_data"]
-    output_params = non_path_params["output_data"]
 
     ch_type = data_params["channel_type"]
-    write_root = output_params["root"]
+    write_root = data_params["output_root"]
 
     data = load.load_files(data_params)
     for file in data:
