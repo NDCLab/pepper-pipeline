@@ -78,7 +78,7 @@ def preprocess_data(file, load_data, preprocess):
 
 
 def run_pipeline(load_data, preprocess):
-    """Function to take in user_params parameters to preprocess EEG data 
+    """Function to take in user_params parameters to preprocess EEG data
     and potentially run in parallel.
     Writes out derivates.
 
