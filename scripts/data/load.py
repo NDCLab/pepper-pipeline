@@ -21,7 +21,7 @@ def load_params(user_param_path):
             user_params = json.load(fp)
             return user_params
     except FileNotFoundError:
-        raise FileNotFoundError(user_param_path, ":", MISSING_PATH_MSG)
+        raise FileNotFoundError(user_param_path, MISSING_PATH_MSG)
 
 
 def _check_params(s_sub, s_task, e_sub, e_task, e_run):
