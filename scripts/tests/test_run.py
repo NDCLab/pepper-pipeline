@@ -2,7 +2,7 @@ import pytest
 import os
 import mne
 
-from run import run_pipeline
+from run import run_preprocess
 from scripts.constants import INTERM, FINAL
 
 
@@ -34,7 +34,7 @@ def test_default_pipeline(default_params, tmp_path):
     preprocess_params = default_params["preprocess"]
     load_params = default_params["load_data"]
 
-    run_pipeline(load_params, preprocess_params)
+    run_preprocess(load_params, preprocess_params)
 
     # assert data is written in tmp_path
     for _, dirnames, filenames in os.walk(tmp_path):
@@ -63,7 +63,7 @@ def test_non_overwrite_pipeline(default_params, tmp_path):
 
     # run pipeline twice
     for i in range(2):
-        run_pipeline(load_params, preprocess_params)
+        run_preprocess(load_params, preprocess_params)
 
     # assert data is written once in tmp_path
     for _, dirnames, filenames in os.walk(tmp_path):
