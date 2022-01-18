@@ -12,7 +12,8 @@
         "channel_type": "eeg",
         "exit_on_error": false,
         "overwrite": true,
-        "parallel_runs": 1
+        "parallel_runs": 1,
+        "steps": ["preprocess"]
     },
     "preprocess": {
         "set_reference": {
@@ -51,7 +52,8 @@
             "erp": {
                 "tmin": 100, 
                 "tmax": 150, 
-                "channel": "Pz"
+                "channel": "Pz",
+                "events": ["4", "8"]
             },
         "metrics": ["sme", "split_half", "mean"]
         }
