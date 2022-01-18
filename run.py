@@ -77,7 +77,7 @@ def preprocess_data(file, load_data, preprocess):
     write.write_output_param(output, file, ch_type, write_path)
 
 
-def run_pipeline(load_data, preprocess):
+def run_preprocess(load_data, preprocess):
     """Function to take in user_params parameters to preprocess EEG data
     and potentially run in parallel.
     Writes out derivates.
@@ -107,11 +107,11 @@ def run_pipeline(load_data, preprocess):
 
 if __name__ == "__main__":
     # load all parameters
-    user_params = load.load_params(CONFIG_FILE_NAME)
+    input_configs = load.load_params(CONFIG_FILE_NAME)
 
     # get data and metadata sections
-    load_params = user_params["load_data"]
-    preprocess_params = user_params["preprocess"]
+    load_params = input_configs["load_data"]
+    preprocess_params = input_configs["preprocess"]
 
-    # Execute pipeline steps specified in user_params.json
-    run_pipeline(load_params, preprocess_params)
+    # Execute pipeline steps specified in preprocess
+    run_preprocess(load_params, preprocess_params)
