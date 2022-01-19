@@ -12,8 +12,9 @@ import sys
 # Get path from command line
 data_path = sys.argv[1]
 
-tasks = mne_bids.get_entity_vals(data_path, 'task')
-conditions = ['12', '5']
+# tasks = mne_bids.get_entity_vals(data_path, 'task')
+tasks = ["surroundSuppBlock1", "surroundSuppBlock2", "surroundSuppBlock3"]
+conditions = ['4', '8']
 electrode = ['E75']
 
 # gen csv file name using task
