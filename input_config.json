@@ -1,12 +1,9 @@
 {
     "load_data": {
         "root": "CMI/rawdata",
-        "subjects": [
-            "*"
-        ],
-        "tasks": [
-            "*"
-        ],
+        "output_root": "CMI",
+        "subjects": ["*"],
+        "tasks": ["*"],
         "exceptions": {
             "subjects": "",
             "tasks": "",
@@ -49,7 +46,25 @@
         },
         "reref_raw": {}
     },
-    "output_data": {
-        "root": "CMI"
+    "subject_level_postprocess": {
+        "measures": {
+            "erp": {
+                "tmin": 100, 
+                "tmax": 150, 
+                "channel": "Pz",
+                "events": ["4", "8"]
+            },
+        "metrics": ["sme", "split_half", "mean"]
+        }
+    }, 
+    "study_level_postprocess": {
+        "measures": {
+            "erp": {
+                "tmin": 100, 
+                "tmax": 150, 
+                "channel": "Pz"
+            },
+        "metrics": ["sme", "split_half", "mean"]
+        }
     }
 }

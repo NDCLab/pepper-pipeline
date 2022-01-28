@@ -9,6 +9,11 @@ Both approaches will require an installation of [Docker Desktop](https://www.doc
 
 Once Docker is installed to your computer, open the "Docker Desktop" application. 
 
+All following commands will occur in the `PEPPER-pipeline` directory. To clone and enter the directory, execute:
+   ```
+   git clone https://github.com/NDCLab/pepper-pipeline.git
+   cd pepper-pipeline
+   ```
 ## Pulling an Existing Container
 
 To work with an existing PEPPER container simply use the `pull` command exactly as described below:
@@ -35,7 +40,7 @@ The two scripts `init_docker.cmd` and `init_docker.sh` are provided for the auto
 Run the `init_docker.cmd` script within your command prompt by executing:
    ```
    cd containers/docker
-   init_docker.cmd [tag]
+   init_docker.cmd
    ```
 
 Once inside the container shell, restart the conda environment by executing:
@@ -47,8 +52,8 @@ Once inside the container shell, restart the conda environment by executing:
 
 Run the `init_docker.sh` script within your command prompt by executing:
    ```
-   cd container/docker
-   sh init_start_docker.sh [tag]
+   cd containers/docker
+   sh init_start_docker.sh
    ```
 
 Once inside the container shell, restart the conda environment by executing:

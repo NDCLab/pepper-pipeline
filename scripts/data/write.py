@@ -16,7 +16,7 @@ from scripts.constants import \
     DEFAULT_IDENT_PARAMS, \
     DEFAULT_SEG_PARAMS, \
     DEFAULT_INTERP_PARAMS, \
-    PARAM_FILE_NAME, \
+    CONFIG_FILE_NAME, \
     ICA_NAME, \
     FINAL_NAME, \
     REREF_NAME
@@ -181,6 +181,7 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
     # set up default load_data params
     user_params[type(DEFAULT_LOAD_PARAMS).__name__] = {
         "root": root,
+        "output_root": write_root,
         "subjects": ALL if subjects is None else subjects,
         "tasks": ALL if tasks is None else tasks,
         "exceptions": exceptions,
@@ -209,13 +210,8 @@ def write_template_params(root, write_root, subjects=None, tasks=None,
         REREF_NAME: {}
     }
 
-    # set up write_data params
-    user_params["output_data"] = {
-        "root": write_root
-    }
-
     if to_file is not None:
-        path_to_file = os.path.join(to_file, PARAM_FILE_NAME)
+        path_to_file = os.path.join(to_file, CONFIG_FILE_NAME)
         with open(path_to_file, 'w') as file:
             str = json.dumps(user_params, indent=4)
             file.seek(0)

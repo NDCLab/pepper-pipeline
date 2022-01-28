@@ -2,7 +2,7 @@
 docker volume create data
 
 :: bind the volume by running the container with the specified tags
-docker run -it -d --name pepper -w /projects/pepper-pipeline --mount source=data,destination=/projects %1
+docker run -it -d --name pepper -w /projects/pepper-pipeline --mount source=data,destination=/projects pepper_container:szegedi-1.0.0
 
 :: copy all data from local to container
 docker cp ../../scripts pepper:/projects/pepper-pipeline

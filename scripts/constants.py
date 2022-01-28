@@ -52,7 +52,7 @@ DEFAULT_IDENT_PARAMS = identbad("Cz")
 DEFAULT_SEG_PARAMS = segdata(-0.2, 0.5, None, None, None, None, 1, False, None)
 DEFAULT_INTERP_PARAMS = interpdata("accurate")
 
-PARAM_FILE_NAME = "user_params.json"
+CONFIG_FILE_NAME = "input_config.json"
 ICA_NAME = "ica_raw"
 FINAL_NAME = "final_reject_epoch"
 REREF_NAME = "reref_raw"
