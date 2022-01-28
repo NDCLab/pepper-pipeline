@@ -36,11 +36,13 @@ for task in tasks:
     fileList = []
     for root, dirs, files in os.walk(data_path):
         for file in files:
-            if (file.endswith('.fdt') or file.endswith('.fif')) and task in file:
+            if (file.endswith('.set') or file.endswith('.fif')) and task in file:
                 fileList.append(os.path.join(root, file))
     # if filelist is empty, ie no preprocessed data, skip task
     if not fileList:
         continue
+    # print filelist for hpc debugging
+    print(fileList)
     # append to total fileList for sme computation
     total_fileList += fileList
     # init dict for metric storage
