@@ -47,7 +47,7 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
 
     for dt in filelist:
         if dt.endswith('.fdt'):
-            raw = mne.read_raw_eeglab(dt)
+            raw = mne.io.read_raw_eeglab(dt)
         else:
             raw = mne.read_epochs(dt)
 

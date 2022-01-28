@@ -23,7 +23,7 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
 
     for dt in filelist:
         if dt.endswith('.fdt'):
-            raw = mne.read_raw_eeglab(dt)
+            raw = mne.io.read_raw_eeglab(dt)
         else:
             raw = mne.read_epochs(dt)
 
