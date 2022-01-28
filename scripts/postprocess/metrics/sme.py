@@ -46,8 +46,8 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
     result = pd.DataFrame(columns=col_index)
 
     for dt in filelist:
-        if dt.endswith('.fdt'):
-            raw = mne.io.read_raw_eeglab(dt)
+        if dt.endswith('.set'):
+            raw = mne.io.read_epochs_eeglab(dt)
         else:
             raw = mne.read_epochs(dt)
 
