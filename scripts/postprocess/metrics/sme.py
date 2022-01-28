@@ -46,7 +46,10 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
     result = pd.DataFrame(columns=col_index)
 
     for dt in filelist:
-        raw = mne.read_epochs(dt)
+        if dt.endswith('.fdt'):
+            raw = mne.read_raw_eeglab(dt)
+        else:
+            raw = mne.read_epochs(dt)
 
         # find the start and end time points of interest
         start_point = bisect.bisect_left(raw.times, start_t)

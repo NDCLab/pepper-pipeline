@@ -22,7 +22,10 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
     trial_erp = {key: [] for key in conditions}
 
     for dt in filelist:
-        raw = mne.read_epochs(dt)
+        if dt.endswith('.fdt'):
+            raw = mne.read_raw_eeglab(dt)
+        else:
+            raw = mne.read_epochs(dt)
 
         # subset to the time and electrodes specified
         data_cropped = raw.copy().pick_channels(electrode).crop(tmin=start_t, tmax=end_t)

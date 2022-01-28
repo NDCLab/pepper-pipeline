@@ -36,7 +36,7 @@ for task in tasks:
     fileList = []
     for root, dirs, files in os.walk(data_path):
         for file in files:
-            if file.endswith('.fif') and task in file:
+            if (file.endswith('.fdt') or file.endswith('.fif')) and task in file:
                 fileList.append(os.path.join(root, file))
     # if filelist is empty, ie no preprocessed data, skip task
     if not fileList:
