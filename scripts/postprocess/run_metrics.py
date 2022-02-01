@@ -13,7 +13,7 @@ data_path = sys.argv[1]
 
 # tasks = mne_bids.get_entity_vals(data_path, 'task')
 tasks = ["surroundSuppBlock1", "surroundSuppBlock2", "surroundSuppBlock3"]
-conditions = ['4', '8']
+conditions = ['2']
 electrode = ['E75']
 
 # gen csv file name using task
