@@ -22,7 +22,6 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
     trial_erp = {key: [] for key in conditions}
 
     for dt in filelist:
-        print(dt)
         if dt.endswith('.set'):
             raw = mne.io.read_epochs_eeglab(dt)
         else:
