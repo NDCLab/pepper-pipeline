@@ -1,4 +1,3 @@
-import mne_bids
 from metrics.sme import sme
 from metrics.reliability import split_half
 from measures.erp import get_trial_erp
@@ -21,8 +20,8 @@ electrode = ['E75']
 file_name = "metrics.csv"
 
 # hard code split_half column names
-columns = ["task", "condition", "corr_mean", "corr_lower", "corr_upper", "reliab_mean",
-           "reliab_lower", "reliab_upper"]
+columns = ["task", "condition", "corr_mean", "corr_lower", "corr_upper",
+                                "reliab_mean", "reliab_lower", "reliab_upper"]
 
 # metrics file header (could replace with pandas DataFrame)
 with open(file_name, 'w', newline='') as f:
@@ -36,7 +35,7 @@ for task in tasks:
     fileList = []
     for root, dirs, files in os.walk(data_path):
         for file in files:
-            if (file.endswith('.set') or file.endswith('.fif')) and task in file:
+            if file.endswith('.fif') or file.endswith('.set') and task in file:
                 fileList.append(os.path.join(root, file))
     # if filelist is empty, ie no preprocessed data, skip task
     if not fileList:
@@ -51,8 +50,10 @@ for task in tasks:
     # compute splithalf reliability
     # get trial level erp for all participants
     try:
-        erp_by_condition = get_trial_erp(fileList, 0.1, 0.15, conditions, electrode)
-    except KeyError:
+        erp_by_condition = get_trial_erp(fileList, 0.1, 0.15,
+                                         conditions, electrode)
+    except KeyError as msg:
+        print(str(msg))
         continue
 
     sem_output = pd.DataFrame(columns=['subject'] + conditions)
