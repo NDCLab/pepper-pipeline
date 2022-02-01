@@ -17,7 +17,7 @@ conditions = ['2']
 electrode = ['E75']
 
 # gen csv file name using task
-file_name = "metrics.csv"
+file_name = "made_metrics.csv"
 
 # hard code split_half column names
 columns = ["task", "condition", "corr_mean", "corr_lower", "corr_upper",
@@ -91,8 +91,8 @@ for task in tasks:
                 metrics = list(task_data[key].values())
                 writer.writerow(metrics)
 
-sem_output.to_csv(f'sme_new_{task}.csv', index=False)
+sem_output.to_csv(f'made_sme_new_{task}.csv', index=False)
 
 # cal sme
 sme_result = sme(total_fileList, 0.1, 0.15, conditions, electrode)
-sme_result.to_csv('sme.csv', index=False)
+sme_result.to_csv('made_sme.csv', index=False)
