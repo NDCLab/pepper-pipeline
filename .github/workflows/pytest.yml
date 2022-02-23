@@ -17,7 +17,9 @@ jobs:
         run: docker pull ndclab/pepper_container:szegedi-1.0.0
       - name: List available docker images
         run: docker images
-      - name: Run docker container
-        run: docker run --name pepper -w /projects/pepper-pipeline ndclab/pepper_container:szegedi-1.0.0
+      - name: Run docker container in detached mode
+        run: docker run -t -d --name pepper ndclab/pepper_container:szegedi-1.0.0
+      - name: Copy files into docker container
+        run: docker cp scripts pepper:/scripts
       - name: Run pytest in docker 
         run: docker exec pepper conda run -n pipe pytest scripts/tests/
