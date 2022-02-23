@@ -2,6 +2,7 @@ import json
 import os
 import glob
 import mne
+import hashlib
 
 from scripts.constants import \
     PIPE_NAME, \
@@ -19,7 +20,8 @@ from scripts.constants import \
     CONFIG_FILE_NAME, \
     ICA_NAME, \
     FINAL_NAME, \
-    REREF_NAME
+    REREF_NAME, \
+    HASHES_FILE_NAME
 
 
 def write_output_param(dict_array, file, datatype, root):
@@ -65,6 +67,36 @@ def write_output_param(dict_array, file, datatype, root):
         file.seek(0)
         file.write(str)
     return file_name
+
+
+def check_hash(data, config):
+    """Function to check if hash of data exists already, or record if not yet
+    generated.
+
+    Parameters
+    ----------
+    config: dict()
+            dictionary containing pipeline configuration
+    data:   mne.io.Epochs | mne.io.Raw
+            MNE data file
+    """
+    # Generate hash of data and configs
+    SHA256 = hashlib.sha256()
+    SHA256.update(data)
+    SHA256.update(config)
+
+    curr_hash = SHA256.digest()
+
+    # Compare to hidden list of hashes
+    with open(HASHES_FILE_NAME, "w") as hash_file:
+        exis_hash = hash_file.readlines()
+
+        if curr_hash in exis_hash:
+            return True
+        else:
+            hash_file.write(curr_hash)
+
+    return False
 
 
 def is_preprocessed(file, datatype, root, rewrite):
