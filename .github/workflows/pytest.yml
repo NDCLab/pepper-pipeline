@@ -15,7 +15,9 @@ jobs:
     steps:
       - name: Get docker container
         run: docker pull ndclab/pepper_container:szegedi-1.0.0
-      - name: Verify docker containers
+      - name: List available docker images
+        run: docker images
+      - name: Run docker container
         run: docker run --name pepper -w /projects/pepper-pipeline ndclab/pepper_container:szegedi-1.0.0
       - name: Run pytest in docker 
-        run: docker exec ndclab/pepper_container:szegedi-1.0.0 conda run -n pipe pytest scripts/tests/
+        run: docker exec pepper conda run -n pipe pytest scripts/tests/
