@@ -13,6 +13,7 @@ jobs:
   container-test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Get docker container
         run: docker pull ndclab/pepper_container:szegedi-1.0.0
       - name: List available docker images
