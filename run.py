@@ -41,7 +41,7 @@ def preprocess_data(file, load_data, preprocess):
     eeg_obj = mne_bids.read_raw_bids(file)
 
     # if data has been preprocessed already, exit
-    if write.check_hash(file, ch_type, write_path, rewrite):
+    if write.check_hash(eeg_obj, load_data) and rewrite:
         logging.info("File already preprocessed. Skipping write according to 'rewrite'\
                       parameter.")
         return
