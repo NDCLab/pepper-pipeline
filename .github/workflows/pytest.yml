@@ -12,9 +12,10 @@ on:
 jobs:
   container-test:
     runs-on: ubuntu-latest
-    container: ndclab/pepper_container:szegedi-1.0.0
     steps:
-      - name: Clone in data into container
-        run: git clone https://github.com/NDCLab/pepper-pipeline.git && cd pepper-pipeline
-      - name: Run pytest in conda env
-        run: conda run -n pipe pytest scripts/tests/
+      - name: Get docker container
+        run: docker pull ndclab/pepper_container:szegedi-1.0.0
+      - name: Verify docker containers
+        run: docker run --name pepper -w /projects/pepper-pipeline ndclab/pepper_container:szegedi-1.0.0
+      - name: Run pytest in docker 
+        run: docker exec ndclab/pepper_container:szegedi-1.0.0 conda run -n pipe pytest scripts/tests/
