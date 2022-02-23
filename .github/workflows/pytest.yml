@@ -1,4 +1,4 @@
-name: Pytest
+name: Pytest on docker
 on:
   push:
     branches:
@@ -10,10 +10,19 @@ on:
       - dev
 
 jobs:
-  build:
+  container-test:
     runs-on: ubuntu-latest
-    container: ndclab/pepper_container:szegedi-1.0.0
     steps:
-      - name: Activate pipe and run pytest
-        run: conda activate pipe 
-        run: sudo pytest 
+      - uses: actions/checkout@v2
+      - name: Get docker container
+        run: docker pull ndclab/pepper_container:szegedi-1.0.0
+      - name: List available docker images
+        run: docker images
+      - name: Run docker container in detached mode
+        run: docker run -t -d --name pepper ndclab/pepper_container:szegedi-1.0.0
+      - name: Copy scripts into docker container
+        run: docker cp scripts/ pepper:/projects
+      - name: Copy driver script into docker container
+        run: docker cp run.py pepper:/projects
+      - name: Run pytest in docker 
+        run: docker exec pepper conda run -n pipe pytest
