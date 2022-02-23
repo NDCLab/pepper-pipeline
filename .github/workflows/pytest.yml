@@ -23,4 +23,4 @@ jobs:
       - name: Copy files into docker container
         run: docker cp scripts/ pepper:/
       - name: Run pytest in docker 
-        run: docker exec pepper conda run -n pipe pytest scripts/tests/
+        run: docker exec pepper conda run -n pipe pytest
