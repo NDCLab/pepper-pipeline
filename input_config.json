@@ -47,24 +47,24 @@
         "reref_raw": {}
     },
     "subject_level_postprocess": {
-        "measures": {
-            "erp": {
-                "tmin": 100, 
-                "tmax": 150, 
-                "channel": "Pz",
-                "events": ["4", "8"]
-            },
-        "metrics": ["sme", "split_half", "mean"]
+        "erp": {
+            "tmin": 100, 
+            "tmax": 150, 
+            "channel": "Pz",
+            "events": ["4", "8"],
+            "metrics": ["reliability"]
+        },
+        "power": {
+            "freq": 100,
+            "bands": [],
+            "metrics": ["reliability"]
         }
     }, 
     "study_level_postprocess": {
-        "measures": {
-            "erp": {
-                "tmin": 100, 
-                "tmax": 150, 
-                "channel": "Pz"
-            },
-        "metrics": ["sme", "split_half", "mean"]
+        "erp": {
+            "channel": "Pz",
+            "events": ["4"],
+            "metrics": ["reliability"]
         }
     }
 }
