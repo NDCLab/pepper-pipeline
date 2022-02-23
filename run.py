@@ -22,7 +22,8 @@ def clean_outputs(output_dict):
 
 
 def check_hash(data, config):
-    """Function to check if hash of data exists already, or record if not yet generated.
+    """Function to check if hash of data exists already, or record if not yet
+    generated.
 
     Parameters
     ----------
