@@ -6,18 +6,48 @@ from collections import ChainMap
 from itertools import repeat
 
 import logging
+import hashlib
 from multiprocessing import Pool
-
 import sys
 from scripts.constants import \
     ERROR_KEY, \
     DEFAULT_LOAD_PARAMS, \
-    CONFIG_FILE_NAME
+    CONFIG_FILE_NAME, \
+    HASHES_FILE_NAME
 
 
 def clean_outputs(output_dict):
     output_dict = [result for result in output_dict if result is not None]
     return output_dict
+
+
+def check_hash(data, config):
+    """Function to check if hash of data exists already, or record if not yet generated.
+
+    Parameters
+    ----------
+    config: dict()
+            dictionary containing pipeline configuration
+    data:   mne.io.Epochs | mne.io.Raw
+            MNE data file
+    """
+    # Generate hash of data and configs
+    SHA256 = hashlib.sha256()
+    SHA256.update(data)
+    SHA256.update(config)
+
+    curr_hash = SHA256.digest()
+
+    # Compare to hidden list of hashes
+    with open(HASHES_FILE_NAME, "w") as hash_file:
+        exis_hash = hash_file.readlines()
+
+        if curr_hash in exis_hash:
+            return True
+        else:
+            hash_file.write(curr_hash)
+
+    return False
 
 
 def preprocess_data(file, load_data, preprocess):
@@ -105,6 +135,14 @@ def run_preprocess(load_data, preprocess):
                        zip(data, repeat(load_data), repeat(preprocess)))
 
 
+def sub_postprocess_data(postprocess):
+    return postprocess
+
+
+def stud_postprocess_data(postprocess):
+    return postprocess
+
+
 if __name__ == "__main__":
     # load all parameters
     input_configs = load.load_params(CONFIG_FILE_NAME)
@@ -112,6 +150,14 @@ if __name__ == "__main__":
     # get data and metadata sections
     load_params = input_configs["load_data"]
     preprocess_params = input_configs["preprocess"]
+    subpost_params = input_configs["subject_level_postprocess"]
+    studypost_params = input_configs["study_level_postprocess"]
 
     # Execute pipeline steps specified in preprocess
     run_preprocess(load_params, preprocess_params)
+
+    # Execute subject level postprocessing
+    sub_postprocess_data(subpost_params)
+
+    # Execute study level postprocessing
+    stud_postprocess_data(studypost_params)

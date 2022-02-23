@@ -43,6 +43,9 @@ identbad = namedtuple('identify_badchans_raw', 'ref_elec_name')
 segdata = namedtuple('segment_data', 'tmin tmax baseline picks reject_tmin \
                       reject_tmax decim verbose preload')
 interpdata = namedtuple('interpolate_data', 'mode')
+ICA_NAME = "ica_raw"
+FINAL_NAME = "final_reject_epoch"
+REREF_NAME = "reref_raw"
 
 DEFAULT_LOAD_PARAMS = loaddata("eeg", False, True, 1)
 DEFAULT_REF_PARAMS = setref("Cz")
@@ -52,7 +55,6 @@ DEFAULT_IDENT_PARAMS = identbad("Cz")
 DEFAULT_SEG_PARAMS = segdata(-0.2, 0.5, None, None, None, None, 1, False, None)
 DEFAULT_INTERP_PARAMS = interpdata("accurate")
 
+# File constants
 CONFIG_FILE_NAME = "input_config.json"
-ICA_NAME = "ica_raw"
-FINAL_NAME = "final_reject_epoch"
-REREF_NAME = "reref_raw"
+HASHES_FILE_NAME = "scripts/.hashes"
