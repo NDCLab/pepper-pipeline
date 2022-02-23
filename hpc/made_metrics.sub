@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+#SBATCH --nodes=1                # node count
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --time=00:24:00          # total run time limit (HH:MM:SS)
+
+# load singularity module
+module load singularity-3.5.3
+
+# use singularity image to run all tests
+singularity exec --bind /home/data/NDClab/datasets/cmi-dataset /home/data/NDClab/tools/pepper-pipeline/containers/singularity/container.simg python3 scripts/postprocess/ru$
+
+

@@ -46,7 +46,10 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
     result = pd.DataFrame(columns=col_index)
 
     for dt in filelist:
-        raw = mne.read_epochs(dt)
+        if dt.endswith('.set'):
+            raw = mne.io.read_epochs_eeglab(dt)
+        else:
+            raw = mne.read_epochs(dt)
 
         # find the start and end time points of interest
         start_point = bisect.bisect_left(raw.times, start_t)
@@ -80,6 +83,6 @@ def sme(filelist, start_t, end_t, cond, pick_elec):
 
         # append sem_arr to new row, account for None
         sem_ser = pd.Series(sem_arr, index=result.columns[:len(sem_arr)])
-        result.append(sem_ser, ignore_index=True)
+        result = result.append(sem_ser, ignore_index=True)
 
     return result

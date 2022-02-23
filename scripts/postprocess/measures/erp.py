@@ -1,9 +1,7 @@
-import numpy as np
 import mne
-import bisect
 
 
-def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
+def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
     """get trial level erp
     Parameters
     ----------
@@ -13,43 +11,27 @@ def get_trial_erp(filelist, start_t, end_t, cond1, cond2=None):
              start time point of interest (in second), e,g., 0, 0.1
     end_t: float
              end time point of interest (in second), e,g., 0.1, 0.2
-    cond1: string
-           name of the first event of interest
-    cond2: string
-           name of the second event of interest
+    conditions: a list of strings
+           name of the events of interest
+    pick_elec: a list of strings
+           names of the electrode of interest
     Returns
     ----------
-    dataList: a list of numpy arrays
+    trial_erp: a dictionary with a key per requested condition, each containing a list of numpy arrays
     """
-    datalist1 = []
-    datalist2 = []
+    trial_erp = {key: [] for key in conditions}
 
     for dt in filelist:
-        raw = mne.read_epochs(dt)
+        if dt.endswith('.set'):
+            raw = mne.io.read_epochs_eeglab(dt)
+        else:
+            raw = mne.read_epochs(dt)
 
-        # find the start and end time points of interest
-        start_point = bisect.bisect_left(raw.times, start_t)
-        end_point = bisect.bisect_left(raw.times, end_t)
+        # subset to the time and electrodes specified
+        data_cropped = raw.copy().pick_channels(electrode).crop(tmin=start_t, tmax=end_t)
 
-        # get erp data for condition 1
-        epoch_con1 = raw[cond1]
-        epoch_con1_arr = epoch_con1.get_data()
-        # return a array of shape (n_epochs, n_channels, n_times)
-        # cut the data to the time of interest
-        epoch_con1_arr_int = epoch_con1_arr[:, :, start_point:end_point]
+        # for each condition, get the average across the time window indicated
+        for c in conditions:
+            trial_erp[c].append(data_cropped[c].get_data().mean(axis=(1, 2)))
 
-        # compute trial level erp
-        datalist1.append(np.mean(epoch_con1_arr_int, axis=(1, 2)))
-
-        # get erp data for condition 2
-        if cond2 is not None:
-            epoch_con2 = raw[cond2]
-            epoch_con2_arr = epoch_con2.get_data()
-            # return a array of shape (n_epochs, n_channels, n_times)
-            # cut the data to the time of interest
-            epoch_con2_arr_int = epoch_con2_arr[:, :, start_point:end_point]
-
-            # compute trial level erp
-            datalist2.append(np.mean(epoch_con2_arr_int, axis=(1, 2)))
-
-    return datalist1, datalist2
+    return trial_erp
