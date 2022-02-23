@@ -20,6 +20,6 @@ jobs:
       - name: Run docker container in detached mode
         run: docker run -t -d --name pepper ndclab/pepper_container:szegedi-1.0.0
       - name: Copy files into docker container
-        run: docker cp scripts pepper:/scripts
+        run: docker cp scripts/ pepper:/
       - name: Run pytest in docker 
         run: docker exec pepper conda run -n pipe pytest scripts/tests/
