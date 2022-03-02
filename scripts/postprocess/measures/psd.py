@@ -80,8 +80,12 @@ def get_trial_psd(filelist, start_freq, end_freq, bands, tmin=None, tmax=None, p
         for k in bands:
             start_idx = bisect.bisect_left(freqs_mean, bands[k][0])
             end_idx = bisect.bisect_left(freqs_mean, bands[k][1])
+            
+            # make sure to include both boundaries, since the end_idex will not be included in python
+            if bands[k][1] == freqs_mean[end_idx]:
+                end_idx = end_idx + 1
 
-            # will not overlap, since the end_idex will not be included in python
+            # the end_idex will not be included in python
             band_list.append(psds_welch_mean_db_avg[start_idx:end_idx].mean())
 
             trial_psd[k].append(psds_welch_mean_db[:, :, start_idx:end_idx].mean(axis=(1, 2)))
