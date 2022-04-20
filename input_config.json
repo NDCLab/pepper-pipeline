@@ -1,0 +1,69 @@
+{
+    "load_data": {
+        "root": "CMI/rawdata",
+        "output_root": "CMI",
+        "subjects": ["*"],
+        "tasks": ["*"],
+        "exceptions": {
+            "subjects": "",
+            "tasks": "",
+            "runs": ""
+        },
+        "channel_type": "eeg",
+        "exit_on_error": false,
+        "parallel_runs": 1
+    },
+    "preprocess": {
+        "set_reference": {
+            "ref_channels": "Cz"
+        },
+        "set_montage": {
+            "montage": "GSN-HydroCel-129"
+        },
+        "filter_data": {
+            "l_freq": 0.3,
+            "h_freq": 40
+        },
+        "identify_badchans_raw": {
+            "ref_elec_name": "Cz"
+        },
+        "ica_raw": {},
+        "segment_data": {
+            "tmin": -0.2,
+            "tmax": 0.5,
+            "baseline": null,
+            "picks": null,
+            "reject_tmin": null,
+            "reject_tmax": null,
+            "decim": 1,
+            "verbose": false,
+            "preload": null
+        },
+        "final_reject_epoch": {},
+        "interpolate_data": {
+            "mode": "accurate"
+        },
+        "reref_raw": {}
+    },
+    "subject_level_postprocess": {
+        "erp": {
+            "tmin": 100, 
+            "tmax": 150, 
+            "channel": "Pz",
+            "events": ["4", "8"],
+            "metrics": ["reliability"]
+        },
+        "power": {
+            "freq": 100,
+            "bands": [],
+            "metrics": ["reliability"]
+        }
+    }, 
+    "study_level_postprocess": {
+        "erp": {
+            "channel": "Pz",
+            "events": ["4"],
+            "metrics": ["reliability"]
+        }
+    }
+}
