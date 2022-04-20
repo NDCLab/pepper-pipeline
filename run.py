@@ -1,6 +1,10 @@
 from scripts.data import load, write
 from scripts.preprocess import preprocess as pre
 
+from scripts.postprocess.metrics import sme
+from scripts.postprocess.metrics import reliability
+from scripts.postprocess.measures import erp
+
 from collections import ChainMap
 import mne_bids
 
@@ -79,6 +83,14 @@ def run_pipeline(preprocess, load_data, write_data):
         outputs.reverse()
         output = dict(ChainMap(*outputs))
         write.write_output_param(output, file, ch_type, path, rewrite)
+
+
+def sub_postprocess_data(postprocess):
+    return postprocess
+
+
+def stud_postprocess_data(postprocess):
+    return postprocess
 
 
 if __name__ == "__main__":
