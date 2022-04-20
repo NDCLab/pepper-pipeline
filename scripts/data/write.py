@@ -2,7 +2,9 @@ import json
 import os
 import glob
 import mne
+
 import hashlib
+import pickle 
 
 from scripts.constants import \
     PIPE_NAME, \
@@ -69,7 +71,7 @@ def write_output_param(dict_array, file, datatype, root):
     return file_name
 
 
-def check_hash(data, config):
+def hash_exists(data, config, clear=False):
     """Function to check if hash of data exists already, or record if not yet
     generated.
 
@@ -80,21 +82,25 @@ def check_hash(data, config):
     data:   mne.io.Epochs | mne.io.Raw
             MNE data file
     """
-    # Generate hash of data and configs
+    # Generate hash of data and byte configs
     SHA256 = hashlib.sha256()
-    SHA256.update(data)
-    SHA256.update(config)
+    SHA256.update(pickle.dumps(data))
+    SHA256.update(pickle.dumps(config))
 
-    curr_hash = SHA256.digest()
+    curr_hash = SHA256.digest().decode('ISO-8859-1')
 
     # Compare to hidden list of hashes
-    with open(HASHES_FILE_NAME, "w") as hash_file:
-        exis_hash = hash_file.readlines()
-        if curr_hash in exis_hash:
+    with open(HASHES_FILE_NAME, "r+", encoding='ISO-8859-1') as hash_file:
+        # clear hashfile if specified
+        if clear:
+            hash_file.truncate(0)
+            hash_file.write(curr_hash)
+            return False
+        exit_hash = hash_file.readlines()
+        if curr_hash in exit_hash:
             return True
         else:
             hash_file.write(curr_hash)
-
     return False
 
 

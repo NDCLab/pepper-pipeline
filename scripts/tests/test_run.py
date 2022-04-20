@@ -3,7 +3,7 @@ import os
 import mne
 
 from run import run_preprocess
-from scripts.constants import INTERM, FINAL
+from scripts.constants import INTERM, FINAL, HASHES_FILE_NAME
 
 
 @pytest.fixture
@@ -45,21 +45,11 @@ def test_default_pipeline(default_params, tmp_path):
             # if at final dir, assert final obj written
             assert len(filenames) == 1
 
-    # Assert immutability of user_params
-    load_new = default_params["load_data"]
-    preprocess_new = default_params["preprocess"]
-
-    assert load_params == load_new
-    assert preprocess_new == preprocess_params
-
 
 def test_non_overwrite_pipeline(default_params, tmp_path):
     # get the default params
     load_params = default_params["load_data"]
     preprocess_params = default_params["preprocess"]
-
-    # set overwrite to be false
-    default_params["preprocess"]["overwrite"] = False
 
     # run pipeline twice
     for i in range(2):
@@ -74,9 +64,6 @@ def test_non_overwrite_pipeline(default_params, tmp_path):
             # if at final dir, assert final obj written
             assert len(filenames) == 1
 
-    # Assert immutability of user_params
-    load_new = default_params["load_data"]
-    preprocess_new = default_params["preprocess"]
-
-    assert preprocess_new == preprocess_params
-    assert load_params == load_new
+    # clean up hash file
+    with open(HASHES_FILE_NAME, "r+") as hash_file:
+        hash_file.truncate(0)
