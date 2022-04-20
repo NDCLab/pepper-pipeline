@@ -1,6 +1,8 @@
 import mne_bids
 from scripts.data import load, write
 from scripts import preprocess as pre
+from scripts.postprocess.metrics import sme, reliability
+from scripts.postprocess.measures import erp, psd
 
 from collections import ChainMap
 from itertools import repeat
@@ -98,8 +100,70 @@ def run_preprocess(load_data, preprocess):
                        zip(data, repeat(load_data), repeat(preprocess)))
 
 
-def sub_postprocess_data(postprocess):
-    return postprocess
+def sub_postprocess_data(postprocess, write_path):
+    for root, dirs, files in os.walk(data_path):
+        for file in files:
+            if file.endswith('.fif') or file.endswith('.set') and task in file:
+                fileList.append(os.path.join(root, file))
+    # if filelist is empty, ie no preprocessed data, skip task
+    if not fileList:
+        continue
+    # print filelist for hpc debugging
+    print(fileList)
+    # append to total fileList for sme computation
+    total_fileList += fileList
+    # init dict for metric storage
+    metric_data = {key: None for key in columns}
+
+    # compute splithalf reliability
+    # get trial level erp for all participants
+    try:
+        erp_by_condition = get_trial_erp(fileList, 0.1, 0.15,
+                                         conditions, electrode)
+    except KeyError as msg:
+        print(str(msg))
+        continue
+
+    sem_output = pd.DataFrame(columns=['subject'] + conditions)
+    sem_output['subject'] = [Path(filename).stem for filename in fileList]
+
+    # call Dan's splithalf
+    for c in conditions:
+        condition_data = erp_by_condition[c]
+        sem_output[c] = [scipy.stats.sem(values) for values in condition_data]
+
+        try:
+            split = split_half(condition_data, None)
+            # store data into dict
+            metric_data["corr_mean"] = split.correlation.mean
+            metric_data["corr_lower"] = split.correlation.lower
+            metric_data["corr_upper"] = split.correlation.upper
+
+            metric_data["reliab_mean"] = split.reliability.mean
+            metric_data["reliab_lower"] = split.reliability.lower
+            metric_data["reliab_upper"] = split.reliability.upper
+        except Exception as e:
+            for key in metric_data:
+                if key != "task":
+                    metric_data[key] = str(e)
+                    print(metric_data)
+        metric_data["task"] = task
+        metric_data["condition"] = c
+
+        task_data[task] = metric_data
+
+        # append data
+        with open(file_name, 'a', newline='') as f:
+            writer = csv.writer(f)
+            for key in task_data:
+                metrics = list(task_data[key].values())
+                writer.writerow(metrics)
+
+    sem_output.to_csv(f'made_sme_new_{task}.csv', index=False)
+
+    # cal sme
+    sme_result = sme(total_fileList, 0.1, 0.15, conditions, electrode)
+    sme_result.to_csv('made_sme.csv', index=False)
 
 
 def stud_postprocess_data(postprocess):
