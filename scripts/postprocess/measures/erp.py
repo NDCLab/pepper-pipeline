@@ -17,7 +17,8 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
            names of the electrode of interest
     Returns
     ----------
-    trial_erp: a dictionary with a key per requested condition, each containing a list of numpy arrays
+    trial_erp: a dictionary with a key per requested condition, each
+    containing a list of numpy arrays
     """
     trial_erp = {key: [] for key in conditions}
 
@@ -28,7 +29,8 @@ def get_trial_erp(filelist, start_t, end_t, conditions, electrode):
             raw = mne.read_epochs(dt)
 
         # subset to the time and electrodes specified
-        data_cropped = raw.copy().pick_channels(electrode).crop(tmin=start_t, tmax=end_t)
+        data_cropped = raw.copy().pick_channels(electrode).\
+            crop(tmin=start_t, tmax=end_t)
 
         # for each condition, get the average across the time window indicated
         for c in conditions:
