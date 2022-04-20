@@ -90,7 +90,6 @@ def check_hash(data, config):
     # Compare to hidden list of hashes
     with open(HASHES_FILE_NAME, "w") as hash_file:
         exis_hash = hash_file.readlines()
-
         if curr_hash in exis_hash:
             return True
         else:

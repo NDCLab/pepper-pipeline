@@ -35,13 +35,13 @@ def preprocess_data(file, load_data, preprocess):
     write_path = load_data["output_root"]
     ch_type = load_data["channel_type"]
     exit_on_error = load_data["exit_on_error"]
-    rewrite = load_data["overwrite"]
+    overwrite = load_data["overwrite"]
 
     # load raw data from file
     eeg_obj = mne_bids.read_raw_bids(file)
 
     # if data has been preprocessed already, exit
-    if write.check_hash(eeg_obj, load_data) and rewrite:
+    if write.check_hash(eeg_obj, load_data) and overwrite:
         logging.info("File already preprocessed. Skipping write according to 'rewrite'\
                       parameter.")
         return
@@ -104,14 +104,6 @@ def run_preprocess(load_data, preprocess):
                        zip(data, repeat(load_data), repeat(preprocess)))
 
 
-def sub_postprocess_data(postprocess):
-    return postprocess
-
-
-def stud_postprocess_data(postprocess):
-    return postprocess
-
-
 if __name__ == "__main__":
     # load all parameters
     input_configs = load.load_params(CONFIG_FILE_NAME)
@@ -124,9 +116,3 @@ if __name__ == "__main__":
 
     # Execute pipeline steps specified in preprocess
     run_preprocess(load_params, preprocess_params)
-
-    # Execute subject level postprocessing
-    sub_postprocess_data(subpost_params)
-
-    # Execute study level postprocessing
-    stud_postprocess_data(studypost_params)
