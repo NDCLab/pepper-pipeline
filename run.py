@@ -35,16 +35,10 @@ def preprocess_data(file, load_data, preprocess):
     write_path = load_data["output_root"]
     ch_type = load_data["channel_type"]
     exit_on_error = load_data["exit_on_error"]
-    overwrite = load_data["overwrite"]
 
     # load raw data from file
     eeg_obj = mne_bids.read_raw_bids(file)
 
-    # if data has been preprocessed already, exit
-    if write.hash_exists(eeg_obj, load_data): 
-        print("File already preprocessed. Skipping write according to 'rewrite'\
-                      parameter.")
-        return
     # initialize output list
     outputs = [None] * len(preprocess)
 
