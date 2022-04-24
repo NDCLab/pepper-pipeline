@@ -60,8 +60,6 @@ for task in tasks:
                                                                                                                 'corr_upper', 'reliab_mean',
                                                                                                                 'reliab_lower', 'reliab_upper']))
 
-
-
         except Exception as e:
             print(str(e))
 
