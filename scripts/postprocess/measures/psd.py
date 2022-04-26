@@ -6,13 +6,15 @@ import pandas as pd
 from mne.time_frequency import psd_welch
 
 
-def get_trial_psd(filelist, start_freq, end_freq, bands, tmin=None, tmax=None, pick_elec=None, n_fft=256,
+def get_trial_psd(filelist, conditions, start_freq, end_freq, bands, tmin=None, tmax=None, pick_elec=None, n_fft=256,
                   n_per_seg=None, average="mean"):
     """get power for given bands for each subject by using Welch’s method
     Parameters
     ----------
     filelist: list
               a list of file path in .fif format
+    conditions: a list of strings
+           name of the events of interest
     start_freq: float
                 min frequency of interest
     end_freq: float
@@ -45,13 +47,10 @@ def get_trial_psd(filelist, start_freq, end_freq, bands, tmin=None, tmax=None, p
             col3 - psd values for band2
     """
     # save trial level data to feed downstream analysis
-    trial_psd = {key: [] for key in bands}
+    trial_psd = {f'{key1}_{key2}': [] for key2 in bands for key1 in conditions}
 
     # save subject psd for output
-    col_name = [key for key in bands]
-    # create a dataframe to save the result
-    col_name.insert(0, 'subject')
-    result = pd.DataFrame(columns=col_name)
+    result = pd.DataFrame(None, columns=['subject'] + [key for key in trial_psd])
 
     # if average is "none" -- the unaggregated segments will be returned. Then "mean" will be used.
     if average is None:
@@ -63,32 +62,36 @@ def get_trial_psd(filelist, start_freq, end_freq, bands, tmin=None, tmax=None, p
         else:
             raw = mne.read_epochs(dt)
 
-        kwargs = dict(fmin=start_freq, fmax=end_freq,
-                      tmin=tmin, tmax=tmax,
-                      n_jobs=1, picks=pick_elec,
-                      n_fft=n_fft, n_per_seg=n_per_seg)
-        psds_welch_mean, freqs_mean = psd_welch(raw, average=average, **kwargs)
-
-        # Convert power to dB scale and average across epochs and channels
-        psds_welch_mean_db = 10 * np.log10(psds_welch_mean)
-
-        # average across subjects and electrodes for computing result
-        psds_welch_mean_db_avg = psds_welch_mean_db.mean(axis=(0, 1))
-
+        # store psd measure
         band_list = []
-        # loop through given freq bands
-        for k in bands:
-            start_idx = bisect.bisect_left(freqs_mean, bands[k][0])
-            end_idx = bisect.bisect_left(freqs_mean, bands[k][1])
+        for c in conditions:
+            kwargs = dict(fmin=start_freq, fmax=end_freq,
+                          tmin=tmin, tmax=tmax,
+                          n_jobs=1, picks=pick_elec,
+                          n_fft=n_fft, n_per_seg=n_per_seg)
 
-            # make sure to include both boundaries, since the end_idex will not be included in python
-            if bands[k][1] == freqs_mean[end_idx]:
-                end_idx = end_idx + 1
+            # psds_welch_mean = epochs * electrodes * freq bins
+            psds_welch_mean, freqs_mean = psd_welch(raw[c], average=average, **kwargs)
 
-            # the end_idex will not be included in python
-            band_list.append(psds_welch_mean_db_avg[start_idx:end_idx].mean())
+            # Convert power to dB scale and average across epochs and channels
+            psds_welch_mean_db = 10 * np.log10(1 + psds_welch_mean)
 
-            trial_psd[k].append(psds_welch_mean_db[:, :, start_idx:end_idx].mean(axis=(1, 2)))
+            # average across electrodes -- generate data epochs*freq bin
+            psds_welch_mean_db_avg = psds_welch_mean_db.mean(axis=(0, 1))
+
+            # loop through given freq bands
+            for k in bands:
+                start_idx = bisect.bisect_left(freqs_mean, bands[k][0])
+                end_idx = bisect.bisect_left(freqs_mean, bands[k][1])
+
+                # make sure to include both boundaries, since the end_idex will not be included in python
+                if bands[k][1] == freqs_mean[end_idx]:
+                    end_idx = end_idx + 1
+
+                # the end_idex will not be included in python
+                band_list.append(psds_welch_mean_db_avg[start_idx:end_idx].mean())
+
+                trial_psd[f'{c}_{k}'].append(psds_welch_mean_db[:, :, start_idx:end_idx].mean(axis=(1, 2)))
 
         # get subject name (file name) to organize the output data into a dataframe(result)
         file_name = os.path.basename(dt)
